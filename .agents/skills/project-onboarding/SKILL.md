@@ -1,0 +1,54 @@
+---
+name: project-onboarding
+description: Onboard an AI agent to an existing software repository by inspecting its instructions, stack, architecture, conventions, developer workflow, tests, risks, and documentation gaps, then creating or refreshing concise project knowledge. Use when Axiom is first introduced to a repository or when a major codebase change makes project knowledge unreliable.
+---
+
+# Project Onboarding
+
+## Purpose
+
+Establish a trustworthy project context so future engineering tasks do not repeatedly rediscover the same information.
+
+## Inputs and preconditions
+
+- Accessible repository root.
+- Existing repository/agent instructions.
+- User context, if supplied.
+- Permission to create or update project documentation.
+
+## Procedure
+
+1. Read the onboarding workflow at `workflows/codebase-onboarding/WORKFLOW.md`.
+2. Inspect root and relevant nested instructions, manifests, lockfiles, CI, source structure, tests, infrastructure, and documentation.
+3. Use the `codebase-exploration` skill to map the system and gather evidence.
+4. Detect stack and versions from manifests and lockfiles. Distinguish declared versions from observed runtime versions.
+5. Trace architecture, entry points, core modules, data flows, external services, and persistence.
+6. Identify development setup, commands, test layers, build and release process using scripts and CI evidence.
+7. Capture conventions and representative patterns. Avoid imposing generic conventions that conflict with the repository.
+8. Record risks, unknowns, operational constraints, and security-sensitive areas.
+9. Create or selectively update the project knowledge files using templates:
+   - `.axiom/project/overview.md`
+   - `.axiom/project/tech-stack.md`
+   - `.axiom/project/architecture.md`
+   - `.axiom/project/conventions.md`
+   - `.axiom/project/development-guide.md`
+   - `.axiom/project/glossary.md`
+10. Validate links, commands, paths, and claims where practical. Mark unverified statements clearly.
+11. Record onboarding state and evidence in `.axiom/workflows/` or a concise report.
+
+## Outputs
+
+A repository map and a concise, evidence-backed project knowledge set. Keep detail proportional to repository complexity.
+
+## Quality gates
+
+- Root/nested instructions inspected.
+- Stack claims supported by manifests/lockfiles.
+- Architecture claims supported by source structure and traced code.
+- Test/development commands supported by manifests or CI.
+- Unknowns and verification limits disclosed.
+- No secrets copied into project documentation.
+
+## Failure handling
+
+Preserve existing user-authored documentation. If existing documentation conflicts with code, record drift and propose correction instead of silently overwriting. If the repository is too large for exhaustive exploration, scope the analysis and list unexamined areas.
