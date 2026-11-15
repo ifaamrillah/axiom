@@ -69,6 +69,8 @@ Axiom is currently distributed as repository content and Markdown instructions. 
 
 The current M0–M7 implementation scope and evidence limits are summarized in the [roadmap](docs/IMPLEMENTATION-ROADMAP.md). Maintainers can run the structural validator with `python3 scripts/validate_repository.py`; it does not run model evaluations or host compatibility tests.
 
+See the dated [11-project benchmark](docs/research/benchmark-2026-11.md) for the feature comparison, adoption decisions, and license notes that informed the current improvements.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). Contributions should preserve portability, evidence-based execution, and minimal context overhead.

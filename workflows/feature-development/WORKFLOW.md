@@ -88,7 +88,7 @@ Adapt stages to complexity and risk. Record a workflow instance under `.axiom/wo
 - **Required:** Yes.
 - **Dependencies:** stage 6, or stage 5 for a small sequential change.
 - **Outputs:** source changes and tests.
-- **Exit criteria:** implementation meets task acceptance criteria and relevant focused checks run.
+- **Exit criteria:** implementation changes are ready for focused verification; each acceptance criterion is tracked as addressed or still open. Implementation completion alone does not mean the feature is complete.
 
 ### 8. Verification and QA
 
@@ -96,7 +96,7 @@ Adapt stages to complexity and risk. Record a workflow instance under `.axiom/wo
 - **Required:** Yes.
 - **Dependencies:** stage 7.
 - **Outputs:** test report and evidence.
-- **Exit criteria:** required checks pass or a blocker/waiver is explicitly recorded; regressions are addressed.
+- **Exit criteria:** required checks pass or a blocker/waiver is explicitly recorded; regressions are addressed. Compare observed behavior with every acceptance criterion, then return to implementation for any unmet criterion and repeat focused verification. Stop when all criteria are evidenced or a blocker/authorized waiver is recorded.
 
 ### 9. Security review
 
@@ -139,6 +139,7 @@ After planning, independent tasks may run in parallel only with disjoint write s
 ## Quality gates
 
 - Requirements and acceptance criteria are clear.
+- Every acceptance criterion has a verification result; implementation and focused verification repeat until criteria pass or are explicitly blocked/waived.
 - Relevant tests and build checks have evidence.
 - Review findings are resolved or disclosed.
 - Risk-based security checks are complete.
