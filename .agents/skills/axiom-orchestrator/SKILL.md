@@ -57,3 +57,6 @@ Read only when needed:
 - `core/policies/`
 - `workflows/README.md`
 - Relevant workflow definition and skill.
+- [Routing guidance](references/routing.md)
+- [Execution and completion](references/execution.md)
+- [Delegation](references/delegation.md)
