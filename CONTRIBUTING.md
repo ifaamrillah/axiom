@@ -21,7 +21,9 @@ Thank you for helping improve Axiom.
 
 ## Skills
 
-A skill must follow the standard Agent Skills structure. Its `SKILL.md` frontmatter must contain `name` and `description`. Names must match the containing directory and use lowercase kebab-case. Keep core instructions concise; move optional detail into `references/`.
+A skill must follow the standard Agent Skills structure. Its `SKILL.md` frontmatter must contain `name` and `description`, and the description must include a "Use when …" trigger clause. Names must match the containing directory and use lowercase kebab-case. Keep `SKILL.md` under 250 lines and move optional detail into `references/`, linked from `SKILL.md`.
+
+Write skills test-first with the [skill-factory](.agents/skills/skill-factory/SKILL.md) skill: add [eval cases](evaluations/cases/README.md) in `evaluations/cases/<skill>.md`, record a baseline run, then write the skill and record the post-change run in `evaluations/results/`.
 
 ## Workflows
 
@@ -31,4 +33,4 @@ Workflow definitions use Markdown. Each stage must identify its purpose, skill o
 
 Describe the problem, approach, affected skills/workflows/platforms, validation performed, and known limitations. Do not claim platform compatibility without testing or clearly label it as unverified.
 
-Run `python3 scripts/validate_repository.py` before submitting when Python 3 is available. This checks repository structure and Markdown links; it does not exercise agent behavior. Evaluation fixtures are scenarios for human or model runs, not test results. Keep platform guidance dated and link official references when capability details may change.
+Run `python3 scripts/validate_repository.py`, `python3 scripts/run_evals.py --check`, and `python3 -m unittest discover -s scripts/tests` before submitting when Python 3 is available. These check repository structure, links, JSON, and eval-case structure. They do not exercise agent behavior. Behavior evidence comes only from recorded runs (`scripts/run_evals.py --host …`), which spend model quota and are run by maintainers. Unrun fixtures are scenarios, not test results. Keep platform guidance dated and link official references when capability details may change.

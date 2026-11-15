@@ -1,0 +1,15 @@
+{
+  "name": "axiom",
+  "description": "Axiom skills-first engineering harness for Claude Code.",
+  "owner": {
+    "name": "Axiom contributors"
+  },
+  "plugins": [
+    {
+      "name": "axiom",
+      "source": "./",
+      "description": "Canonical Axiom skills from .agents/skills/ plus an optional read-only session-start kernel hook.",
+      "category": "development"
+    }
+  ]
+}

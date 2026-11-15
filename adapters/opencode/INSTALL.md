@@ -10,6 +10,12 @@ OpenCode's own `.opencode/skills/` path has higher precedence. Avoid duplicate I
 
 OpenCode documents user-level directories and explicit `skills` configuration. Use those host mechanisms when desired; no Axiom-specific configuration is required for the project path.
 
+## Bootstrap and role mapping
+
+Paste the [Axiom block](../../templates/project/agents-md-block.md) into the project's `AGENTS.md` so that the kernel and skill routing are always loaded. Map role metadata from `agents/roles/` to the host's agent or model settings where it supports them: `capability` (deep, standard, fast) selects the model tier, and `writes: false` means a read-only agent. Where the host has no such controls, follow the role cards as instructions.
+
+Optional installer: `npx skills add ifaamrillah/axiom -a opencode` (see the [adapter overview](../README.md)).
+
 ## Verify
 
 Use the host's skill listing/invocation and confirm `axiom-orchestrator` loads. Then check relative references from the skill directory. Live Axiom session testing remains outstanding.

@@ -1,6 +1,6 @@
 ---
 name: codebase-onboarding
-description: Compatibility alias for the canonical project-onboarding skill. Use project-onboarding to discover a repository and create evidence-based project knowledge.
+description: Compatibility alias for the canonical project-onboarding skill. Use when an older reference names codebase-onboarding; follow project-onboarding to discover a repository and create evidence-based project knowledge.
 ---
 
 # Codebase Onboarding Compatibility Alias

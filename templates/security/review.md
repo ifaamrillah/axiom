@@ -1,16 +1,31 @@
 # Security Review: <scope>
 
 - **Date / reviewer:**
-- **Scope and depth:**
-- **Environment:**
+- **Mode / profile:** guidance | full audit (quick / standard / deep)
+- **Source ref:** <commit> (dirty: yes/no)
+- **Scope and exclusions:**
+- **Execution:** static only | sandboxed local checks (limits: …)
+- **Status:** complete | incomplete (<reason>)
 
-## Assets and trust boundaries
+## Assets, principals, and trust boundaries
 
-## Findings
+## Confirmed findings
 
-| Severity | Evidence | Impact | Recommendation |
-|---|---|---|---|
+| Fingerprint | Severity | Boundary crossed | Evidence | Fix |
+|---|---|---|---|---|
 
-## Areas not reviewed
+## Needs validation (no severity)
 
-## Limitations and follow-up
+| Fingerprint | Missing fact | Safe owner check |
+|---|---|---|
+
+## Rejected concerns
+
+| Concern | Refuting control (file:line) |
+|---|---|
+
+## Hardening notes (not findings)
+
+## Coverage statement
+
+Units covered, deferred, blocked, and out of scope; prior runs used; what this review does not establish.

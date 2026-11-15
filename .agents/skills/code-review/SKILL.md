@@ -1,22 +1,86 @@
 ---
 name: code-review
-description: Independently review a proposed code change for correctness, regressions, security, maintainability, performance, compatibility, and missing tests. Use before integrating substantial changes or completing a workflow.
+description: Independently review a diff, branch, or plan for correctness, regressions, security, missing tests, weakened quality bars, and what is absent rather than only what is present. Use when asked to review or do a quality pass on a PR, diff, or another agent's changes, to check a plan before implementing it, before integrating substantial or security-sensitive changes, and after a delegated task completes.
 ---
 
 # Code Review
 
-## Review procedure
+## Purpose
 
-1. Read the task, specification, and acceptance criteria.
-2. Inspect the complete diff and relevant surrounding code.
-3. Prioritize correctness and user impact; trace changed behavior through callers and data flows.
-4. Examine security boundaries, authorization, validation, secrets, error handling, and sensitive data.
-5. Check compatibility, migrations, concurrency, performance, observability, and maintainability where relevant.
-6. Evaluate tests against acceptance criteria and failure cases.
-7. Report actionable findings with severity, file/line, impact, and reproduction or rationale.
-8. Separate confirmed findings from questions and suggestions.
-9. Re-review fixes and verify that findings are resolved.
+Catch defects before they land. The reviewer protects the codebase, not the author's feelings. A false approval costs far more than a false rejection, but invented findings waste everyone's time. Both are failures.
 
-## Outputs
+## Inputs
 
-Findings-first review report, followed by residual risks and areas not covered. Do not invent findings or approve work that was not inspected.
+The task or specification and its acceptance criteria, the complete diff (or plan), relevant surrounding code, and the project's constraints (`.axiom/CONSTRAINTS.md`, constitution) when present. A review without the acceptance criteria can only check code health, not correctness. Say so if they are missing.
+
+## Posture
+
+- **Read-only.** The reviewer reports. The owner fixes. When the host supports it, run the review as a read-only role (see [reviewer role](../../../agents/roles/reviewer.md)).
+- **Fresh context when possible.** A reviewer who did not write the change sees what the author cannot. Prefer a separate subagent with a constructed brief ([task reviewer prompt](../../../agents/prompts/task-reviewer.md)).
+- **Predict first.** Before reading details, write down the 3 places this change is most likely to be wrong. Then check them deliberately.
+
+## Procedure
+
+1. **Spec compliance first.** For each acceptance criterion, decide met, partially met, not met, or not verifiable, and cite the evidence. Scope creep (unrequested behavior) is a finding.
+2. **Trace changed behavior** through callers, data flows, and persisted formats. Use [blast radius](references/blast-radius.md) when signatures, schemas, or shared behavior change.
+3. **Correctness and edge cases:** boundaries, empty and null values, concurrency, ordering, error paths, retries, and time zones. See [edge-case hunter](references/edge-case-hunter.md).
+4. **Security boundaries:** authorization at the last trusted decision point, input validation, output encoding, secrets, injection, and sensitive data in logs. Escalate to [security-audit](../security-audit/SKILL.md) for material attack-surface changes.
+5. **Tests and evidence:** do the tests fail without the change? Do they cover failure paths? Did the claimed checks actually run? See [verification gap](references/verification-gap.md).
+6. **Bar-lowering detection:** new `@ts-ignore`, `eslint-disable`, `# type: ignore`, `noqa`, skipped or deleted tests, removed assertions, loosened thresholds, broadened catch-all error handling, TODO stubs presented as done. Each one is a finding unless it is justified and approved. See [quality-constraints](../quality-constraints/SKILL.md).
+7. **What is missing:** run the [gap analysis](references/review-lenses.md#gap-analysis). Look for migrations, docs, config, feature flags, rollback, observability, and tests that should exist and do not.
+8. **Lenses:** for code, apply the security, new-engineer, and operations lenses. For plans, apply the executor, stakeholder, and skeptic lenses. See [review lenses](references/review-lenses.md).
+9. **Maintainability and performance** where they matter: duplication, needless abstraction, hot-path complexity, N+1 queries.
+10. **Report**, then re-review fixes until blocking findings are resolved or explicitly escalated.
+
+## Severity
+
+| Severity | Meaning | Merge |
+|---|---|---|
+| Blocking | Incorrect behavior, data loss, security boundary violation, failed acceptance criterion, broken build or test | Must fix |
+| Major | Likely defect under realistic conditions, missing required test, weakened quality bar | Fix or record an owner-approved exception |
+| Minor | Real but low-impact issue | Fix when cheap |
+| Note | Suggestion or question | Optional |
+
+Separate **confirmed** findings (with file:line and a reproduction or reasoning chain) from **questions** (where the reviewer lacks context). Do not present a question as a defect.
+
+## Output format
+
+```markdown
+## Review: <scope> (<commit or diff range>)
+Verdict: Changes required | Approved with notes | Approved
+Acceptance: AC1 met (test_x), AC2 not met (no handling for empty cart), …
+
+### Findings
+1. [Blocking] path/file.ts:42 — <defect>. Impact: <who/what breaks>. Evidence: <repro or trace>. Fix: <smallest change>.
+2. …
+
+### Missing
+- <expected artifact or test that is absent>
+
+### Questions
+- …
+
+### Not covered
+- <files, behaviors, or checks this review did not inspect>
+```
+
+## Plan review mode
+
+When reviewing a plan before execution: check that every file path referenced exists or is marked new, that tasks are ordered by dependency, that each task has a verification step, that acceptance criteria are testable, and that no placeholders or TBDs remain. Simulate the first two tasks mentally as the implementer would. Use the [Ready for Development standard](../task-planning/SKILL.md#ready-for-development-standard).
+
+## High-stakes claims
+
+For irreversible or security-critical decisions, add an adversarial pass: a fresh reviewer that tries to disprove the specific claim. See [adversarial review](references/adversarial-review.md).
+
+## Rules
+
+Do not approve work that was not inspected. Do not invent findings to look thorough. State the reviewed scope and what was not covered. Style nits that a formatter or linter would catch are not findings.
+
+## References
+
+- [Review lenses and gap analysis](references/review-lenses.md)
+- [Edge-case hunter](references/edge-case-hunter.md)
+- [Verification gap](references/verification-gap.md)
+- [Blast radius](references/blast-radius.md)
+- [Adversarial review](references/adversarial-review.md)
+- [Independent review delegation](../../../agents/delegation/review.md)

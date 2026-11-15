@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -14,8 +15,10 @@ REQUIRED_SKILLS = {
     "codebase-onboarding", "debugging", "e2e-testing", "implementation", "product-discovery",
     "project-documentation", "release-management", "requirements-analysis", "security-audit",
     "skill-evaluator", "skill-factory", "task-planning", "tdd", "technical-research",
-    "testing", "ui-ux-design",
+    "testing", "ui-ux-design", "verification-before-completion", "spec-analysis",
+    "quality-constraints",
 }
+SKILL_MAX_LINES = 250
 REQUIRED_WORKFLOWS = {
     "bug-fix", "codebase-onboarding", "feature-development", "performance-audit",
     "refactoring", "release", "security-audit",
@@ -60,8 +63,42 @@ def check_skills() -> None:
             seen.add(value)
         if not desc:
             fail(f"{relative}: required frontmatter field 'description' missing")
+        else:
+            block = re.search(r"(?ms)^description:(.*?)(?=^[a-z_-]+:|\Z)", front)
+            desc_text = " ".join(block.group(1).split()) if block else ""
+            if not re.search(r"\bUse (?:when|for|before|during|after|to)\b", desc_text):
+                fail(f"{relative}: description needs a trigger clause such as 'Use when ...'")
         if len(parts[2].strip()) < 100:
             fail(f"{relative}: skill body is unexpectedly short")
+        line_count = len(text.splitlines())
+        if line_count > SKILL_MAX_LINES:
+            fail(f"{relative}: {line_count} lines exceeds the {SKILL_MAX_LINES}-line budget; move depth to references/")
+        check_reference_reachability(path, text)
+
+
+def check_reference_reachability(skill_path: Path, skill_text: str) -> None:
+    """Every file under a skill's references/ must be linked from SKILL.md or a sibling reference."""
+    ref_dir = skill_path.parent / "references"
+    if not ref_dir.is_dir():
+        return
+    corpus = skill_text + "".join(p.read_text(encoding="utf-8") for p in ref_dir.glob("*.md"))
+    for ref in sorted(ref_dir.iterdir()):
+        if not ref.is_file():
+            continue
+        linked_from_skill = f"references/{ref.name}" in skill_text
+        linked_from_sibling = f"({ref.name}" in corpus or f"({ref.name}#" in corpus
+        if not (linked_from_skill or linked_from_sibling):
+            fail(f"{ref.relative_to(ROOT).as_posix()}: orphan reference; link it from SKILL.md")
+
+
+def check_json() -> None:
+    for source in ROOT.rglob("*.json"):
+        if ".git" in source.parts or "node_modules" in source.parts:
+            continue
+        try:
+            json.loads(source.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as error:
+            fail(f"{source.relative_to(ROOT)}: invalid JSON ({error})")
 
 
 def check_workflows() -> None:
@@ -121,6 +158,7 @@ def main() -> int:
     check_skills()
     check_workflows()
     check_local_links()
+    check_json()
     if ERRORS:
         for error in ERRORS:
             print(f"ERROR: {error}")

@@ -40,10 +40,11 @@ Not every task needs every stage. The orchestrator selects and adapts the workfl
 
 ## Repository map
 
-- `.agents/skills/` — canonical, portable Agent Skills
-- `core/` — architecture, principles, contracts, policies, and standards
-- `workflows/` — Markdown workflow definitions
-- `agents/` — role guidance and delegation patterns
+- `.agents/skills/` — canonical, portable Agent Skills (including the always-on [kernel](.agents/skills/axiom-orchestrator/references/kernel.md))
+- `.claude-plugin/` — Claude Code plugin and marketplace manifests that point at the canonical skills and the adapter hook
+- `core/` — architecture, principles, contracts, policies, standards, and the definition of done
+- `workflows/` — Markdown workflow definitions (feature development loads stage files on demand)
+- `agents/` — role cards with capability/write metadata, subagent prompt templates, and delegation patterns
 - `integrations/` — optional tool integration guidance
 - `adapters/` — host-specific installation and compatibility instructions
 - `templates/` — reusable project and execution documents
@@ -57,6 +58,15 @@ Axiom's initial compatibility targets are Claude Code, Codex, OpenCode, and Anti
 
 ## Getting started
 
+Claude Code (plugin, includes the optional kernel hook), one command at a time:
+
+```text
+/plugin marketplace add ifaamrillah/axiom
+/plugin install axiom@axiom
+```
+
+Other hosts: copy or link `.agents/skills/` into the project (Codex, OpenCode, and Antigravity read `.agents/skills/`), or use the third-party installer `npx skills add ifaamrillah/axiom`. Then paste the [Axiom block](templates/project/agents-md-block.md) into the project's `AGENTS.md`.
+
 1. Read [the architecture](core/ARCHITECTURE.md) and [principles](core/PRINCIPLES.md).
 2. Choose the adapter for your coding agent under `adapters/`.
 3. Install or expose the skills using that platform's documented discovery mechanism.
@@ -65,9 +75,9 @@ Axiom's initial compatibility targets are Claude Code, Codex, OpenCode, and Anti
 
 The [workflow catalog](workflows/README.md) includes focused procedures for bug fixes, refactoring, security and performance audits, and release readiness. See the [skill catalog](docs/skills/README.md) for discovery, design, specification, architecture, implementation, debugging, review, testing, security, release, documentation, and skill-quality guidance.
 
-Axiom is currently distributed as repository content and Markdown instructions. It has no custom runtime and no CLI.
+Axiom is distributed as repository content and Markdown instructions. It has no custom runtime and no user-facing CLI. Host packaging (the Claude Code plugin) and the optional read-only session-start hook only point at canonical Markdown ([ADR-0004](docs/decisions/0004-maintainer-tooling-and-adapter-hooks.md)).
 
-The current M0–M7 implementation scope and evidence limits are summarized in the [roadmap](docs/IMPLEMENTATION-ROADMAP.md). Maintainers can run the structural validator with `python3 scripts/validate_repository.py`; it does not run model evaluations or host compatibility tests.
+The M0–M12 implementation scope and evidence limits are summarized in the [roadmap](docs/IMPLEMENTATION-ROADMAP.md). Maintainers run `python3 scripts/validate_repository.py` (structure) and `python3 scripts/run_evals.py` (eval case checks, plus optional headless runs against an installed host; results go to `evaluations/results/`). Ideas adapted from other open-source projects are credited in [acknowledgements](docs/acknowledgements.md).
 
 ## Contributing
 
