@@ -30,3 +30,5 @@ Workflow definitions use Markdown. Each stage must identify its purpose, skill o
 ## Pull requests
 
 Describe the problem, approach, affected skills/workflows/platforms, validation performed, and known limitations. Do not claim platform compatibility without testing or clearly label it as unverified.
+
+Run `python3 scripts/validate_repository.py` before submitting when Python 3 is available. This checks repository structure and Markdown links; it does not exercise agent behavior. Evaluation fixtures are scenarios for human or model runs, not test results. Keep platform guidance dated and link official references when capability details may change.

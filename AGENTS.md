@@ -12,7 +12,7 @@ Build Axiom as a universal, skills-first software engineering harness. Keep the 
 - Orchestration is native-first; do not build a custom agent runtime.
 - There is no CLI.
 - Initial platform targets: Claude Code, Codex, OpenCode, and Antigravity.
-- Full lifecycle scope; initial workflows are Codebase Onboarding and Feature Development.
+- Full lifecycle scope; workflows cover onboarding, feature development, bug fixes, refactoring, security/performance audits, and release readiness.
 - Balance quality, speed, and context/token efficiency.
 
 ## Working rules

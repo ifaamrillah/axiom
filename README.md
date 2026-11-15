@@ -63,7 +63,11 @@ Axiom's initial compatibility targets are Claude Code, Codex, OpenCode, and Anti
 4. Start with [Codebase Onboarding](workflows/codebase-onboarding/WORKFLOW.md) for an unfamiliar repository.
 5. Use [Feature Development](workflows/feature-development/WORKFLOW.md) for a feature request.
 
+The [workflow catalog](workflows/README.md) includes focused procedures for bug fixes, refactoring, security and performance audits, and release readiness. See the [skill catalog](docs/skills/README.md) for discovery, design, specification, architecture, implementation, debugging, review, testing, security, release, documentation, and skill-quality guidance.
+
 Axiom is currently distributed as repository content and Markdown instructions. It has no custom runtime and no CLI.
+
+The current M0–M7 implementation scope and evidence limits are summarized in the [roadmap](docs/IMPLEMENTATION-ROADMAP.md). Maintainers can run the structural validator with `python3 scripts/validate_repository.py`; it does not run model evaluations or host compatibility tests.
 
 ## Contributing
 
