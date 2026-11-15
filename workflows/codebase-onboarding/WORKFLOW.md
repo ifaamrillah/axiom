@@ -89,11 +89,26 @@ Use targeted exploration. Do not read every file. Prioritize manifests, entry po
 - **Outputs:** onboarding report and validation evidence.
 - **Exit criteria:** no known broken references; unverifiable claims are marked; remaining gaps are listed.
 
-### 8. Optional deep dives
+### 8. Security baseline (conditional)
 
-- **Security baseline:** run when the user requests security posture, the repository handles sensitive data/authentication, or onboarding reveals material risk.
-- **Performance baseline:** run when performance is a user concern or architecture suggests a measurable bottleneck.
-- **Research:** run when key technical facts are version-specific or absent from repository evidence.
+- **Condition:** the user requests security posture, the repository handles sensitive data/authentication, or onboarding reveals material risk.
+- **Dependencies:** stages 1 and 3.
+- **Outputs:** scoped security observations or a handoff to the Security Audit workflow.
+- **Exit criteria:** the scope and evidence boundary are clear; a full audit is not implied.
+
+### 9. Performance baseline (conditional)
+
+- **Condition:** performance is a user concern or architecture suggests a measurable bottleneck.
+- **Dependencies:** stages 1–3.
+- **Outputs:** safe baseline measurements or a handoff to the Performance Audit workflow.
+- **Exit criteria:** measurements are reproducible and bounded, or the limitation is recorded.
+
+### 10. Technical research (conditional)
+
+- **Condition:** a key technical fact is version-specific or absent from repository evidence.
+- **Dependencies:** stage 2.
+- **Outputs:** a concise research note with authoritative sources and version scope.
+- **Exit criteria:** material external assumptions are verified or left explicitly unresolved.
 
 ## Parallelization
 
@@ -106,3 +121,7 @@ Preserve completed documents. Resume from the earliest incomplete or invalid sta
 ## Completion criteria
 
 Stages 1–7 are complete, required project knowledge exists, evidence and uncertainty are recorded, and the user receives a concise onboarding report.
+
+## State semantics
+
+Record each stage as Pending, Ready, In Progress, Completed, Blocked, Failed, Skipped, or Cancelled. Record quality gates separately as Pending, Passed, Failed, Blocked, or Waived. A skipped stage is not a passed gate. A dependent stage may proceed after a skip only when its required inputs are independently satisfied. Use the shared [workflow state template](../../templates/workflows/workflow-state.md) when retaining state is useful.

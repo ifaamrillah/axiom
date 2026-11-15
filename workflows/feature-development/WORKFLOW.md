@@ -117,7 +117,7 @@ Adapt stages to complexity and risk. Record a workflow instance under `.axiom/wo
 
 ### 11. Documentation and knowledge update
 
-- **Skill:** project documentation procedure.
+- **Skill:** `project-documentation`.
 - **Required:** Yes when behavior, configuration, operations, public API, or architecture changes; otherwise record why no update is needed.
 - **Dependencies:** implementation and review.
 - **Outputs:** updated docs, decisions, workflow state.
@@ -148,6 +148,10 @@ After planning, independent tasks may run in parallel only with disjoint write s
 ## Recovery
 
 Preserve completed valid work. If tests, review, or security checks invalidate an earlier decision, return to the relevant stage and update downstream tasks. Record failed attempts and do not erase evidence.
+
+## State semantics
+
+Record each stage as Pending, Ready, In Progress, Completed, Blocked, Failed, Skipped, or Cancelled. Record quality gates separately as Pending, Passed, Failed, Blocked, or Waived. A skipped stage is not a passed gate. A dependent stage may proceed after a skip only when its required inputs are independently satisfied. Use the shared [workflow state template](../../templates/workflows/workflow-state.md) for multi-stage work.
 
 ## Completion criteria
 
