@@ -5,9 +5,9 @@
 | Host | Officially documented discovery | Axiom-specific status |
 |---|---|---|
 | Claude Code | Project `.claude/skills/`; plugin manifest `skills` paths | **Live-tested (2.1.325):** plugin validated; loaded with `--plugin-dir` and installed from the GitHub marketplace (24 skills, 4 subagents, kernel hook observed in context); trigger and behavior evals recorded (see below) |
-| Codex | Project `.agents/skills/`; user `~/.agents/skills/` | Official docs inspected; live discovery and invocation not tested |
-| OpenCode | `.agents/skills/` is a project compatibility source; permissions and precedence can affect loading | Official docs inspected; live discovery and invocation not tested |
-| Antigravity | Workspace `.agents/skills/`; global `~/.gemini/config/skills/` | Official docs inspected; live discovery and invocation not tested |
+| Codex | Project `.agents/skills/`; user `~/.agents/skills/` | **Live-tested (codex-cli 0.169.0, 2026-11-16):** native trigger 107/113 across 24 skills (1 host timeout). Codex reads `SKILL.md` files with shell commands and sometimes reads several, which caused 1 negative-case failure. User-level config loads because Codex has no isolation flag. |
+| OpenCode | `.agents/skills/` is a project compatibility source; permissions and precedence can affect loading | **Discovery live-tested (opencode 1.19.5):** `opencode debug skill` listed all 24 Axiom skills from a project's `.agents/skills/`. Model invocation not tested: no provider credentials. |
+| Antigravity | Workspace `.agents/skills/`; global `~/.gemini/config/skills/` | Official docs inspected. Not tested: Antigravity is a desktop IDE that needs a Google account sign-in, and it is not installed on the test machine. |
 
 ## Claude Code live evidence (2026-11-16, Claude Code 2.1.325, host default model)
 
@@ -61,12 +61,23 @@ Earlier on the same day, CLI behavior runs with the independent grader produced 
 - 4/5: code-review.
 - 3/5: requirements-analysis. The failures came from a runner limitation that has since been fixed.
 
+## Behavior after the kernel routing change (2026-11-16)
+
+Every case was rerun with the updated kernel:
+
+| Record | Harness | Grader | Result |
+|---|---|---|---|
+| [CLI batch 1](../../evaluations/results/2026-11-16-1528-claude-code-behavior.md) and [batch 2](../../evaluations/results/2026-11-16-1528-claude-code-behavior-2.md) | Claude Code CLI, native | Claude (separate session) | 31/32 graded. Covers 7 cases: architecture-design, axiom-orchestrator, release-management, and requirements-analysis at 5/5; code-review 4/5; codebase-exploration and security-audit with every graded run passing. The rest of these batches hit the usage limit. |
+| [Subagents](../../evaluations/results/2026-11-16-2250-subagent-behavior-codex-graded.md) | In-session subagents | **Codex (non-Claude)** | 22/26 across 9 cases. Of the 4 misses, 3 come from onboarding cases where a truncated trace left a claim unproven. |
+| [CLI](../../evaluations/results/2026-11-16-2309-claude-code-behavior.md) | Claude Code CLI, native | **Codex (non-Claude)** | 23/24 across 8 cases, with the skill invoked in 24/24 runs. The one miss: a plan task that did not name its test file. |
+
 ## What has not been checked
 
 - User-scope (global) installs with any installer.
 - Any live run on Codex, OpenCode, or Antigravity. The eval runner supports only Claude Code.
 - Observed baselines for skills created test-first in a subagent.
-- Grading by a different model family; graders here were Claude models.
+- Human grading. Model graders came from two families: Claude (Sonnet) and OpenAI (via Codex).
+- Antigravity in any form, and OpenCode model invocation.
 - Results may differ with other models, versions, or user settings.
 
 ## Graceful fallbacks

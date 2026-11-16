@@ -2,7 +2,7 @@
 
 Two kinds of evaluation material live here:
 
-- **Runnable cases** in [`cases/`](cases/README.md): trigger prompts (positive and negative with an owner) and behavior cases with observable expectations, run by [`scripts/run_evals.py`](../scripts/run_evals.py) against an installed host. Disposable fixture projects live in [`fixtures/`](fixtures/), and recorded runs in [`results/`](results/README.md).
+- **Runnable cases** in [`cases/`](cases/README.md): trigger prompts (positive and negative with an owner) and behavior cases with observable expectations, run by [`scripts/run_evals.py`](../scripts/run_evals.py) against an installed host (`--host claude-code` or `--host codex`; set `AXIOM_CODEX_BIN` if `codex` is not on PATH). `--grade --grader-host codex` grades behavior runs with a non-Claude model. Disposable fixture projects live in [`fixtures/`](fixtures/), and recorded runs in [`results/`](results/README.md).
 - **Scenario fixtures** in `skills/`, `workflows/`, `cross-agent/`, and `efficiency/`: human-reviewable prompts and expected signals.
 
 Neither kind is evidence until it has been run and recorded. A recorded result applies only to its host version and model.

@@ -16,6 +16,6 @@ Optional installer: `npx skills add ifaamrillah/axiom -a codex` (see the [adapte
 
 ## Verify
 
-Start or refresh the Codex session and ask it to list or use `axiom-orchestrator`. Confirm a known instruction is applied. If not discovered, inspect the working root, exact `SKILL.md` path, frontmatter, and host version. The docs were checked; Axiom's behavior has not been live-tested here.
+Start or refresh the Codex session and ask it to list or use `axiom-orchestrator`. Confirm a known instruction is applied. If not discovered, inspect the working root, exact `SKILL.md` path, frontmatter, and host version. Verified 2026-11-16 with codex-cli 0.169.0: in a project with `.agents/skills/` and the Axiom block in `AGENTS.md`, `codex exec` read the matching `SKILL.md` for 107 of 113 trigger prompts. Records are in `evaluations/results/*-codex-trigger.md`. Codex sometimes reads more than one skill, and it loads user-level config.
 
 Official reference: [Codex skills](https://developers.openai.com/codex/skills).

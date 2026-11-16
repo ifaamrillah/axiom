@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -33,7 +34,10 @@ ROOT = Path(__file__).resolve().parents[1]
 CASES_DIR = ROOT / "evaluations" / "cases"
 RESULTS_DIR = ROOT / "evaluations" / "results"
 SKILLS_DIR = ROOT / ".agents" / "skills"
-SUPPORTED_HOSTS = ("claude-code",)
+SUPPORTED_HOSTS = ("claude-code", "codex")
+# Codex CLI binary; override with AXIOM_CODEX_BIN when it is not on PATH.
+CODEX_BIN = os.environ.get("AXIOM_CODEX_BIN", "codex")
+SKILL_READ = re.compile(r"(\S*)\.(?:agents|claude)/skills/([a-z0-9-]+)/SKILL\.md")
 
 
 @dataclass
@@ -189,6 +193,13 @@ BEHAVIOR_ALLOWED = ["Skill", "Read", "Glob", "Grep", "Edit", "Write",
 def host_command(host: str, prompt: str, model: str | None, max_turns: int,
                  kind: str = "trigger", budget: float | None = None,
                  isolate: bool = True) -> list[str]:
+    if host == "codex":
+        # Codex has no turn, budget, or settings-isolation flags; the sandbox bounds what it may do.
+        cmd = [CODEX_BIN, "exec", "--json", "--skip-git-repo-check",
+               "--sandbox", "read-only" if kind == "trigger" else "workspace-write"]
+        if model:
+            cmd += ["-m", model]
+        return cmd + [prompt]
     if host != "claude-code":
         raise SystemExit(f"Host '{host}' is not supported yet; supported: {', '.join(SUPPORTED_HOSTS)}")
     cmd = ["claude", "-p", prompt, "--output-format", "stream-json", "--verbose",
@@ -219,6 +230,10 @@ def run_completed(stream: str) -> bool:
             event = json.loads(line)
         except json.JSONDecodeError:
             continue
+        if isinstance(event, dict) and event.get("type") in ("turn.failed", "error"):
+            return False
+        if isinstance(event, dict) and event.get("type") == "turn.completed":
+            return True
         if isinstance(event, dict) and event.get("type") == "result":
             # Usage-limit and API failures can arrive as a "success" subtype with is_error set.
             if event.get("is_error") and event.get("subtype") != "error_max_turns":
@@ -228,12 +243,21 @@ def run_completed(stream: str) -> bool:
 
 
 def invoked_skills(stream: str) -> list[str]:
-    """Extract skill names from Claude Code stream-json tool_use blocks named 'Skill'."""
+    """Skill names from Claude Code 'Skill' tool_use blocks, or, for Codex, from shell commands
+    that read a project skill's SKILL.md (user-level skills under the home directory are ignored)."""
     names: list[str] = []
+    home = str(Path.home())
     for line in stream.splitlines():
         try:
             event = json.loads(line)
         except json.JSONDecodeError:
+            continue
+        item = event.get("item") if isinstance(event, dict) else None
+        if isinstance(item, dict) and item.get("type") == "command_execution" and event.get("type") == "item.started":
+            for prefix, skill in SKILL_READ.findall(str(item.get("command", ""))):
+                user_level = prefix.rstrip("/") in (home, "~", "$HOME") or prefix.endswith(("~/", "$HOME/"))
+                if not user_level and skill not in names:
+                    names.append(skill)
             continue
         message = event.get("message") if isinstance(event, dict) else None
         content = message.get("content") if isinstance(message, dict) else None
@@ -248,7 +272,8 @@ def invoked_skills(stream: str) -> list[str]:
 
 def run_host(cmd: list[str], cwd: Path, timeout: int) -> tuple[int, str]:
     try:
-        proc = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, timeout=timeout)
+        proc = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, timeout=timeout,
+                              stdin=subprocess.DEVNULL)
         return proc.returncode, proc.stdout + proc.stderr
     except FileNotFoundError:
         return 127, f"host executable not found: {cmd[0]}"
@@ -329,10 +354,16 @@ def grade(behavior: Behavior, trace: str, final: str, args: argparse.Namespace) 
     prompt = GRADER_PROMPT.format(prompt=behavior.prompt, trace=trace, final=final[:6000],
                                   expect=numbered(behavior.expect), fail_if=numbered(behavior.fail_if),
                                   n_expect=len(behavior.expect), n_fail=len(behavior.fail_if))
-    cmd = ["claude", "-p", prompt, "--output-format", "stream-json", "--verbose", "--max-turns", "1",
-           "--tools", "", "--setting-sources", "project,local", "--max-budget-usd", "0.5"]
-    if args.grader_model:
-        cmd += ["--model", args.grader_model]
+    if getattr(args, "grader_host", "claude-code") == "codex":
+        cmd = [CODEX_BIN, "exec", "--json", "--skip-git-repo-check", "--sandbox", "read-only"]
+        if args.grader_model:
+            cmd += ["-m", args.grader_model]
+        cmd.append(prompt)
+    else:
+        cmd = ["claude", "-p", prompt, "--output-format", "stream-json", "--verbose", "--max-turns", "1",
+               "--tools", "", "--setting-sources", "project,local", "--max-budget-usd", "0.5"]
+        if args.grader_model:
+            cmd += ["--model", args.grader_model]
     empty = Path(tempfile.mkdtemp(prefix="axiom-grader-"))
     _, out = run_host(cmd, empty, args.timeout)
     shutil.rmtree(empty, ignore_errors=True)
@@ -407,6 +438,15 @@ def tool_trace(stream: str, limit: int = 60, result_chars: int = 240) -> list[st
             event = json.loads(line)
         except json.JSONDecodeError:
             continue
+        item = event.get("item") if isinstance(event, dict) else None
+        if isinstance(item, dict) and event.get("type") == "item.completed":
+            if item.get("type") == "command_execution":
+                out = " ".join(str(item.get("aggregated_output", "")).split())[:result_chars]
+                calls.append(f"Shell: {str(item.get('command', ''))[:160]}" + (f"\n   → {out}" if out else ""))
+            elif item.get("type") == "file_change":
+                paths = ", ".join(str(c.get("path", "")) for c in item.get("changes", []) if isinstance(c, dict))
+                calls.append(f"FileChange: {paths[:160]}")
+            continue
         message = event.get("message") if isinstance(event, dict) else None
         content = message.get("content") if isinstance(message, dict) else None
         if not isinstance(content, list):
@@ -441,11 +481,15 @@ def _final_text(stream: str) -> str:
             continue
         if isinstance(event, dict) and event.get("type") == "result":
             return str(event.get("result", ""))
+        item = event.get("item") if isinstance(event, dict) else None
+        if isinstance(item, dict) and item.get("type") == "agent_message" and event.get("type") == "item.completed":
+            return str(item.get("text", ""))
     return stream[-4000:]
 
 
 def host_version(host: str) -> str:
-    code, out = run_host(["claude", "--version"], ROOT, 30) if host == "claude-code" else (1, "")
+    binary = {"claude-code": "claude", "codex": CODEX_BIN}.get(host)
+    code, out = run_host([binary, "--version"], ROOT, 30) if binary else (1, "")
     return out.strip() if code == 0 else "unknown"
 
 
@@ -459,8 +503,8 @@ def write_results(kind: str, args: argparse.Namespace, body: str) -> Path:
               f"- Host version: {host_version(args.host)}\n- Model: {args.model or 'host default'}\n"
               f"- Skill filter: {args.skill or 'all'}\n- Max turns: {args.max_turns}\n"
               f"- Repeats per behavior case: {getattr(args, 'repeat', 1)}; grader: "
-              f"{('separate session, model ' + (args.grader_model or 'host default')) if getattr(args, 'grade', False) else 'none'}\n"
-              f"- Isolation: {'user settings excluded' if not args.no_isolate else 'user settings loaded'}\n"
+              f"{('separate ' + getattr(args, 'grader_host', 'claude-code') + ' session, model ' + (args.grader_model or 'host default')) if getattr(args, 'grade', False) else 'none'}\n"
+              f"- Isolation: {'user-level config loaded (Codex has no isolation flag); sandbox bounds the run' if args.host == 'codex' else ('user settings excluded' if not args.no_isolate else 'user settings loaded')}\n"
               f"- Kernel in project instructions: {'no' if args.no_kernel else 'yes'}\n"
               f"- Per-run budget cap (USD): {args.budget or 'none'}\n"
               f"- Runner: scripts/run_evals.py\n\n")
@@ -494,6 +538,8 @@ def main() -> int:
     parser.add_argument("--grade", action="store_true",
                         help="grade each behavior run with a separate tool-less headless session")
     parser.add_argument("--grader-model", help="model for the grader session (default: host default)")
+    parser.add_argument("--grader-host", choices=SUPPORTED_HOSTS, default="claude-code",
+                        help="host that runs the grader (codex gives a non-Claude grader)")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     if args.repeat < 1:

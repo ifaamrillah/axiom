@@ -191,3 +191,28 @@ class WriteResultsTest(unittest.TestCase):
         self.assertNotEqual(first, second)
         self.assertIn("one", first.read_text(encoding="utf-8"))
         self.assertIn("two", second.read_text(encoding="utf-8"))
+
+
+class CodexStreamTest(unittest.TestCase):
+    def stream(self, command, output="ok", final="done"):
+        events = [
+            {"type": "item.started", "item": {"type": "command_execution", "command": command}},
+            {"type": "item.completed", "item": {"type": "command_execution", "command": command,
+                                                "aggregated_output": output}},
+            {"type": "item.completed", "item": {"type": "agent_message", "text": final}},
+            {"type": "turn.completed"},
+        ]
+        return "\n".join(json.dumps(e) for e in events)
+
+    def test_project_skill_read_counts_and_home_skill_does_not(self):
+        home = str(Path.home())
+        cmd = (f"cat {home}/.agents/skills/personal/SKILL.md && "
+               "cat /tmp/axiom-eval-x/.agents/skills/debugging/SKILL.md && cat .agents/skills/tdd/SKILL.md")
+        stream = self.stream(cmd)
+        self.assertEqual(run_evals.invoked_skills(stream), ["debugging", "tdd"])
+        self.assertTrue(run_evals.run_completed(stream))
+        self.assertEqual(run_evals._final_text(stream), "done")
+        self.assertIn("Shell:", run_evals.tool_trace(stream)[0])
+
+    def test_failed_turn_is_not_completed(self):
+        self.assertFalse(run_evals.run_completed(json.dumps({"type": "turn.failed"})))

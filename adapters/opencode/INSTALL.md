@@ -18,6 +18,6 @@ Optional installer: `npx skills add ifaamrillah/axiom -a opencode` (see the [ada
 
 ## Verify
 
-Use the host's skill listing/invocation and confirm `axiom-orchestrator` loads. Then check relative references from the skill directory. Live Axiom session testing remains outstanding.
+Use the host's skill listing/invocation and confirm `axiom-orchestrator` loads. Then check relative references from the skill directory. Verified 2026-11-16 with opencode 1.19.5: `opencode debug skill`, run from a project root, listed all 24 Axiom skills from `.agents/skills/`. Model invocation was not tested.
 
 Official reference: [OpenCode skills](https://opencode.ai/docs/skills/).

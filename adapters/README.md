@@ -5,9 +5,9 @@ Canonical skills remain in `.agents/skills/`. Adapters explain how a host discov
 | Host | Project-level discovery | Packaging / bootstrap | Status |
 |---|---|---|---|
 | Claude Code | `.claude/skills/`, or the plugin manifest | `.claude-plugin/` plugin and marketplace; optional SessionStart kernel hook | Manifest validated with `claude plugin validate` (2026-11-16); see [compatibility](../docs/compatibility/README.md) for live runs |
-| Codex | `.agents/skills/` | Axiom block in `AGENTS.md` | Docs reviewed 2026-11-15; live invocation untested |
-| OpenCode | `.agents/skills/` (compatibility source) | Axiom block in `AGENTS.md` | Docs reviewed 2026-11-15; live invocation untested |
-| Antigravity | `.agents/skills/` | Axiom block in `AGENTS.md` | Docs reviewed 2026-11-15; live invocation untested |
+| Codex | `.agents/skills/` | Axiom block in `AGENTS.md` | Live trigger evals 107/113 (codex-cli 0.169.0, 2026-11-16) |
+| OpenCode | `.agents/skills/` (compatibility source) | Axiom block in `AGENTS.md` | Discovery verified (opencode 1.19.5, 24/24 skills); invocation untested |
+| Antigravity | `.agents/skills/` | Axiom block in `AGENTS.md` | Docs reviewed 2026-11-15; not tested (desktop IDE, needs a Google sign-in) |
 
 ## Installing into another project without a custom CLI
 
