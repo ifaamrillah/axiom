@@ -21,7 +21,7 @@ Thank you for helping improve Axiom.
 
 ## Skills
 
-A skill must follow the standard Agent Skills structure. Its `SKILL.md` frontmatter must contain `name` and `description`, and the description must include a "Use when …" trigger clause. Names must match the containing directory and use lowercase kebab-case. Keep `SKILL.md` under 250 lines and move optional detail into `references/`, linked from `SKILL.md`.
+A skill must follow the standard Agent Skills structure. Its `SKILL.md` frontmatter must contain `name` and `description`, and the description must include a "Use when …" trigger clause. Names must match the containing directory and use lowercase kebab-case. Keep `SKILL.md` under 250 lines and move optional detail into `references/`, linked from `SKILL.md`. Links inside a skill must stay within `.agents/skills/`, because skills-only installs copy nothing else. Bundle a template the skill fills under its `assets/` (register it in `BUNDLED_ASSETS` in `scripts/validate_repository.py` and refresh copies with `--sync`), or name other repository files as plain text.
 
 Write skills test-first with the [skill-factory](.agents/skills/skill-factory/SKILL.md) skill: add [eval cases](evaluations/cases/README.md) in `evaluations/cases/<skill>.md`, record a baseline run, then write the skill and record the post-change run in `evaluations/results/`.
 

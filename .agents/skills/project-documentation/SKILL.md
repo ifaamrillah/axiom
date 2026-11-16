@@ -35,7 +35,7 @@ Use it when a change alters setup, behavior, architecture, APIs, operations, or 
    ---
    ```
 
-6. **Record pitfalls.** When an agent made a concrete, repeatable mistake in this repository, add one line to the **Pitfalls** section of the project's [Axiom block](../../../templates/project/agents-md-block.md): the date, what went wrong, and the rule that prevents it. Remove entries whose cause is gone.
+6. **Record pitfalls.** When an agent made a concrete, repeatable mistake in this repository, add one line to the **Pitfalls** section of the project's [Axiom block](assets/agents-md-block.md): the date, what went wrong, and the rule that prevents it. Remove entries whose cause is gone.
 7. **Check** links and consistency with the implementation.
 
 ## Outputs and gate
@@ -48,4 +48,4 @@ If behavior is unclear, record the unknown or verify it with a safe check. Do no
 
 ## References
 
-See the [document contract](../../../core/contracts/DOCUMENT-CONTRACT.md) and the [documentation standard](../../../core/standards/documentation.md).
+See the document contract (`core/contracts/DOCUMENT-CONTRACT.md` in the Axiom repository) and the documentation standard (`core/standards/documentation.md` in the Axiom repository).

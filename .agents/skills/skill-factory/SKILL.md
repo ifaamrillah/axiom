@@ -25,7 +25,7 @@ Check existing skills first. Extending or composing beats a near-duplicate.
 ## Procedure
 
 1. **Define the job.** State the recurring task, the user, the activation cases, the non-activation cases, and the expected output.
-2. **Write eval cases first** in `evaluations/cases/<skill>.md`: at least 2 positive triggers, 1 negative with its owner, and 1 behavior case with observable expectations and failure signals. See the [case format](../../../evaluations/cases/README.md).
+2. **Write eval cases first** in `evaluations/cases/<skill>.md`: at least 2 positive triggers, 1 negative with its owner, and 1 behavior case with observable expectations and failure signals. See the case format (`evaluations/cases/README.md` in the Axiom repository).
 3. **Run the baseline (red).** Run the behavior case without the skill, or with the current version. Record the exact failures and the rationalizations the agent used ("this is too simple to test").
 4. **Write the minimum skill (green):**
    - Frontmatter has only `name` (equal to the directory) and `description`. The description says what the skill does and contains a "Use when/for …" trigger clause with the words users actually type.
@@ -52,7 +52,7 @@ The skill directory, its eval cases, and recorded baseline and post-skill result
 
 ## References
 
-- [Skill contract](../../../core/contracts/SKILL-CONTRACT.md)
-- [Skill template](../../../templates/skills/SKILL.template.md)
+- Skill contract (`core/contracts/SKILL-CONTRACT.md` in the Axiom repository)
+- Skill template (`templates/skills/SKILL.template.md` in the Axiom repository)
 - [Skill evaluator](../skill-evaluator/SKILL.md)
-- [Eval runner](../../../scripts/run_evals.py)
+- Eval runner (`scripts/run_evals.py` in the Axiom repository)

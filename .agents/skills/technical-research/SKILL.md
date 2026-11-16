@@ -18,7 +18,7 @@ Replace recalled knowledge with verified, version-matched facts. Training data a
    1. Official docs, reference, release notes, and migration guides for that version.
    2. The library's source at the matching tag, for exact facts that docs often omit: signatures, defaults, option names, and where an error message comes from.
    3. Standards and specifications (RFC, W3C, language spec).
-   4. A documentation index (for example a Context7-style service, see [documentation search](../../../integrations/context7/README.md)) to speed up steps 1–2, when available.
+   4. A documentation index (for example a Context7-style service; see `integrations/context7/README.md` in the Axiom repository) to speed up steps 1–2, when available.
    5. Community sources only to corroborate, and labeled as such.
 5. **Budget the lookups.** Most questions need 1–4 queries. Stop at about 6 per question and report what is still uncertain instead of searching indefinitely.
 6. **Prove locally** when a fact is decisive and cheap to test: a tiny script or test against the installed version beats any document.

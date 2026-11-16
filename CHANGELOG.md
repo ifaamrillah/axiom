@@ -28,4 +28,5 @@ All notable changes to Axiom are documented here.
 - `tdd` description names the "failing test for this bug first" request.
 - `run_evals.py`: workspaces receive the kernel in `CLAUDE.md`/`AGENTS.md` like a documented install (`--no-kernel` to measure skills alone); case files may set a `fixture:` for trigger runs; result files are never overwritten.
 - `tdd` and `debugging` trigger cases that referred to code now run against the `discount-bug` fixture.
-- Evidence: trigger 5/5 (`tdd`) and 7/7 (`debugging`); behavior `debugging/B1` passes 2/2 recorded runs and `tdd/B1` 1/1; marketplace install from GitHub verified; `npx skills` install verified and its skills-only limits documented.
+- Evidence: trigger 5/5 (`tdd`) and 7/7 (`debugging`); behavior `debugging/B1` passes 2/2 recorded runs and `tdd/B1` 1/1; marketplace install from GitHub verified; `npx skills` install verified.
+- Skills are self-contained for skills-only installs: 16 templates and prompts are bundled under skill `assets/` (byte-identical to their repository source, enforced by the validator, refreshed with `--sync`); other repository files are named as plain text. The validator rejects links that leave `.agents/skills/`.

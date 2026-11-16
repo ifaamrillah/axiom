@@ -65,7 +65,7 @@ Claude Code (plugin, includes the optional kernel hook), one command at a time:
 /plugin install axiom@axiom
 ```
 
-Other hosts: copy or link `.agents/skills/` into the project (Codex, OpenCode, and Antigravity read `.agents/skills/`), or use the third-party installer `npx skills add ifaamrillah/axiom`, which installs skills only, without workflows or templates. Then paste the [Axiom block](templates/project/agents-md-block.md) into the project's `AGENTS.md`.
+Other hosts: copy or link `.agents/skills/` into the project (Codex, OpenCode, and Antigravity read `.agents/skills/`), or use the third-party installer `npx skills add ifaamrillah/axiom`, which installs the skills (with their bundled templates and prompts) but not the workflows. Then paste the [Axiom block](templates/project/agents-md-block.md) into the project's `AGENTS.md`.
 
 1. Read [the architecture](core/ARCHITECTURE.md) and [principles](core/PRINCIPLES.md).
 2. Choose the adapter for your coding agent under `adapters/`.

@@ -21,11 +21,11 @@ Use it whenever a change affects how something looks, feels, moves, or is intera
 ## Procedure
 
 1. **Detect, never assume, the stack.** Check `package.json` dependencies (react, next, vue, svelte, angular), `pubspec.yaml` (Flutter), `Package.swift` or `*.xcodeproj` (SwiftUI), `composer.json` (Laravel), and React Native markers. Ask if the stack is unclear and it matters.
-2. **Load the design system.** If `.axiom/design/MASTER.md` exists, it is the source of truth for tokens, components, and patterns. A page override (`.axiom/design/pages/<page>.md`) wins for that page only. If neither exists and the work is a new product or page, propose a master (see [design-system master](../../../templates/design/master.md)).
+2. **Load the design system.** If `.axiom/design/MASTER.md` exists, it is the source of truth for tokens, components, and patterns. A page override (`.axiom/design/pages/<page>.md`) wins for that page only. If neither exists and the work is a new product or page, propose a master (see [design-system master](assets/master.md)).
 3. **Map the flow and the states.** Cover the primary path and alternates, plus loading, empty, error, success, partial, and offline states, and the permission-denied state where relevant.
 4. **Apply the rules in priority order** from the [UI rules](references/ui-rules.md). Resolve CRITICAL and HIGH categories before styling details.
 5. **Reuse established components and patterns.** Document any deviation and why.
-6. **Specify** using the [design brief](../../../templates/design/brief.md): flows, a state inventory, responsive behavior, accessibility notes, and mockups where useful.
+6. **Specify** using the [design brief](assets/brief.md): flows, a state inventory, responsive behavior, accessibility notes, and mockups where useful.
 7. **Verify the rendered result** when browser tooling is available ([e2e-testing](../e2e-testing/SKILL.md)): screenshots at mobile and desktop widths, keyboard pass, contrast and accessibility scan. Run the [pre-delivery checklist](references/ui-rules.md#pre-delivery-checklist). Label unverified visual claims.
 
 ## Outputs and gate
@@ -39,5 +39,5 @@ Without design or browser tooling, produce a textual interaction spec. Implement
 ## References
 
 - [UI rules and pre-delivery checklist](references/ui-rules.md)
-- [Design-system master template](../../../templates/design/master.md), [design brief](../../../templates/design/brief.md)
-- [Feature Development workflow](../../../workflows/feature-development/WORKFLOW.md)
+- [Design-system master template](assets/master.md), [design brief](assets/brief.md)
+- Feature Development workflow (`workflows/feature-development/WORKFLOW.md` in the Axiom repository)

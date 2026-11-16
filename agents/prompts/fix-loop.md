@@ -11,6 +11,6 @@ Use this loop when a task review returns `Spec: FAIL` or `CHANGES_REQUIRED`.
 
 ## Limits
 
-- At most **3 rounds** per task. After the third failed round, stop: the task or plan is probably wrong. Record a ruling or escalate under the stop conditions in [execution](../../.agents/skills/axiom-orchestrator/references/execution.md).
+- At most **3 rounds** per task. After the third failed round, stop: the task or plan is probably wrong. Record a ruling or escalate under the stop conditions in the `axiom-orchestrator` skill (`references/execution.md`).
 - Never resolve a finding by weakening a test, adding a suppression, or narrowing the acceptance criteria. That is lowering the bar, not fixing.
 - Record each round in the task ledger: findings, fixes, and evidence.

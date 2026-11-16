@@ -9,9 +9,9 @@ A subagent does not inherit the session. Give it exactly what it needs:
 - the task text, acceptance criteria, and verification commands,
 - the owned files (allowed / restricted / shared),
 - the relevant interfaces, conventions, and constraints, quoted or linked,
-- the expected output format (see [handoff template](../../../../templates/workflows/HANDOFF.md)).
+- the expected output format (see [handoff template](../assets/handoff.md)).
 
-Use the prompt templates in `agents/prompts/`: [implementer](../../../../agents/prompts/implementer.md), [task reviewer](../../../../agents/prompts/task-reviewer.md), and [fix loop](../../../../agents/prompts/fix-loop.md).
+Use the prompt templates in `agents/prompts/`: [implementer](../assets/prompts/implementer.md), [task reviewer](../assets/prompts/task-reviewer.md), and [fix loop](../assets/prompts/fix-loop.md).
 
 ## Choose the role
 

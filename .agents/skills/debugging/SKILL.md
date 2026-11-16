@@ -78,4 +78,4 @@ Root cause (with evidence), fix, regression check, verification results, and lim
 - [Root-cause tracing](references/root-cause-tracing.md)
 - [Condition-based waiting](references/condition-based-waiting.md)
 - [Test-pollution bisection](references/test-pollution-bisection.md)
-- [Codebase exploration](../codebase-exploration/SKILL.md), [testing](../testing/SKILL.md), [bug-fix workflow](../../../workflows/bug-fix/WORKFLOW.md)
+- [Codebase exploration](../codebase-exploration/SKILL.md), [testing](../testing/SKILL.md), bug-fix workflow (`workflows/bug-fix/WORKFLOW.md` in the Axiom repository)

@@ -66,7 +66,7 @@ Before any status claim, or before expressing satisfaction with the result:
 
 ## When a check cannot run
 
-Report it as **not run** or **blocked**, with the reason and the exact command a human can run. Never convert Blocked or Skipped into Passed. Under the [quality gate contract](../../../core/contracts/QUALITY-GATE-CONTRACT.md), only an authorized approver can waive a blocking gate, and a waiver never means the check succeeded.
+Report it as **not run** or **blocked**, with the reason and the exact command a human can run. Never convert Blocked or Skipped into Passed. Under the quality gate contract (`core/contracts/QUALITY-GATE-CONTRACT.md` in the Axiom repository), only an authorized approver can waive a blocking gate, and a waiver never means the check succeeded.
 
 ## Baseline-aware gates
 

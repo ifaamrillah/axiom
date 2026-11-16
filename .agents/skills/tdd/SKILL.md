@@ -71,4 +71,4 @@ Changed tests and code, plus a short log of the cycle: the test, the observed fa
 
 - [Testing](../testing/SKILL.md) for choosing test layers.
 - [Verification before completion](../verification-before-completion/SKILL.md).
-- [Quality gate contract](../../../core/contracts/QUALITY-GATE-CONTRACT.md).
+- Quality gate contract (`core/contracts/QUALITY-GATE-CONTRACT.md` in the Axiom repository).

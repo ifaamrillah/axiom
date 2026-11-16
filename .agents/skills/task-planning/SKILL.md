@@ -24,7 +24,7 @@ Keep the plan concise enough to hold in context. If it grows past a few pages, t
 
 ## Procedure
 
-1. **Constitution check.** List each MUST principle as pass, fail, or not applicable. Justify unavoidable violations in a complexity-tracking table (see the [constitution template](../../../templates/project/constitution.md)).
+1. **Constitution check.** List each MUST principle as pass, fail, or not applicable. Justify unavoidable violations in a complexity-tracking table (see the [constitution template](../quality-constraints/assets/constitution.md)).
 2. **File map first.** List the files to create or modify and each file's single responsibility. Follow existing patterns. Files that change together live together.
 3. **Decompose into tasks.** A task is the smallest unit that carries its own test cycle and is worth a reviewer's gate. Fold setup, configuration, and documentation into the task whose deliverable needs them.
 4. **Order by dependency.** Put setup first, then foundations, then stories in priority order (P1 first, as a viable increment), then polish. Mark tasks that can run in parallel with `[P]`: different files and no unmet dependency.
@@ -53,9 +53,9 @@ Set the plan frontmatter `status: ready` only when all six hold.
 
 ## Outputs
 
-`PLAN.md` from the [plan template](../../../templates/workflows/PLAN.md), with frontmatter `status`, a constitution check, a file map, a task table, a coverage map, risks, and the integration order.
+`PLAN.md` from the [plan template](assets/PLAN.md), with frontmatter `status`, a constitution check, a file map, a task table, a coverage map, risks, and the integration order.
 
 ## References
 
-- [Plan template](../../../templates/workflows/PLAN.md), [task template](../../../templates/workflows/TASK.md)
+- [Plan template](assets/PLAN.md), [task template](assets/TASK.md)
 - [Execution loop](../axiom-orchestrator/references/execution.md)
