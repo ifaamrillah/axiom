@@ -15,21 +15,33 @@ The always-on baseline for any agent working in a project that uses Axiom. Keep 
 
 ## Routing
 
-Load a skill when its situation applies; skip ceremony for trivial changes.
+Before your first tool call, check this table. When a row matches, load that skill first: loading a skill is cheap and is not ceremony. Proportionality limits plans, workflow files, and reviews, never skill loading. If no row matches, work directly.
 
 | Situation | Skill |
 |---|---|
-| Meaningful multi-step engineering request | `axiom-orchestrator` |
+| Meaningful multi-step engineering request, or a new feature in an existing codebase | `axiom-orchestrator` |
 | About to claim completion, commit, or open a PR | `verification-before-completion` |
 | Bug, failing test, unexpected behavior, "X returns Y, should be Z" | `debugging` (load it before the first edit) |
 | Behavior change or bug fix with a test harness; "failing test first" | `tdd` |
 | Vague idea or underspecified feature | `product-discovery`, then `requirements-analysis` |
+| Write a spec, requirements, or acceptance criteria | `requirements-analysis` |
+| Turn a spec into tasks, or "plan the work" | `task-planning` |
+| Implement a planned task or specced feature | `implementation` |
 | Spec, plan, and tasks exist; check consistency or remaining work | `spec-analysis` |
+| Design choice, trade-off, or "which approach" question | `architecture-design` |
+| Where is X, how is X used, map or trace the code | `codebase-exploration` |
+| New to a repository, or set up project knowledge | `project-onboarding` |
+| Add or plan unit, integration, or regression tests | `testing` |
+| Browser, end-to-end, or Playwright test | `e2e-testing` |
+| Write or update README or project docs | `project-documentation` |
+| Release, release notes, version tag, or publish | `release-management` |
 | Quality bar is unwritten or being lowered | `quality-constraints` |
 | Review a diff or a plan | `code-review` |
 | Security question or audit | `security-audit` |
-| UI, layout, interaction, accessibility | `ui-ux-design` |
-| Version-specific library or API facts | `technical-research` |
+| UI, layout, form usability, interaction, accessibility | `ui-ux-design` |
+| Library, API, or language behavior facts, including "what does X do" | `technical-research` |
+| Create or improve an agent skill | `skill-factory` |
+| Judge whether a skill works or is ready | `skill-evaluator` |
 
 ## Proportionality
 

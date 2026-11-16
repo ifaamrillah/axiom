@@ -19,6 +19,11 @@ All runs used `scripts/run_evals.py` with user-level settings excluded (`--setti
 
 **`npx skills` (skills@1.8.1):** installed all 24 skills for Claude Code, Codex, OpenCode, and Antigravity targets in a scratch project; Claude Code listed all 24. Only skill directories are copied. At that point 39 links in 17 skills pointed outside them; skills are now self-contained and a skills-only copy has no broken links. See the [adapter overview](../../adapters/README.md#installing-into-another-project-without-a-custom-cli).
 
+**Native trigger accuracy, all 24 skills:** **110/113** ([record](../../evaluations/results/2026-11-16-1500-claude-code-trigger.md)).
+- All 49 negative cases passed. Each positive miss went to a defensible alternative route or to a clarifying question.
+- The run before it scored 56/81 on 18 skills, with every miss an under-trigger. That changed after the kernel routing table was expanded to all 24 skills and stated that loading a skill is not ceremony.
+- The per-skill history below predates that change.
+
 **Trigger accuracy** (latest run per skill; positives must invoke the skill, negatives must not):
 
 | Skill | Result | Note |
@@ -60,7 +65,6 @@ Earlier on the same day, CLI behavior runs with the independent grader produced 
 
 - User-scope (global) installs with any installer.
 - Any live run on Codex, OpenCode, or Antigravity. The eval runner supports only Claude Code.
-- Native (CLI) trigger accuracy for the 18 skills whose run was invalidated by the usage limit.
 - Observed baselines for skills created test-first in a subagent.
 - Grading by a different model family; graders here were Claude models.
 - Results may differ with other models, versions, or user settings.

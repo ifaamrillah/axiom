@@ -30,5 +30,6 @@ All notable changes to Axiom are documented here.
 - `tdd` and `debugging` trigger cases that referred to code now run against the `discount-bug` fixture.
 - Evidence: trigger 5/5 (`tdd`) and 7/7 (`debugging`); behavior `debugging/B1` passes 2/2 recorded runs and `tdd/B1` 1/1; marketplace install from GitHub verified; `npx skills` install verified.
 - Eval cases for all 24 skills; `run_evals.py` gains `--repeat`, `--grade` (separate tool-less grader with strict verdicts), written content in traces, and host-error detection (budget caps, usage limits). Repeated, independently graded behavior runs recorded on the CLI and, after a usage limit, on an in-session subagent harness.
+- Kernel routing covers all 24 skills and states that loading a skill is not ceremony. Native trigger accuracy went from 56/81 (18 skills) to 110/113 (all 24), with no negative-case regressions.
 - `skill-factory`: eval case file before `SKILL.md`, and predicted baselines labeled as unobserved. This raised its graded behavior from 2/5 to 5/5.
 - Skills are self-contained for skills-only installs: 16 templates and prompts are bundled under skill `assets/` (byte-identical to their repository source, enforced by the validator, refreshed with `--sync`); other repository files are named as plain text. The validator rejects links that leave `.agents/skills/`.
