@@ -17,6 +17,8 @@ All runs used `scripts/run_evals.py` with user-level settings excluded (`--setti
 
 **Marketplace install:** `claude plugin marketplace add "https://github.com/ifaamrillah/axiom.git#feat/m8-m12-adoption" --scope local` followed by `claude plugin install axiom@axiom --scope local` in a scratch project succeeded. The next headless session listed 24 `axiom:` skills and 4 `axiom:` subagents, and the kernel came from the hook. Both were removed afterward.
 
+**`npx skills` (skills@1.8.1):** installed all 24 skills for Claude Code, Codex, OpenCode, and Antigravity targets in a scratch project; Claude Code listed all 24. Only skill directories are copied, so 39 links in 17 skills to repository-level files do not resolve. See the [adapter overview](../../adapters/README.md#installing-into-another-project-without-a-custom-cli).
+
 **Trigger accuracy** (latest run per skill; positives must invoke the skill, negatives must not):
 
 | Skill | Result | Note |
@@ -43,7 +45,7 @@ Other behavior cases have not been run.
 
 ## What has not been checked
 
-- The `npx skills` installer and user-scope (global) installs.
+- User-scope (global) installs with any installer.
 - Any live run on Codex, OpenCode, or Antigravity. The eval runner supports only Claude Code.
 - Behavior cases other than `debugging/B1` and `tdd/B1`; independent grading; repeated runs large enough to measure variance.
 - Results may differ with other models, versions, or user settings.

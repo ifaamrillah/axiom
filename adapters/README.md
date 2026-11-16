@@ -20,7 +20,16 @@ npx skills add ifaamrillah/axiom                                  # choose agent
 npx skills add ifaamrillah/axiom --skill debugging -a claude-code # one skill, one agent
 ```
 
-Its documented targets (checked 2026-11-16) are Claude Code `.claude/skills/`; Codex, OpenCode, and Antigravity `.agents/skills/` (project scope). Review what it installs. Per-skill installs copy only that skill's directory, so links from a skill to `templates/`, `core/`, or `workflows/` in this repository will not resolve. Install the whole set, or vendor the repository, when you need workflows and templates.
+Its documented targets (checked 2026-11-16) are Claude Code `.claude/skills/`; Codex, OpenCode, and Antigravity `.agents/skills/` (project scope). Review what it installs.
+
+Verified 2026-11-16 with `skills@1.8.1` and Claude Code 2.1.325, from a scratch project:
+
+- `npx skills add "ifaamrillah/axiom#<branch>" --skill '*' -a claude-code -a codex -a opencode -a antigravity -y` installed all 24 skills into `.agents/skills/`, symlinked them into `.claude/skills/`, and wrote `skills-lock.json` with the source and ref. Claude Code then listed all 24 as project skills.
+- Pin a branch or tag with `owner/repo#ref`. The `/tree/<ref>` URL form failed for a branch name containing `/`.
+- **Only skill directories are installed, even with `--skill '*'`.** 39 links in 17 skills point to `workflows/`, `templates/`, `core/`, `agents/`, `integrations/`, or `evaluations/` in this repository and do not resolve. The skills still work on their own, but they cannot open those files. Use the Claude Code plugin, or vendor the whole repository (clone or Git submodule), when you need workflows, templates, and contracts.
+- As project skills, names are not namespaced. Axiom's `code-review` shares its name with a Claude Code built-in skill; the project skill was the one listed. The plugin's `axiom:` namespace avoids the clash.
+- The installer does not add the kernel. Paste the bootstrap block as below.
+- The installer sends install telemetry unless `DO_NOT_TRACK=1` is set.
 
 **Bootstrap:** paste the [Axiom block](../templates/project/agents-md-block.md) into the project's `AGENTS.md` (or `CLAUDE.md`), or use the Claude Code plugin hook.
 
