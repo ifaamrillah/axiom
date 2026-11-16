@@ -9,13 +9,13 @@ A subagent does not inherit the session. Give it exactly what it needs:
 - the task text, acceptance criteria, and verification commands,
 - the owned files (allowed / restricted / shared),
 - the relevant interfaces, conventions, and constraints, quoted or linked,
-- the expected output format (see [handoff template](../../../../templates/workflows/HANDOFF.md)).
+- the expected output format (see [handoff template](../assets/handoff.md)).
 
-Use the prompt templates in `agents/prompts/`: [implementer](../../../../agents/prompts/implementer.md), [task reviewer](../../../../agents/prompts/task-reviewer.md), and [fix loop](../../../../agents/prompts/fix-loop.md).
+Use the bundled prompt templates: [implementer](../assets/prompts/implementer.md), [task reviewer](../assets/prompts/task-reviewer.md), and [fix loop](../assets/prompts/fix-loop.md).
 
 ## Choose the role
 
-Role cards in `agents/roles/` declare a capability tier (`deep`, `standard`, or `fast`) and whether the role writes files. Adapters map these to host-specific models and tool permissions. Reviewers, researchers, and auditors are read-only.
+Role cards (`agents/roles/` in the Axiom repository) declare a capability tier (`deep`, `standard`, or `fast`) and whether the role writes files. Adapters map these to host-specific models and tool permissions. Reviewers, researchers, and auditors are read-only.
 
 ## Integrate
 

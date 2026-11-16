@@ -25,4 +25,4 @@ A skill leaves Experimental only when recorded runs on at least one host show it
 
 ## References
 
-See the [eval case format](../../../evaluations/cases/README.md), [evaluation guide](../../../evaluations/README.md), and [skill factory](../skill-factory/SKILL.md).
+See the eval case format (`evaluations/cases/README.md` in the Axiom repository), evaluation guide (`evaluations/README.md` in the Axiom repository), and [skill factory](../skill-factory/SKILL.md).

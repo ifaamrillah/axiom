@@ -25,6 +25,8 @@ Each card declares portable metadata. Adapters map it to host specifics (model c
 - [Task reviewer](prompts/task-reviewer.md): two stages, spec compliance then code quality.
 - [Fix loop](prompts/fix-loop.md): bounded rounds for resolving review findings.
 
+These prompts are the source. Copies ship under `.agents/skills/axiom-orchestrator/assets/prompts/` for skills-only installs. After editing a prompt, run `python3 scripts/validate_repository.py --sync`.
+
 ## Delegation patterns
 
 [Sequential](delegation/sequential.md), [parallel](delegation/parallel.md), and [review](delegation/review.md).

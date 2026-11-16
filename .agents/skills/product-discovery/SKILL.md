@@ -53,7 +53,7 @@ Optional deep mode for high-stakes ideas: rate each dimension from 0 to 1 and co
 
 ## Outputs and gate
 
-A design summary using the [discovery brief template](../../../templates/discovery/brief.md). Gate: the work traces to a real need, success can be assessed, and the user approved the summary.
+A design summary using the [discovery brief template](assets/brief.md). Gate: the work traces to a real need, success can be assessed, and the user approved the summary.
 
 ## References
 

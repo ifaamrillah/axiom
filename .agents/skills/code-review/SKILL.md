@@ -15,8 +15,8 @@ The task or specification and its acceptance criteria, the complete diff (or pla
 
 ## Posture
 
-- **Read-only.** The reviewer reports. The owner fixes. When the host supports it, run the review as a read-only role (see [reviewer role](../../../agents/roles/reviewer.md)).
-- **Fresh context when possible.** A reviewer who did not write the change sees what the author cannot. Prefer a separate subagent with a constructed brief ([task reviewer prompt](../../../agents/prompts/task-reviewer.md)).
+- **Read-only.** The reviewer reports. The owner fixes. When the host supports it, run the review as a read-only role, such as the reviewer role in the Axiom repository (`agents/roles/reviewer.md`).
+- **Fresh context when possible.** A reviewer who did not write the change sees what the author cannot. Prefer a separate subagent with a constructed brief ([task reviewer prompt](../axiom-orchestrator/assets/prompts/task-reviewer.md)) for substantial or risky changes. For a small diff, a self-review is acceptable if it still predicts first and says it was a self-review.
 - **Predict first.** Before reading details, write down the 3 places this change is most likely to be wrong. Then check them deliberately.
 
 ## Procedure
@@ -83,4 +83,4 @@ Do not approve work that was not inspected. Do not invent findings to look thoro
 - [Verification gap](references/verification-gap.md)
 - [Blast radius](references/blast-radius.md)
 - [Adversarial review](references/adversarial-review.md)
-- [Independent review delegation](../../../agents/delegation/review.md)
+- Independent review delegation (`agents/delegation/review.md` in the Axiom repository)

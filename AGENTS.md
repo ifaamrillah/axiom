@@ -34,3 +34,19 @@ Build Axiom as a universal, skills-first software engineering harness. Keep the 
 - State status and verification date where freshness matters.
 - Distinguish normative requirements from examples and recommendations.
 - Avoid platform capability claims unless the adapter documents their evidence and limitations.
+
+## Project facts (verified 2026-11-16 at 096adb1)
+
+- Structure and links: `python3 scripts/validate_repository.py` (`--sync` refreshes bundled skill assets after editing their source)
+- Eval case structure: `python3 scripts/run_evals.py --check`
+- Tooling tests: `python3 -m unittest discover -s scripts/tests`
+- Live evals (spend model quota; maintainers only): `python3 scripts/run_evals.py --host claude-code --kind trigger|behavior [--repeat N --grade]`
+
+## Pitfalls
+
+Observed agent mistakes in this repository and the rule that prevents each.
+
+- 2026-11-16 Reverted a temporary test edit with `git checkout <file>` and silently discarded unrelated unstaged edits in that file → undo a temporary edit by editing it back (or stash first); never `git checkout` a file that has uncommitted work.
+- 2026-11-16 Several eval runs finishing in the same minute overwrote each other's result file, losing a record → result writers must never overwrite; check that a record exists after each run.
+- 2026-11-16 A trigger case said "this bug" in an empty workspace; the agent correctly asked which bug, and the case was misread as a skill miss → prompts that refer to code need a `fixture:`; before blaming a skill, read what the agent actually did.
+- 2026-11-16 Claimed that "installing the whole skill set" kept repository links working, without checking → verify install claims by inspecting the installed tree.

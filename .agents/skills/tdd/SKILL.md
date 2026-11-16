@@ -3,9 +3,10 @@ name: tdd
 description: >
   Drive a behavior change with a red-green-refactor loop where every new test is
   seen failing for the intended reason before production code is written. Use when
-  the user asks for TDD, test-first work, or "a failing test first, then fix it",
-  and for new logic or bug fixes that need a regression test when the project has
-  a runnable test harness.
+  the user asks for TDD, test-first work, or to write a failing test before fixing
+  a bug ("write a failing test for this bug first, then fix it"), and for new logic
+  or bug fixes that need a regression test when the project has a runnable test
+  harness. When the bug's cause is still unknown, pair with debugging.
 ---
 
 # Test-Driven Development
@@ -39,6 +40,10 @@ Avoid or adapt for exploratory spikes (throw the spike away afterward), pure con
 7. **Repeat** for the next behavior, edge case, or failure path.
 8. **Close** with the broader suite proportionate to risk, then inspect the diff.
 
+## Tests for existing code (characterization)
+
+When adding tests for behavior that already exists, there is no natural red step. Prove each test can fail: temporarily break the production code the test targets (one mutation per behavior), watch the test fail for the intended reason, then restore the original and confirm with `git status` or a diff that production code is unchanged. A test that survives the mutation tests nothing.
+
 ## Bug fixes
 
 Reproduce the bug as a failing test first. The red run must show the reported symptom. After the fix, the same test passes. Keep it as the regression test.
@@ -70,4 +75,4 @@ Changed tests and code, plus a short log of the cycle: the test, the observed fa
 
 - [Testing](../testing/SKILL.md) for choosing test layers.
 - [Verification before completion](../verification-before-completion/SKILL.md).
-- [Quality gate contract](../../../core/contracts/QUALITY-GATE-CONTRACT.md).
+- Quality gate contract (`core/contracts/QUALITY-GATE-CONTRACT.md` in the Axiom repository).

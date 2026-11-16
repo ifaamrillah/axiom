@@ -15,7 +15,7 @@ Projects may extend this list in `.axiom/CONSTRAINTS.md`. They should not shorte
 
 - [ ] The change is scoped to the task; no unrelated refactors.
 - [ ] No debug output, commented-out code, or orphaned code from this change.
-- [ ] No unapproved lowering of the quality bar (see [quality-constraints](../../.agents/skills/quality-constraints/SKILL.md)).
+- [ ] No unapproved lowering of the quality bar (see the `quality-constraints` skill).
 - [ ] Lint, format, and type checks pass at the project's thresholds.
 
 ## Integration

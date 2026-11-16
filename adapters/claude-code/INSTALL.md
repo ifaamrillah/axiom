@@ -24,7 +24,9 @@ For a local checkout during development:
 claude --plugin-dir /path/to/axiom
 ```
 
-Plugin skills are namespaced, for example `axiom:debugging`. Version pinning: the manifest sets no `version`, so updates follow the marketplace source. Pin a ref or commit SHA in your marketplace source if you need a fixed version.
+Plugin skills are namespaced, for example `axiom:debugging`. Version pinning: the manifest sets no `version`, so updates follow the marketplace source. Pin a ref or commit SHA in your marketplace source if you need a fixed version, for example `claude plugin marketplace add "https://github.com/ifaamrillah/axiom.git#<ref>"`.
+
+Verified 2026-11-16 on Claude Code 2.1.325: adding the marketplace from GitHub at a branch ref and running `claude plugin install axiom@axiom` (both at `--scope local` in a scratch project) loaded all 24 `axiom:` skills, the 4 `axiom:` subagents, and the kernel through the session-start hook.
 
 ## Option B: project skills without a plugin
 
@@ -76,7 +78,7 @@ The plugin ships four subagents built on this mapping, in [agents/](agents/): `a
 ## Verify
 
 1. Start a session and ask "What skills are available?" `verification-before-completion` and `axiom-orchestrator` should be listed (namespaced as `axiom:` when installed as a plugin).
-2. With the hook enabled, ask "What is rule 5 of the Axiom kernel?" The answer should quote the evidence-before-claims rule without reading files.
+2. With the hook enabled, ask "What is rule 6 of the Axiom kernel?" The answer should quote the evidence-before-claims rule without reading files.
 3. Run the trigger evals: `python3 scripts/run_evals.py --host claude-code --kind trigger --skill debugging`.
 
 Recorded results live in `evaluations/results/`. See the [compatibility report](../../docs/compatibility/README.md) for what has actually been run.

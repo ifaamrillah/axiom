@@ -13,9 +13,9 @@ Other skills describe what good looks like. This skill records what **this proje
 
 | File | Holds | Template |
 |---|---|---|
-| `.axiom/constitution.md` | Non-negotiable principles (MUST/SHOULD) that plans are checked against | [constitution](../../../templates/project/constitution.md) |
-| `.axiom/CONSTRAINTS.md` | Numeric thresholds and the check that enforces each | [constraints](../../../templates/project/constraints.md) |
-| Definition of Done | The standing checklist every change clears | [definition of done](../../../core/standards/definition-of-done.md) |
+| `.axiom/constitution.md` | Non-negotiable principles (MUST/SHOULD) that plans are checked against | [constitution](assets/constitution.md) |
+| `.axiom/CONSTRAINTS.md` | Numeric thresholds and the check that enforces each | [constraints](assets/constraints.md) |
+| Definition of Done | The standing checklist every change clears | [definition of done](assets/definition-of-done.md) |
 
 If these files already exist and the user is not changing them, read and follow them. Do not re-interview.
 
@@ -23,9 +23,9 @@ If these files already exist and the user is not changing them, read and follow 
 
 1. **Inspect** the existing CI, linters, type checker, test coverage, and performance or accessibility tooling. Record which checks exist and which ones block merges.
 2. **Ask which dimensions matter** (correctness, coverage, types, security, accessibility, performance, bundle size, documentation). Ask one question at a time and recommend a default.
-3. **Propose numbers** when the user has none. Use the defaults in the [constraints template](../../../templates/project/constraints.md) as a starting point, and mark them as defaults.
+3. **Propose numbers** when the user has none. Use the defaults in the [constraints template](assets/constraints.md) as a starting point, and mark them as defaults.
 4. **Bind each constraint to a check:** the command, where it runs (local or CI), and whether it blocks. A constraint without a check is a wish. Record it as such.
-5. **Write** the files and link them from the project's instructions file (see the [Axiom block](../../../templates/project/agents-md-block.md)).
+5. **Write** the files and link them from the project's instructions file (see the [Axiom block](../project-documentation/assets/agents-md-block.md)).
 
 In non-interactive contexts (CI or autonomous runs), do not interview. Apply the floor below, record that defaults were used, and flag the rest for a human.
 
@@ -51,7 +51,7 @@ Inspect the diff (and the CI configuration diff) for these patterns. Each one is
 | Relaxed thresholds | coverage, performance budget, lint level, or `--max-warnings` lowered; CI step made non-blocking (`continue-on-error`, `|| true`) |
 | Stubs | `NotImplementedError`, `todo!()`, `throw new Error("TODO")` in code reported as done |
 
-Report each one with file:line, the pattern, and the requirement it undermines. The remedy is to fix the underlying issue or obtain an explicit waiver (reason, scope, approver) under the [quality gate contract](../../../core/contracts/QUALITY-GATE-CONTRACT.md).
+Report each one with file:line, the pattern, and the requirement it undermines. The remedy is to fix the underlying issue or obtain an explicit waiver (reason, scope, approver) under the quality gate contract (`core/contracts/QUALITY-GATE-CONTRACT.md` in the Axiom repository).
 
 ## Outputs and gate
 
@@ -60,4 +60,4 @@ Written constitution and constraints, each constraint bound to a check, or a low
 ## References
 
 - [Code review](../code-review/SKILL.md) step 6
-- [Definition of done](../../../core/standards/definition-of-done.md)
+- [Definition of done](assets/definition-of-done.md)

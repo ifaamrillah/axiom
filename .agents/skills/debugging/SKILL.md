@@ -43,7 +43,7 @@ Find similar code that works: the same API used elsewhere, an earlier revision, 
 1. Write a failing regression test or reproduction script that captures the symptom (see [tdd](../tdd/SKILL.md)).
 2. Fix the root cause at the layer where the bad state originates. Add validation at other layers only when it is justified (defense in depth).
 3. Run the regression check, then nearby and broader checks proportionate to risk.
-4. Report the cause, the fix, the evidence, and remaining uncertainty.
+4. Report the cause, the fix, the evidence, and remaining uncertainty. Evidence means the exact command you ran and its decisive output line, before and after the fix, for example: `python3 -m unittest` → `FAILED (failures=1)` before, `OK` after. "All tests pass" without the command is not evidence.
 
 ## Stop rule: three failed fixes
 
@@ -78,4 +78,4 @@ Root cause (with evidence), fix, regression check, verification results, and lim
 - [Root-cause tracing](references/root-cause-tracing.md)
 - [Condition-based waiting](references/condition-based-waiting.md)
 - [Test-pollution bisection](references/test-pollution-bisection.md)
-- [Codebase exploration](../codebase-exploration/SKILL.md), [testing](../testing/SKILL.md), [bug-fix workflow](../../../workflows/bug-fix/WORKFLOW.md)
+- [Codebase exploration](../codebase-exploration/SKILL.md), [testing](../testing/SKILL.md), bug-fix workflow (`workflows/bug-fix/WORKFLOW.md` in the Axiom repository)

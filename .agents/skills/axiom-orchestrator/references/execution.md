@@ -2,7 +2,7 @@
 
 ## Before edits
 
-Inspect instructions, Git status, and affected paths. Read references on demand. Use the project's established commands. For multi-stage work, keep state in `.axiom/workflows/active/<ID>/` using [workflow state](../../../../templates/workflows/workflow-state.md). For brief work, state tracking is optional.
+Inspect instructions, Git status, and affected paths. Read references on demand. Use the project's established commands. For multi-stage work, keep state in `.axiom/workflows/active/<ID>/` using [workflow state](../assets/workflow-state.md). For brief work, state tracking is optional.
 
 ## Record a verification baseline
 
@@ -20,9 +20,9 @@ For an approved plan (see [task-planning](../../task-planning/SKILL.md)):
 1. Check that the plan meets the Ready for Development standard. If it does not, return to planning.
 2. For each task in dependency order:
    - **Inline mode:** implement the task yourself with the [implementation](../../implementation/SKILL.md) skill.
-   - **Delegated mode:** when the host supports subagents and tasks are independent, dispatch a fresh implementer with a constructed brief ([implementer prompt](../../../../agents/prompts/implementer.md)). Subagents receive only what the task needs, not the session history.
-   - Review the task in two stages: **spec compliance**, then **code quality** ([task reviewer prompt](../../../../agents/prompts/task-reviewer.md)).
-   - If the review fails, run the [fix loop](../../../../agents/prompts/fix-loop.md). If it passes, verify the evidence yourself, then update the task status and the ledger in the workflow state.
+   - **Delegated mode:** when the host supports subagents and tasks are independent, dispatch a fresh implementer with a constructed brief ([implementer prompt](../assets/prompts/implementer.md)). Subagents receive only what the task needs, not the session history.
+   - Review the task in two stages: **spec compliance**, then **code quality** ([task reviewer prompt](../assets/prompts/task-reviewer.md)).
+   - If the review fails, run the [fix loop](../assets/prompts/fix-loop.md). If it passes, verify the evidence yourself, then update the task status and the ledger in the workflow state.
 3. After the last task, run a whole-change review and the full gate checks against the baseline.
 
 Continue between tasks without asking "should I continue?" unless a stop condition applies.

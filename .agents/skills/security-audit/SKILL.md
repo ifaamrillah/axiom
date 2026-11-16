@@ -109,4 +109,4 @@ For each confirmed finding, state the invariant the code must enforce and the na
 - [Attack-surface checklists](references/attack-surfaces.md)
 - [Hunting and validation](references/hunting-and-validation.md)
 - [Records, ledger, and report](references/reporting.md)
-- [Security audit workflow](../../../workflows/security-audit/WORKFLOW.md), [security tools integration](../../../integrations/security-tools/README.md)
+- Security audit workflow (`workflows/security-audit/WORKFLOW.md` in the Axiom repository), security tools integration (`integrations/security-tools/README.md` in the Axiom repository)

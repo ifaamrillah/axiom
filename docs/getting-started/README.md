@@ -11,7 +11,7 @@ Axiom ships no installer, custom runtime, or CLI of its own. Choose one path:
 
 - **Claude Code:** install the repository as a plugin (`/plugin marketplace add ifaamrillah/axiom`, then `/plugin install axiom@axiom`). See the [Claude Code adapter](../../adapters/claude-code/INSTALL.md).
 - **Any host:** clone or fork this repository and copy or link `.agents/skills/` (with each skill's `references/`) into a host-supported location.
-- **Third-party installer:** `npx skills add ifaamrillah/axiom` discovers `.agents/skills/` and installs it for the agents you select. Review what it installs. See the [adapter overview](../../adapters/README.md) for its limits.
+- **Third-party installer:** `npx skills add ifaamrillah/axiom` discovers `.agents/skills/` and installs it for the agents you select. It installs skill directories only. Skills carry the templates and prompts they fill under `assets/`; workflows and contracts are not included. Review what it installs. See the [adapter overview](../../adapters/README.md) for its limits.
 
 Then load the kernel: paste the [Axiom block](../../templates/project/agents-md-block.md) into the project's `AGENTS.md` or `CLAUDE.md`, unless the Claude Code plugin hook already injects it. Keep .agents/skills/ as the source copy.
 

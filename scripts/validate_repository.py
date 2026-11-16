@@ -25,6 +25,30 @@ REQUIRED_WORKFLOWS = {
 }
 
 
+SKILLS_ROOT = ROOT / ".agents" / "skills"
+# Skills-only installs (for example `npx skills`) copy skill directories and nothing else,
+# so templates a skill fills are bundled under its assets/. The repository copy stays the
+# source; each bundled copy must match it byte for byte. Run with --sync to refresh copies.
+BUNDLED_ASSETS = {
+    "axiom-orchestrator/assets/handoff.md": "templates/workflows/HANDOFF.md",
+    "axiom-orchestrator/assets/workflow-state.md": "templates/workflows/workflow-state.md",
+    "axiom-orchestrator/assets/prompts/implementer.md": "agents/prompts/implementer.md",
+    "axiom-orchestrator/assets/prompts/task-reviewer.md": "agents/prompts/task-reviewer.md",
+    "axiom-orchestrator/assets/prompts/fix-loop.md": "agents/prompts/fix-loop.md",
+    "product-discovery/assets/brief.md": "templates/discovery/brief.md",
+    "project-documentation/assets/agents-md-block.md": "templates/project/agents-md-block.md",
+    "quality-constraints/assets/constitution.md": "templates/project/constitution.md",
+    "quality-constraints/assets/constraints.md": "templates/project/constraints.md",
+    "quality-constraints/assets/definition-of-done.md": "core/standards/definition-of-done.md",
+    "requirements-analysis/assets/spec.md": "templates/specifications/spec.md",
+    "requirements-analysis/assets/requirements.md": "templates/specifications/requirements.md",
+    "task-planning/assets/PLAN.md": "templates/workflows/PLAN.md",
+    "task-planning/assets/TASK.md": "templates/workflows/TASK.md",
+    "ui-ux-design/assets/master.md": "templates/design/master.md",
+    "ui-ux-design/assets/brief.md": "templates/design/brief.md",
+}
+
+
 def fail(message: str) -> None:
     ERRORS.append(message)
 
@@ -154,8 +178,41 @@ def check_local_links() -> None:
                 fail(f"{source.relative_to(ROOT)}: broken local link '{target}'")
 
 
+def check_skill_self_containment() -> None:
+    """Links inside a skill must resolve within .agents/skills/; name repository files as plain text."""
+    # Inline links and images, plus reference-style definitions such as "[x]: ../path".
+    inline = re.compile(r"\[[^\]]*\]\(([^)\s]+)[^)]*\)")
+    reference = re.compile(r"(?m)^\s*\[[^\]]+\]:\s*(\S+)")
+    for source in SKILLS_ROOT.rglob("*.md"):
+        text = source.read_text(encoding="utf-8")
+        for target in inline.findall(text) + reference.findall(text):
+            target = target.strip().strip("<>").split("#", 1)[0]
+            if not target or "://" in target or target.startswith("mailto:"):
+                continue
+            resolved = (source.parent / target).resolve()
+            if SKILLS_ROOT not in resolved.parents:
+                fail(f"{source.relative_to(ROOT)}: link '{target}' leaves .agents/skills/ and breaks "
+                     "skills-only installs; bundle the file under assets/ or name it as plain text")
+
+
+def check_bundled_assets(sync: bool) -> None:
+    for bundled, source in BUNDLED_ASSETS.items():
+        copy, original = SKILLS_ROOT / bundled, ROOT / source
+        if not original.is_file():
+            fail(f"{source}: bundled asset source missing")
+            continue
+        if sync:
+            copy.parent.mkdir(parents=True, exist_ok=True)
+            copy.write_bytes(original.read_bytes())
+        elif not copy.is_file() or copy.read_bytes() != original.read_bytes():
+            fail(f".agents/skills/{bundled}: differs from {source}; run "
+                 "`python3 scripts/validate_repository.py --sync`")
+
+
 def main() -> int:
+    check_bundled_assets(sync="--sync" in sys.argv[1:])
     check_skills()
+    check_skill_self_containment()
     check_workflows()
     check_local_links()
     check_json()

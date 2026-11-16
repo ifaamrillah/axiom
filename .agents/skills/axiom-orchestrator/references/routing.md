@@ -1,5 +1,7 @@
 # Routing
 
+Workflow paths refer to the Axiom repository. Skills-only installs do not include them; when a workflow is missing, follow the skills named in the same row.
+
 | Request | Starting point |
 |---|---|
 | Unknown or poorly documented repository | `workflows/codebase-onboarding/WORKFLOW.md` |

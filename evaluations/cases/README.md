@@ -7,6 +7,8 @@ One file per skill, named `<skill>.md`. These cases can be run by [`scripts/run_
 ```markdown
 ---
 skill: <skill-name>
+fixture: evaluations/fixtures/<name>   # optional; trigger runs start from this project
+accept: <other-skill>                  # optional; comma-separated aliases that also count as a hit
 ---
 
 # Eval cases: <skill-name>
@@ -34,6 +36,8 @@ Rules:
 - At least 2 positive trigger prompts, 1 negative prompt with an owner, and 1 behavior case.
 - Phrase prompts the way users actually write, including terse and indirect requests.
 - Each expectation must be checkable by reading the transcript. Avoid "does a good job".
+- Prompts that refer to code ("this bug", "this function") need a `fixture:`; in an empty workspace the correct response is a clarifying question, not a skill call.
+- Workspaces receive the kernel block in `CLAUDE.md` and `AGENTS.md`, as a documented install does. Pass `--no-kernel` to measure skill descriptions alone.
 - The negative owner names the skill that should handle the prompt instead, or `none`.
 
 ## Running
