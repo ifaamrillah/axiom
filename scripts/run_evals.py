@@ -384,6 +384,8 @@ def run_behaviors(cases: list[CaseFile], args: argparse.Namespace) -> tuple[list
     summary: list[str] = []
     for case in cases:
         for behavior in case.behaviors:
+            if getattr(args, "case", None) and behavior.case_id not in args.case.split(","):
+                continue
             cmd = host_command(args.host, behavior.prompt, args.model, args.max_turns, "behavior",
                                args.budget, not args.no_isolate)
             if args.dry_run:
@@ -535,6 +537,7 @@ def main() -> int:
     parser.add_argument("--no-kernel", action="store_true",
                         help="omit the kernel block from CLAUDE.md/AGENTS.md (measure skills alone)")
     parser.add_argument("--repeat", type=int, default=1, help="behavior runs per case")
+    parser.add_argument("--case", help="behavior case IDs to run, comma-separated (for example B2,B3)")
     parser.add_argument("--grade", action="store_true",
                         help="grade each behavior run with a separate tool-less headless session")
     parser.add_argument("--grader-model", help="model for the grader session (default: host default)")

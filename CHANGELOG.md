@@ -42,6 +42,9 @@ All notable changes to Axiom are documented here.
 - All content is rewritten in Axiom's wording and attributed per file. A 12-word phrase check found at most 3.7% overlap with any source. See `docs/acknowledgements.md`.
 - The plan template gains a Global constraints section.
 - New `notes-api` fixture with four seeded vulnerabilities and a safe decoy, and a new `security-audit` behavior case (B2).
+- New `tenant-billing` fixture (6 subtle multi-file vulnerabilities, 2 decoys, 4 correctness bugs) with `security-audit` B3 and `code-review` B2.
+- `run_evals.py --case` filters behavior cases.
+- Old vs deepened skills, Codex-graded: no difference with Opus (security 18/18 both; review 14/15 both). With Haiku, code review rose from 10/15 to 13/15 and security was unchanged. The sample is small. See `evaluations/results/2026-11-17-depth-comparison.md`.
 
 ### M8–M12: adoption pass (2026-11-16)
 
