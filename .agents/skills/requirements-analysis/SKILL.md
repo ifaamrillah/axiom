@@ -16,14 +16,15 @@ The request, discovery output (if any), existing product behavior, architecture,
 ## Procedure
 
 1. **Restate** the desired outcome, the actors, and the success criteria in measurable, technology-agnostic terms.
-2. **Draft** the spec from [the template](assets/spec.md): prioritized user stories (P1 is a viable increment on its own), numbered `FR-`/`NFR-` requirements using MUST/SHOULD, key entities, edge cases, security and privacy, and assumptions.
-3. **Mark unknowns inline** as `[NEEDS CLARIFICATION: <specific question>]`. Do not guess silently. Make a reasonable default an explicit assumption only when it is reversible and low-risk.
+2. **Draft** the spec from [the template](assets/spec.md): prioritized user stories (P1 is a viable increment on its own), numbered `FR-`/`NFR-` requirements using MUST/SHOULD, key entities, edge cases, security and privacy, and assumptions. Describe behavior, not UI or vendor choices. Compare your draft with the annotated [weak vs good spec](references/spec-examples.md) on your first spec or when a draft feels thin.
+3. **Mark unknowns inline** as `[NEEDS CLARIFICATION: <specific question>]`. Do not guess silently. Make a reasonable default an explicit assumption only when it is reversible and low-risk. Scan for vague words ("fast", "appropriate", "etc.", "handle") with the [ambiguity word list](references/ambiguity-words.md); each hit gets a number or a marker.
 4. **Run a clarification scan** using the [clarification taxonomy](references/clarification-taxonomy.md). Rate each category Clear, Partial, or Missing.
 5. **Ask the highest-impact questions,** at most 5 per round and one at a time when interactive. Each question offers a recommended answer and short options. Record answers in the spec's **Clarifications** section and update the affected requirements immediately.
-6. **Write acceptance scenarios** as Given/When/Then for each story. Every must-have requirement maps to at least one scenario.
-7. **Test the requirements** with the [requirements-quality checklist](references/requirements-checklist.md). These checks test the writing, not the implementation.
-8. **Cross-check** against the constitution, constraints, existing behavior, and architecture. Surface conflicts. Do not reconcile them silently.
-9. **Set status:** `draft` while markers remain on must-haves, `clarified` when none remain, and `approved` only after the user or owner accepts it.
+6. **Write acceptance scenarios** as Given/When/Then for each story. Every must-have requirement maps to at least one scenario. Use concrete values, one action per When, and observable Thens. Use an examples table for rules with ranges, and a state-transition table for entities with a status. See [writing acceptance criteria](references/acceptance-criteria.md).
+7. **Phrase NFRs measurably:** metric, target, load, environment, and verification method. Pick categories from the [NFR catalog](references/nfr-catalog.md) based on what the feature touches (money, personal data, public UI, external APIs).
+8. **Test the requirements** with the [requirements-quality checklist](references/requirements-checklist.md). These checks test the writing, not the implementation.
+9. **Cross-check** against the constitution, constraints, existing behavior, and architecture. Surface conflicts. Do not reconcile them silently.
+10. **Set status:** `draft` while markers remain on must-haves, `clarified` when none remain, and `approved` only after the user or owner accepts it.
 
 ## Outputs
 
@@ -38,6 +39,10 @@ The request, discovery output (if any), existing product behavior, architecture,
 
 ## References
 
-- [Clarification taxonomy](references/clarification-taxonomy.md)
-- [Requirements-quality checklist](references/requirements-checklist.md)
+- [Clarification taxonomy](references/clarification-taxonomy.md): open for the clarification scan (step 4).
+- [Requirements-quality checklist](references/requirements-checklist.md): open for the self-test (step 8).
+- [Spec examples, weak vs good](references/spec-examples.md): open when drafting, to calibrate detail and phrasing.
+- [Writing acceptance criteria](references/acceptance-criteria.md): open when writing scenarios, examples tables, and edge cases.
+- [NFR catalog](references/nfr-catalog.md): open when writing non-functional requirements.
+- [Ambiguity word list](references/ambiguity-words.md): open when scanning a draft for vague language, including the grep command.
 - [Product discovery](../product-discovery/SKILL.md), [spec analysis](../spec-analysis/SKILL.md)

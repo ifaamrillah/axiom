@@ -20,10 +20,10 @@ Use it when a change alters setup, behavior, architecture, APIs, operations, or 
 
 ## Procedure
 
-1. **Identify** the source of truth and the audience.
-2. **Check freshness before editing.** For documents with `sources:` and `verified_at_commit:` metadata, see whether the listed sources changed since that commit (`git diff --stat <commit> -- <sources>`). Unchanged sources mean the content can be trusted and skipped. Changed sources mean the document needs review.
+1. **Identify** the source of truth, the audience, and the document type. Use the decision table in [doc types](references/doc-types.md) (README, ADR, API reference, runbook, how-to, architecture, comment).
+2. **Check freshness before editing** ([freshness rules](references/freshness.md)). For documents with `sources:` and `verified_at_commit:` metadata, see whether the listed sources changed since that commit (`git diff --stat <commit> -- <sources>`). Unchanged sources mean the content can be trusted and skipped. Changed sources mean the document needs review.
 3. **Decide** whether to update, link, or add a focused section. Prefer a targeted update over a rewrite.
-4. **Draft concise content:** prerequisites, steps, expected result, caveats. Cite paths and commands; label assumptions and version-sensitive guidance.
+4. **Draft concise content:** prerequisites, steps, expected result, caveats. Cite paths and commands; label assumptions and version-sensitive guidance. Follow the type's template: [README and how-to](references/doc-types.md), [ADR](references/adrs.md), [API docs](references/api-docs.md), [runbook](references/runbooks.md).
 5. **Stamp metadata** on living documents:
 
    ```yaml
@@ -48,4 +48,11 @@ If behavior is unclear, record the unknown or verify it with a safe check. Do no
 
 ## References
 
-See the document contract (`core/contracts/DOCUMENT-CONTRACT.md` in the Axiom repository) and the documentation standard (`core/standards/documentation.md` in the Axiom repository).
+Open the one matching the document you are writing:
+- [Doc types and README](references/doc-types.md): choosing a type; README, how-to, and comment rules.
+- [ADRs](references/adrs.md): recording an expensive-to-reverse decision.
+- [API docs](references/api-docs.md): changing a public endpoint, library function, CLI, or event.
+- [Runbooks](references/runbooks.md): alerts, manual recovery, on-call steps.
+- [Freshness rules](references/freshness.md): metadata, drift checks, stale marking, pitfall entries.
+
+See also the document contract (`core/contracts/DOCUMENT-CONTRACT.md` in the Axiom repository) and the documentation standard (`core/standards/documentation.md` in the Axiom repository).

@@ -11,13 +11,13 @@ description: >
 
 ## Procedure
 
-1. **Confirm intent.** Identify the intended user, triggers, non-triggers, and expected output.
+1. **Confirm intent.** Identify the intended user, triggers, non-triggers, and expected output. Map each critical rule in the skill to a case; a rule without a case is untested ([eval design](references/eval-design.md)).
 2. **Static checks.** Run `python3 scripts/validate_repository.py` (frontmatter, size budget, trigger clause, references, links) and `python3 scripts/run_evals.py --check` (case structure).
 3. **Trigger accuracy.** Run `python3 scripts/run_evals.py --host <host> --kind trigger --skill <name>`. Positive prompts must invoke the skill. Negative prompts must not, and should go to their owner.
-4. **Behavior.** Run the behavior cases and grade every expectation and failure signal from the transcript. Compare with the baseline (without the skill) when one is recorded.
+4. **Behavior.** Run the behavior cases and grade every expectation and failure signal from the transcript. Compare with the baseline (without the skill) when one is recorded. Repeat runs (at least 3) and report rates, not single outcomes. Grade from tool calls and output, not from the agent's claims ([grading rubric](references/grading-rubric.md)).
 5. **Review the text.** Check for contradictions, vague steps, missing failure handling, unsafe instructions, host-specific assumptions, and duplicated reference material.
 6. **Context cost.** Check the `SKILL.md` line count and which references the agent actually needed.
-7. **Report** a score per dimension, with evidence: trigger precision and recall, behavior pass rate, clarity, safety, portability, and context cost. Add concrete edits and the hosts and models that remain untested.
+7. **Report** a score per dimension (0-3 scale in the [grading rubric](references/grading-rubric.md)), with evidence: trigger precision and recall, behavior pass rate, clarity, safety, portability, and context cost. Add concrete edits and the hosts and models that remain untested.
 
 ## Gate
 
@@ -25,4 +25,7 @@ A skill leaves Experimental only when recorded runs on at least one host show it
 
 ## References
 
-See the eval case format (`evaluations/cases/README.md` in the Axiom repository), evaluation guide (`evaluations/README.md` in the Axiom repository), and [skill factory](../skill-factory/SKILL.md).
+- [Eval design](references/eval-design.md): open when cases are missing, weak, or unobservable; covers trigger and behavior case design, pressure cases, baselines, and repeats.
+- [Grading rubric](references/grading-rubric.md): open when grading transcripts or writing the report; includes a graded transcript and a full report example.
+
+See also the eval case format (`evaluations/cases/README.md` in the Axiom repository), evaluation guide (`evaluations/README.md` in the Axiom repository), and [skill factory](../skill-factory/SKILL.md).

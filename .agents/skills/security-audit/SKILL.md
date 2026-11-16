@@ -63,8 +63,8 @@ The high/medium test: does the result **fully defeat** an explicit control for a
 
 1. Scope the question: the component, the diff, or the reported behavior.
 2. Identify the trust boundaries the code touches ([reconnaissance](references/reconnaissance.md), questions only).
-3. Load only the relevant [attack-surface checklist](references/attack-surfaces.md) sections.
-4. Trace candidate paths from entry point to sink; check the strongest controls on each path.
+3. Load only the relevant [attack-surface checklist](references/attack-surfaces.md) sections, then the matching class reference from the table below for sinks, safe patterns, and traps.
+4. Trace candidate paths from entry point to sink; check the strongest controls on each path ([hunting method](references/hunting-and-validation.md)). Validate with the harmless techniques listed there.
 5. Answer with confirmed findings, `needs_validation` items, rejected concerns, and hardening notes, each with file:line evidence and the smallest fix.
 
 ## Full audit procedure
@@ -105,8 +105,22 @@ For each confirmed finding, state the invariant the code must enforce and the na
 
 ## References
 
-- [Reconnaissance](references/reconnaissance.md)
-- [Attack-surface checklists](references/attack-surfaces.md)
-- [Hunting and validation](references/hunting-and-validation.md)
-- [Records, ledger, and report](references/reporting.md)
-- Security audit workflow (`workflows/security-audit/WORKFLOW.md` in the Axiom repository), security tools integration (`integrations/security-tools/README.md` in the Axiom repository)
+Open a reference when its trigger applies. Do not load all of them.
+
+| Reference | Open when |
+|---|---|
+| [Reconnaissance](references/reconnaissance.md) | Mapping a codebase: stack fingerprint, entry points, trust-boundary questions, ledger, prioritization |
+| [Attack-surface checklists](references/attack-surfaces.md) | Choosing what to hunt; the obvious-exposure sweep; non-web surfaces (cloud, IPC, AI, memory safety) |
+| [Hunting and validation](references/hunting-and-validation.md) | Tracing a candidate, choosing a harmless validation, applying the candidate gate, briefing hunters and verifiers |
+| [Records, ledger, and report](references/reporting.md) | Writing a finding, calibrating severity, shaping a guidance answer or full report |
+| [Injection](references/injection.md) | Input reaches SQL, NoSQL, shell, templates, `eval`, LDAP, or headers |
+| [Authentication and sessions](references/authn-and-session.md) | Login, sessions, JWT, OAuth/OIDC, SAML, MFA, password reset, API keys |
+| [Authorization and tenancy](references/authz-and-tenancy.md) | Requests name resource IDs; roles differ; several tenants share storage; writes bind request bodies to models |
+| [SSRF](references/ssrf.md) | The server fetches a URL or host that a user or tenant influences |
+| [Files and deserialization](references/files-and-deserialization.md) | Paths from input, uploads, archive extraction, XML parsing, pickle/YAML/Java/PHP deserialization |
+| [Browser and web](references/browser-and-web.md) | HTML rendering, cookie-auth state changes, CORS, redirects, `postMessage`, security headers |
+| [Secrets and crypto](references/secrets-and-crypto.md) | Credentials in the repo or bundles, token generation, password hashing, encryption, webhook signatures, debug exposure |
+| [Supply chain](references/supply-chain.md) | Dependency advisories, lockfiles, registries, CI workflows, release and update integrity |
+| [Business logic](references/business-logic.md) | Money, credits, quotas, approvals, multi-step flows, check-then-act races, export/import abuse |
+
+Related repository files: security audit workflow (`workflows/security-audit/WORKFLOW.md` in the Axiom repository), security tools integration (`integrations/security-tools/README.md` in the Axiom repository).

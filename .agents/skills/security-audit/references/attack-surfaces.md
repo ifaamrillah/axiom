@@ -2,6 +2,37 @@
 
 Load only the sections that match the surfaces found in reconnaissance. Each item is a question to trace in source, not a finding. A finding still needs all six elements from `SKILL.md`.
 
+## Deep references by vulnerability class
+
+Each section below is a short checklist. When a question applies, open the matching class reference for sinks by framework, vulnerable and safe code, harmless validation, false-positive traps, and severity guidance.
+
+| Class | Reference | Typical surfaces |
+|---|---|---|
+| SQL, NoSQL, command, template, expression, LDAP, header injection | [injection](injection.md) | Query builders, ORMs' raw APIs, shell calls, template rendering, `eval` |
+| Login, sessions, JWT, OAuth/OIDC, SAML, MFA, reset, API keys | [authn-and-session](authn-and-session.md) | Auth middleware, token verification, recovery flows |
+| IDOR/BOLA, function-level authz, mass assignment, tenant isolation | [authz-and-tenancy](authz-and-tenancy.md) | Any handler that takes a resource ID; ORMs; multi-tenant stores |
+| SSRF | [ssrf](ssrf.md) | Webhooks, URL import, previews, renderers, proxies |
+| Path traversal, uploads, archives, XXE, deserialization | [files-and-deserialization](files-and-deserialization.md) | File APIs, upload handlers, XML parsers, pickle/YAML/Java serialization |
+| XSS, CSRF, CORS, headers, open redirect, postMessage | [browser-and-web](browser-and-web.md) | Templates, SPAs, cookie-auth APIs, cross-origin config |
+| Secrets, randomness, password hashing, crypto, webhook signatures, debug exposure | [secrets-and-crypto](secrets-and-crypto.md) | Config, env, key files, token generators, crypto calls |
+| Vulnerable dependencies, dependency confusion, CI workflows, release | [supply-chain](supply-chain.md) | Manifests, lockfiles, `.github/workflows`, Dockerfiles |
+| Races, state machines, numeric abuse, feature abuse, fail-open | [business-logic](business-logic.md) | Money, credits, quotas, approvals, export/import |
+
+## Obvious-exposure sweep (do this literally, every full audit)
+
+Cheap checks that every team assumes someone else did. Each hit still needs a traced impact before it becomes a finding.
+
+- Committed secrets: `.env*`, `*.pem`, `*.key`, `credentials.json`, service-account JSON, tokens in config, fallback defaults such as `process.env.SECRET || 'dev'`. Is `.gitignore` covering them?
+- Security TODOs: `rg -n -i 'TODO|FIXME|HACK|XXX' | rg -i 'auth|secur|valid|permission|csrf|xss|sanitiz|escape|bypass'`.
+- Debug modes reachable in production config: `DEBUG = True`, `APP_DEBUG=true`, `app.run(debug=True)`, Spring Actuator `exposure.include=*`, `/debug/pprof`.
+- Unprotected operational routes: `/admin`, `/debug`, `/metrics`, `/actuator`, `/env`, `/health` with details, `/graphql` introspection plus playground, `/swagger` on private APIs.
+- Seed, demo, or test accounts with fixed passwords that production also loads.
+- Dynamic code execution with input: `eval`, `exec`, `Function`, `vm.run*`, `child_process`, `shell=True`, `Runtime.exec`.
+- Permissive CORS with credentials; cookies without `HttpOnly`, `Secure`, or `SameSite` on session cookies.
+- Redirect parameters (`next`, `return`, `redirect`, `url`, `goto`, `continue`) passed to redirects.
+- Error handlers returning stack traces, SQL errors, or internal paths.
+- Lockfiles present and committed; obviously outdated security-critical packages.
+
 ## Web, protocol, and authentication
 
 - Is authentication enforced on every route, including alternate verbs, versioned or legacy paths, websockets, and GraphQL resolvers?
@@ -12,6 +43,10 @@ Load only the sections that match the surfaces found in reconnaissance. Each ite
 - Injection: SQL/NoSQL, command, template, LDAP, header, and path traversal at every sink.
 - Mass assignment and over-posting; hidden fields that change authority (role, tenant, owner).
 - Password reset, MFA, and account recovery flows that bypass the primary control.
+- Host and forwarded headers (`Host`, `X-Forwarded-Host`, `X-Forwarded-For`, `Forwarded`) used for absolute URLs, reset links, tenant routing, or client-IP allowlists. Who can set them, and does trusted ingress strip client copies?
+- Cache poisoning and deception: a request value that changes the response but is not in the cache key, or a private dynamic page cached because its path looks static (`/account/profile.css`). Needs both the cache and the app behavior; cache config outside the repo makes it `needs_validation`.
+- Request smuggling: only relevant when the repo contains a proxy, gateway, or custom HTTP parser. Name both components and how each frames the same bytes.
+- GraphQL: per-field authorization on nested types, introspection exposure, batching and alias abuse against rate limits, query depth and cost limits.
 
 ## Data isolation and lifecycle
 
@@ -19,6 +54,10 @@ Load only the sections that match the surfaces found in reconnaissance. Each ite
 - Are derived copies (caches, analytics, logs, backups, search) scoped and deleted with the source data?
 - Do deletion and retention reach every copy? Can soft-deleted data still be reached?
 - Do signed URLs and shared links expire and stay bound to their intended resource?
+- Do cache keys, object-storage paths, search document IDs, temp files, and unique constraints include the tenant?
+- Do bypass clients (`unscoped`, `withoutGlobalScope`, service-role keys, raw SQL, admin DB users) appear on request paths?
+- Do import, restore, undo, and migration paths re-apply current ownership and validation?
+- Do counts, filters, sort orders, and error differences reveal confidential state (existence or aggregate oracles)?
 
 ## Client side
 
@@ -56,6 +95,11 @@ Load only the sections that match the surfaces found in reconnaissance. Each ite
 - Do model-chosen tool arguments cross authority boundaries (file paths, URLs, SQL, shell, other users' data)?
 - Is model output rendered as HTML or Markdown that can exfiltrate data (image URLs with query data)?
 - Are per-user data boundaries preserved in retrieval (RAG) indexes?
+- Is authorization for tool calls enforced in code on the end user's identity, not in the system prompt? Instructions in a prompt are not a control.
+- Can content written by one user (memory, shared documents, tickets) persist into another user's model context?
+- Do destructive or irreversible tool actions require confirmation bound to the exact action and arguments?
+- Do MCP or plugin servers authenticate the client and scope tokens per user, or share one powerful credential?
+- Does model output reach `eval`, SQL, shell, file paths, or `innerHTML` without the same validation as user input?
 
 ## Resource exhaustion and availability
 
@@ -67,3 +111,5 @@ Load only the sections that match the surfaces found in reconnaissance. Each ite
 
 - In C, C++, and unsafe Rust or Go: bounds checks on parser input, integer overflow before allocation, use-after-free in error paths.
 - Prefer existing sanitizer or fuzz harnesses, run inside the sandbox with limits.
+
+Sources: adapted from cloudflare/security-audit-skill (MIT), addyosmani/agent-skills (MIT) and general practice.

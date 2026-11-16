@@ -25,18 +25,18 @@ Keep the plan concise enough to hold in context. If it grows past a few pages, t
 ## Procedure
 
 1. **Constitution check.** List each MUST principle as pass, fail, or not applicable. Justify unavoidable violations in a complexity-tracking table (see the [constitution template](../quality-constraints/assets/constitution.md)).
-2. **File map first.** List the files to create or modify and each file's single responsibility. Follow existing patterns. Files that change together live together.
-3. **Decompose into tasks.** A task is the smallest unit that carries its own test cycle and is worth a reviewer's gate. Fold setup, configuration, and documentation into the task whose deliverable needs them.
-4. **Order by dependency.** Put setup first, then foundations, then stories in priority order (P1 first, as a viable increment), then polish. Mark tasks that can run in parallel with `[P]`: different files and no unmet dependency.
+2. **File map first.** List the files to create or modify and each file's single responsibility. Follow existing patterns. Files that change together live together. Copy exact spec values (limits, names, messages, units) into a short **Global constraints** section under Scope.
+3. **Decompose into tasks.** A task is the smallest unit that carries its own test cycle and is worth a reviewer's gate. Fold setup, configuration, and documentation into the task whose deliverable needs them. Aim for S–M tasks (1–5 files plus tests); split anything larger. Prefer vertical slices (one behavior through every layer) over horizontal layers. See [sizing and ordering](references/sizing-and-ordering.md) for split and merge rules.
+4. **Order by dependency.** Put setup first, then foundations, then stories in priority order (P1 first, as a viable increment), then polish. Put the riskiest task early within each level. Every task leaves the build green. Add a checkpoint (full gate plus one end-to-end check) after every 2–4 tasks and after each priority level. Mark tasks that can run in parallel with `[P]`: different files, no unmet dependency, and no shared contract change. Migrations are never `[P]`.
 5. **Specify each task:**
    - ID, title, story or requirement IDs covered (`US1`, `FR-003`), and `[P]` if parallel-safe.
    - Exact file paths, and the allowed, restricted, and shared files when delegating.
-   - Interfaces: names and signatures decided here.
+   - Interfaces: names and signatures decided here, as **Produces** and **Consumes** lines so neighboring tasks use identical names.
    - Steps, one checkable action each: write the failing test → run it (expect failure) → implement → run it (expect pass) → commit.
    - Verification command and expected result.
 6. **Map coverage.** Every must-have requirement maps to at least one task. Every task maps to a requirement or a recorded technical need.
 7. **Record risks**, the integration order, and the shared-file owner.
-8. **Self-check** against the Ready for Development standard below. For non-trivial plans, request a plan review ([code-review](../code-review/SKILL.md) plan mode) or run [spec-analysis](../spec-analysis/SKILL.md).
+8. **Self-check** against the Ready for Development standard below and the [plan anti-patterns](references/plan-anti-patterns.md) (including its grep checks for placeholders, missing verify lines, and uncited requirement IDs). For non-trivial plans, request a plan review ([code-review](../code-review/SKILL.md) plan mode) or run [spec-analysis](../spec-analysis/SKILL.md).
 
 ## Ready for Development standard
 
@@ -58,4 +58,8 @@ Set the plan frontmatter `status: ready` only when all six hold.
 ## References
 
 - [Plan template](assets/PLAN.md), [task template](assets/TASK.md)
+- [Sizing and ordering](references/sizing-and-ordering.md): open when drawing task boundaries, choosing slices, ordering, marking `[P]`, or picking verification commands per stack.
+- [Worked plan](references/worked-plan.md): open before writing your first plan, or to calibrate detail; a full ready plan built from a real spec.
+- [Plan anti-patterns](references/plan-anti-patterns.md): open during the self-check (step 8).
+- [How an executor consumes a plan](references/executing-a-plan.md): open to check the plan gives an executor what it needs (checkpoints, stop conditions, evidence), or when executing a plan yourself.
 - [Execution loop](../axiom-orchestrator/references/execution.md)

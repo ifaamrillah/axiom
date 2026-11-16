@@ -41,12 +41,12 @@ Check existing skills first. Extending or composing beats a near-duplicate.
 ## Procedure
 
 1. **Define the job.** State the recurring task, the user, the activation cases, the non-activation cases, and the expected output.
-2. **Write eval cases first** in `evaluations/cases/<skill>.md`: at least 2 positive triggers, 1 negative with its owner, and 1 behavior case with observable expectations and failure signals. See the case format (`evaluations/cases/README.md` in the Axiom repository).
-3. **Run the baseline (red).** Run the behavior case without the skill, or with the current version, in a fresh session or subagent. Record the exact failures and the rationalizations the agent used ("this is too simple to test"). If you cannot start a fresh run here, write the failures you predict under `## Baseline` in the case file, label them **predicted, not observed**, and say in your report that the baseline is still owed.
+2. **Write eval cases first** in `evaluations/cases/<skill>.md`: at least 2 positive triggers, 1 negative with its owner, and 1 behavior case with observable expectations and failure signals. For a discipline skill, make at least one behavior case a pressure scenario that combines three or more pressures ([pressure testing](references/pressure-testing.md)). See the case format (`evaluations/cases/README.md` in the Axiom repository).
+3. **Run the baseline (red).** Run the behavior case without the skill, or with the current version, in a fresh session or subagent. Record the exact failures and the rationalizations the agent used ("this is too simple to test"), verbatim. They become the rationalization catalog. If you cannot start a fresh run here, write the failures you predict under `## Baseline` in the case file, label them **predicted, not observed**, and say in your report that the baseline is still owed.
 4. **Write the minimum skill (green):**
-   - Frontmatter has only `name` (equal to the directory) and `description`. The description says what the skill does and contains a "Use when/for …" trigger clause with the words users actually type.
+   - Frontmatter has only `name` (equal to the directory) and `description`. The description says what the skill does and contains a "Use when/for …" trigger clause with the words users actually type. Do not list the procedure's steps in the description; agents may follow the summary and skip the body ([triggers](references/triggers.md)).
    - The body has purpose, the rule (if a discipline skill), procedure, outputs and gate, failure handling, and references.
-   - Address the recorded failures directly. For discipline skills, add a red-flag or rationalization table built from the baseline.
+   - Address the recorded failures directly. For discipline skills, add a red-flag or rationalization table built from the baseline, and phrase the rule as a bright line ([persuasion principles](references/persuasion.md)). Match the fix to the failure kind: discipline failures need rules and counters; shape failures need templates and examples.
    - Keep `SKILL.md` under about 200 lines. Move depth to `references/`, linked from `SKILL.md` and read on demand.
    - Keep it portable. Host tool names and configuration belong in `adapters/`.
 5. **Run with the skill.** Run the trigger cases and the behavior cases. Fix description wording when triggers miss, and fix body wording when behavior fails.
@@ -68,6 +68,10 @@ The skill directory, its eval cases, and recorded baseline and post-skill result
 
 ## References
 
+Open when you reach the matching step:
+- [Triggers](references/triggers.md): writing or fixing the description; collisions with sibling skills (steps 4-5).
+- [Pressure testing](references/pressure-testing.md): building scenarios, running the baseline, the rationalization catalog, closing loopholes (steps 2-3, 6).
+- [Persuasion principles](references/persuasion.md): wording rules in discipline skills so they hold under pressure (step 4).
 - Skill contract (`core/contracts/SKILL-CONTRACT.md` in the Axiom repository)
 - Skill template (`templates/skills/SKILL.template.md` in the Axiom repository)
 - [Skill evaluator](../skill-evaluator/SKILL.md)

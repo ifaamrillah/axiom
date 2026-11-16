@@ -33,8 +33,9 @@ The request, existing product docs and code, prior decisions, and constraints. D
    - Phrase it so that "yes" accepts your recommended answer ("I'd scope this to logged-in customers only. OK?").
    - Prefer multiple choice with a recommendation over open questions.
    - After each answer, update your understanding and choose the next question. Do not send a questionnaire.
+   - Pick the technique that fits the gap (5 whys for solution-first requests, jobs to be done for unclear users, pre-mortem for untested ideas, constraint inversion for growing scope). Open [elicitation techniques](references/elicitation-techniques.md) when you are unsure which question to ask next.
 4. **Track clarity** across the dimensions in the next section. Stop asking when the dimensions that matter are Clear, when the user wants to proceed, or after about 7 questions. Record the rest as assumptions.
-5. **Propose 2–3 approaches** with trade-offs (value, cost, risk, reversibility). Recommend one and give the reason.
+5. **Propose 2–3 approaches** with trade-offs (value, cost, risk, reversibility). Recommend one and give the reason. Use the comparison table in the [worked example](references/discovery-example.md#step-3-approach-comparison). A strawman option does not count as an approach.
 6. **Write a short design summary:** problem, users, outcome and success signal, the chosen approach and the rejected ones, scope and non-goals, assumptions, and open decisions. Size it to the work: a paragraph for small features, a page for large ones.
 7. **Get approval.** For feature work, nothing proceeds to specification or implementation until the user approves the summary. Approval covers only what was shown. Agreement with an idea is not approval of a summary you have not written.
 
@@ -57,4 +58,6 @@ A design summary using the [discovery brief template](assets/brief.md). Gate: th
 
 ## References
 
+- [Elicitation techniques](references/elicitation-techniques.md): open when choosing the next question, or when a session stalls.
+- [Worked discovery example](references/discovery-example.md): open before your first discovery session, or to check pacing, approach comparison, and brief shape.
 - [Requirements analysis](../requirements-analysis/SKILL.md), [clarification taxonomy](../requirements-analysis/references/clarification-taxonomy.md)

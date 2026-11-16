@@ -42,7 +42,7 @@ Avoid or adapt for exploratory spikes (throw the spike away afterward), pure con
 
 ## Tests for existing code (characterization)
 
-When adding tests for behavior that already exists, there is no natural red step. Prove each test can fail: temporarily break the production code the test targets (one mutation per behavior), watch the test fail for the intended reason, then restore the original and confirm with `git status` or a diff that production code is unchanged. A test that survives the mutation tests nothing.
+When adding tests for behavior that already exists, there is no natural red step. For untested legacy code, first break dependencies at a seam (see [TDD in hard places](references/tdd-in-hard-places.md)). Prove each test can fail: temporarily break the production code the test targets (one mutation per behavior), watch the test fail for the intended reason, then restore the original and confirm with `git status` or a diff that production code is unchanged. A test that survives the mutation tests nothing.
 
 ## Bug fixes
 
@@ -53,6 +53,8 @@ Reproduce the bug as a failing test first. The red run must show the reported sy
 - Test observable behavior through public interfaces; avoid asserting private implementation details.
 - One reason to fail per test. Arrange, act, assert.
 - Prefer real collaborators. Mock only slow, non-deterministic, or external boundaries.
+- Derive expected values by hand as literals. Never compute them with the code under test.
+- Before finishing, check that a realistic mutation (wrong comparison, empty return, missing side effect) fails at least one test.
 - Never weaken an assertion, mark a test skipped, or delete a test to reach green.
 - Avoid sleeps; wait on conditions (see [condition-based waiting](../debugging/references/condition-based-waiting.md)).
 
@@ -73,6 +75,11 @@ Changed tests and code, plus a short log of the cycle: the test, the observed fa
 
 ## References
 
+Open these when the situation applies:
+
+- [Worked examples](references/worked-examples.md): full red-green-refactor cycles in Python, TypeScript, and Go, a bug-fix cycle, what counts as a valid red, and a cycle log template. Open on your first cycle in an unfamiliar stack.
+- [Testing anti-patterns](references/testing-anti-patterns.md): mocking the unit under test, implementation-detail tests, test-only production methods, incomplete mocks, mirror assertions, change detectors, and the mutation check. Open before adding a mock or helper, when a test passes on its first run, or when reviewing tests.
+- [TDD in hard places](references/tdd-in-hard-places.md): legacy code seams and characterization, UI components, async and timers, external services and their doubles. Open when the code is untested, asynchronous, a UI, or calls a third party.
 - [Testing](../testing/SKILL.md) for choosing test layers.
 - [Verification before completion](../verification-before-completion/SKILL.md).
 - Quality gate contract (`core/contracts/QUALITY-GATE-CONTRACT.md` in the Axiom repository).
