@@ -33,7 +33,7 @@ Load a skill when its situation applies; skip ceremony for trivial changes.
 
 ## Proportionality
 
-A typo or one-line fix needs no workflow, plan file, or review ceremony, but rules 1–8 still apply. Escalate process with scope, risk, and uncertainty, not by default.
+A typo or one-line fix needs no workflow, plan file, or review ceremony, but rules 1–8 still apply. Escalate process with scope, risk, and uncertainty, not by default. Proportionality never skips a gate the project itself defines (for example an approved plan before feature code, or end-to-end tests per acceptance criterion): project rules win where they are stricter.
 
 ## Project facts and pitfalls
 

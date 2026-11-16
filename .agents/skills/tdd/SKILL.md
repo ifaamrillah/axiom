@@ -40,6 +40,10 @@ Avoid or adapt for exploratory spikes (throw the spike away afterward), pure con
 7. **Repeat** for the next behavior, edge case, or failure path.
 8. **Close** with the broader suite proportionate to risk, then inspect the diff.
 
+## Tests for existing code (characterization)
+
+When adding tests for behavior that already exists, there is no natural red step. Prove each test can fail: temporarily break the production code the test targets (one mutation per behavior), watch the test fail for the intended reason, then restore the original and confirm with `git status` or a diff that production code is unchanged. A test that survives the mutation tests nothing.
+
 ## Bug fixes
 
 Reproduce the bug as a failing test first. The red run must show the reported symptom. After the fix, the same test passes. Keep it as the regression test.

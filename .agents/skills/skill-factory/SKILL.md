@@ -35,7 +35,7 @@ Check existing skills first. Extending or composing beats a near-duplicate.
    - Keep it portable. Host tool names and configuration belong in `adapters/`.
 5. **Run with the skill.** Run the trigger cases and the behavior cases. Fix description wording when triggers miss, and fix body wording when behavior fails.
 6. **Refactor.** Look for new rationalizations, add counters, and rerun. Remove instructions that no case needs.
-7. **Validate.** Run `python3 scripts/validate_repository.py` and `python3 scripts/run_evals.py --check`. Record runs in `evaluations/results/`.
+7. **Validate.** In the Axiom repository, run `python3 scripts/validate_repository.py` and `python3 scripts/run_evals.py --check`, and record runs in `evaluations/results/`. Elsewhere, use the project's equivalent checks and keep the records next to the cases.
 8. **Label maturity honestly**: Experimental until recorded runs pass on at least one host.
 
 ## Writing rules
