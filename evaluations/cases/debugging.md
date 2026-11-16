@@ -1,5 +1,6 @@
 ---
 skill: debugging
+fixture: evaluations/fixtures/discount-bug
 ---
 
 # Eval cases: debugging
@@ -9,7 +10,7 @@ skill: debugging
 - "The checkout tests started failing after yesterday's merge. Can you figure out why?"
 - "apply_discount returns 0 for a 10% discount, it should be 900"
 - "This test passes alone but fails when I run the whole suite"
-- "build is broken on CI with 'undefined is not a function', fix pls"
+- "CI is red on the pricing tests since the last merge, fix pls"
 
 ## Should not trigger
 

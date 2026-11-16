@@ -50,6 +50,7 @@ class Behavior:
 class CaseFile:
     path: Path
     skill: str
+    fixture: str = ""
     positive: list[str] = field(default_factory=list)
     negative: list[tuple[str, str]] = field(default_factory=list)
     behaviors: list[Behavior] = field(default_factory=list)
@@ -71,7 +72,11 @@ def parse_case(path: Path) -> CaseFile:
     if front:
         found = re.search(r"(?m)^skill:\s*([a-z0-9-]+)\s*$", front.group(1))
         skill = found.group(1) if found else ""
-    case = CaseFile(path=path, skill=skill)
+        fixture_match = re.search(r"(?m)^fixture:\s*(\S+)\s*$", front.group(1))
+        fixture = fixture_match.group(1) if fixture_match else ""
+    else:
+        fixture = ""
+    case = CaseFile(path=path, skill=skill, fixture=fixture)
     case.positive = [_strip_quotes(b) for b in _bullets(_section(text, "Should trigger"))]
     for bullet in _bullets(_section(text, "Should not trigger")):
         prompt, _, owner = bullet.partition("→")
@@ -113,6 +118,8 @@ def check(cases: list[CaseFile]) -> list[str]:
         if not case.skill:
             errors.append(f"{rel}: frontmatter 'skill:' missing")
             continue
+        if case.fixture and not (ROOT / case.fixture).exists():
+            errors.append(f"{rel}: trigger fixture missing: {case.fixture}")
         if case.skill not in skills:
             errors.append(f"{rel}: unknown skill '{case.skill}'")
         if case.path.stem != case.skill:
@@ -136,13 +143,29 @@ def check(cases: list[CaseFile]) -> list[str]:
     return errors
 
 
-def prepare_workspace(fixture: str) -> Path:
-    """Create an isolated project: optional fixture copy plus skills in the host path."""
+KERNEL = SKILLS_DIR / "axiom-orchestrator" / "references" / "kernel.md"
+
+
+def kernel_block() -> str:
+    """Behavior, Routing, and Proportionality sections, as the project-instructions block installs them."""
+    text = KERNEL.read_text(encoding="utf-8")
+    start = text.index("## Behavior")
+    end = text.index("## Project facts")
+    return "<!-- axiom:begin -->\n# Axiom\n\n" + text[start:end].rstrip() + "\n<!-- axiom:end -->\n"
+
+
+def prepare_workspace(fixture: str, kernel: bool = True) -> Path:
+    """Create an isolated project: optional fixture copy, skills in the host path, and,
+    by default, the kernel in the project instructions files as a documented install does."""
     workdir = Path(tempfile.mkdtemp(prefix="axiom-eval-"))
     if fixture:
         shutil.copytree(ROOT / fixture, workdir, dirs_exist_ok=True)
     shutil.copytree(SKILLS_DIR, workdir / ".claude" / "skills")
     shutil.copytree(SKILLS_DIR, workdir / ".agents" / "skills")
+    if kernel:
+        block = kernel_block()
+        for name in ("CLAUDE.md", "AGENTS.md"):
+            (workdir / name).write_text(block, encoding="utf-8")
     subprocess.run(["git", "init", "-q"], cwd=workdir, check=False)
     return workdir
 
@@ -228,7 +251,7 @@ def run_triggers(cases: list[CaseFile], args: argparse.Namespace) -> list[str]:
             if args.dry_run:
                 print(" ".join(cmd[:2]) + f" {json.dumps(prompt)} " + " ".join(cmd[3:]))
                 continue
-            workdir = prepare_workspace("")
+            workdir = prepare_workspace(case.fixture, not args.no_kernel)
             code, out = run_host(cmd, workdir, args.timeout)
             shutil.rmtree(workdir, ignore_errors=True)
             used = invoked_skills(out)
@@ -253,7 +276,7 @@ def run_behaviors(cases: list[CaseFile], args: argparse.Namespace) -> list[str]:
                 print(f"[{case.skill}/{behavior.case_id}] fixture={behavior.fixture or 'none'} "
                       f"claude -p {json.dumps(behavior.prompt)[:80]}…")
                 continue
-            workdir = prepare_workspace(behavior.fixture)
+            workdir = prepare_workspace(behavior.fixture, not args.no_kernel)
             code, out = run_host(cmd, workdir, args.timeout)
             shutil.rmtree(workdir, ignore_errors=True)
             final = _final_text(out)
@@ -310,11 +333,16 @@ def write_results(kind: str, args: argparse.Namespace, body: str) -> Path:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     stamp = dt.datetime.now().strftime("%Y-%m-%d-%H%M")
     path = RESULTS_DIR / f"{stamp}-{args.host}-{kind}.md"
+    n = 2
+    while path.exists():  # several runs can finish within one minute; never overwrite a record
+        path = RESULTS_DIR / f"{stamp}-{args.host}-{kind}-{n}.md"
+        n += 1
     header = (f"# Eval run: {kind} on {args.host}\n\n"
               f"- Date: {dt.datetime.now().isoformat(timespec='minutes')}\n"
               f"- Host version: {host_version(args.host)}\n- Model: {args.model or 'host default'}\n"
               f"- Skill filter: {args.skill or 'all'}\n- Max turns: {args.max_turns}\n"
               f"- Isolation: {'user settings excluded' if not args.no_isolate else 'user settings loaded'}\n"
+              f"- Kernel in project instructions: {'no' if args.no_kernel else 'yes'}\n"
               f"- Per-run budget cap (USD): {args.budget or 'none'}\n"
               f"- Runner: scripts/run_evals.py\n\n")
     path.write_text(header + body, encoding="utf-8")
@@ -335,6 +363,8 @@ def main() -> int:
                         help="per-run spend cap in USD passed to the host (0 disables)")
     parser.add_argument("--no-isolate", action="store_true",
                         help="also load the maintainer's user-level host settings")
+    parser.add_argument("--no-kernel", action="store_true",
+                        help="omit the kernel block from CLAUDE.md/AGENTS.md (measure skills alone)")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 

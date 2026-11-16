@@ -82,6 +82,24 @@ class InvokedSkillsTest(unittest.TestCase):
 
 
 class RepositoryCasesTest(unittest.TestCase):
+    def test_kernel_block_carries_rules_without_project_facts(self):
+        block = run_evals.kernel_block()
+        self.assertIn("Reproduce before fixing", block)
+        self.assertIn("## Routing", block)
+        self.assertNotIn("## Project facts", block)
+
+    def test_workspace_kernel_toggle(self):
+        import shutil
+        with_kernel = run_evals.prepare_workspace("", kernel=True)
+        without = run_evals.prepare_workspace("", kernel=False)
+        try:
+            self.assertTrue((with_kernel / "CLAUDE.md").exists())
+            self.assertTrue((with_kernel / "AGENTS.md").exists())
+            self.assertFalse((without / "CLAUDE.md").exists())
+        finally:
+            shutil.rmtree(with_kernel)
+            shutil.rmtree(without)
+
     def test_repository_cases_are_valid(self):
         self.assertEqual(run_evals.check(run_evals.load_cases()), [])
 

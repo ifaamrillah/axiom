@@ -3,9 +3,10 @@ name: tdd
 description: >
   Drive a behavior change with a red-green-refactor loop where every new test is
   seen failing for the intended reason before production code is written. Use when
-  the user asks for TDD, test-first work, or "a failing test first, then fix it",
-  and for new logic or bug fixes that need a regression test when the project has
-  a runnable test harness.
+  the user asks for TDD, test-first work, or to write a failing test before fixing
+  a bug ("write a failing test for this bug first, then fix it"), and for new logic
+  or bug fixes that need a regression test when the project has a runnable test
+  harness. When the bug's cause is still unknown, pair with debugging.
 ---
 
 # Test-Driven Development

@@ -1,5 +1,6 @@
 ---
 skill: tdd
+fixture: evaluations/fixtures/discount-bug
 ---
 
 # Eval cases: tdd
@@ -7,8 +8,8 @@ skill: tdd
 ## Should trigger
 
 - "Use TDD to add a percent cap to apply_discount"
-- "Write a failing test for this bug first, then fix it"
-- "Add validation for negative quantities, test-first please"
+- "apply_discount(1000, 10) returns 0. Write a failing test for this bug first, then fix it"
+- "Make apply_discount reject negative totals, test-first please"
 
 ## Should not trigger
 

@@ -21,3 +21,11 @@ All notable changes to Axiom are documented here.
 - **M11 Domain depth:** rewrite `security-audit` (guidance vs full audit, six-element findings, severity anchors, `needs_validation`, coverage ledger, refuting verifiers, profiles and budget); add elicitation to `product-discovery`; add priority UI rules and a design-system master to `ui-ux-design`; add concrete browser automation and documentation-search protocols; add freshness metadata and pitfalls to documentation; add role capability and write metadata and `.axiom/config.md`.
 - **M12 Distribution:** add Claude Code plugin and marketplace manifests (skills from `.agents/skills/`, kernel hook, read-only reviewer, security-reviewer, and researcher subagents); document `npx skills` installation and AGENTS.md bootstrap for Codex, OpenCode, and Antigravity.
 - Credit adapted ideas in `docs/acknowledgements.md`.
+
+### M8–M12 follow-up: eval fixes (2026-11-16)
+
+- Kernel gains rule 5, **Reproduce before fixing**; later rules are renumbered (evidence before claims is now rule 6). Routing names the "X returns Y, should be Z" and "failing test first" phrasings.
+- `tdd` description names the "failing test for this bug first" request.
+- `run_evals.py`: workspaces receive the kernel in `CLAUDE.md`/`AGENTS.md` like a documented install (`--no-kernel` to measure skills alone); case files may set a `fixture:` for trigger runs; result files are never overwritten.
+- `tdd` and `debugging` trigger cases that referred to code now run against the `discount-bug` fixture.
+- Evidence: trigger 5/5 (`tdd`) and 7/7 (`debugging`); behavior `debugging/B1` passes 2/2 recorded runs and `tdd/B1` 1/1; marketplace install from GitHub verified.
