@@ -26,7 +26,7 @@ Default to **analyze**. Use **converge** only when the user asks what is left, o
 
 1. **Load progressively.** Read requirement IDs, stories, and scenarios from the spec; architecture decisions and constraints from the plan; and IDs, descriptions, and file paths from the tasks. Do not read entire files when sections suffice.
 2. **Build an inventory** that maps each requirement and scenario to the tasks that cover it.
-3. **Run the detection passes:**
+3. **Run the detection passes.** Open [detection passes](references/detection-passes.md) for the inventory commands, real findings versus non-findings for each pass, and how to phrase a finding.
    - **Duplication:** near-identical requirements or tasks.
    - **Ambiguity:** unquantified adjectives, leftover `[NEEDS CLARIFICATION]`, TODO or TBD placeholders.
    - **Underspecification:** a requirement with no measurable outcome; a task with no file path or no verification.
@@ -38,13 +38,13 @@ Default to **analyze**. Use **converge** only when the user asks what is left, o
    - **High:** a conflicting or ambiguous requirement affecting security, data, or a P1 story.
    - **Medium:** terminology drift, a missing non-functional task, or an underspecified edge case.
    - **Low:** wording and minor redundancy.
-5. **Report** (format below), then recommend next actions. Critical findings mean returning to requirements or planning before implementation. Offer remediation edits, but do not apply them without approval.
+5. **Report** (format below), then recommend next actions. The [worked analysis](references/worked-analysis.md) shows a full report and why each severity was chosen. Critical findings mean returning to requirements or planning before implementation. Offer remediation edits, but do not apply them without approval.
 
 ## Converge procedure
 
 1. Treat spec, plan, and tasks as the only source of intent, with the constitution as governing constraints.
-2. Inspect the current code and tests for each requirement and scenario. Classify each one as met, partially met, or unmet, with file evidence.
-3. Append one section, `## Convergence N (YYYY-MM-DD)`, to the task list. It contains new tasks for the remaining work, each traced to its requirement ID, with file paths and verification.
+2. Inspect the current code and tests for each requirement and scenario. Checked boxes are claims, not evidence. Classify each one as met, partial, missing, contradicts (code conflicts with intent), or unrequested (code with no requirement), with file evidence.
+3. Append one section, `## Convergence N (YYYY-MM-DD)`, to the task list. It contains new tasks for the remaining work, each traced to its requirement ID and gap type, with file paths and verification. Number new tasks after the highest existing ID. Put contradictions and constitution violations first. An unrequested item becomes a review task; converge never deletes code. See the [convergence example](references/worked-analysis.md#converge-mode-after-an-implementation-pass).
 4. **Never** edit the spec or plan, rewrite, renumber, reorder, or delete existing tasks, or change application code.
 5. If everything is met, leave the task list byte-for-byte unchanged and report a clean result.
 
@@ -67,4 +67,6 @@ Analysis is read-only. Do not invent requirements; report a gap instead. Prefer 
 
 ## References
 
+- [Detection passes](references/detection-passes.md): open before running analyze mode.
+- [Worked analysis and convergence](references/worked-analysis.md): open to check report shape, severity calls, or the append-only convergence format.
 - [Requirements analysis](../requirements-analysis/SKILL.md), [task planning](../task-planning/SKILL.md), [quality constraints](../quality-constraints/SKILL.md)

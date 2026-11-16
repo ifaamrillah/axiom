@@ -13,6 +13,39 @@ All notable changes to Axiom are documented here.
 - Add structural validation, CI, and human-reviewable skill, workflow, cross-agent, and context-efficiency fixtures.
 - Clarify that fixture definitions and official documentation inspection are not live model or platform test results.
 
+### Skill depth pass (2026-11-17)
+
+- Deepen all 24 skills with focused references:
+  - 13 vulnerability-class and method references for `security-audit`;
+  - curated style, palette, typography, interaction, data-display and per-stack tables for `ui-ux-design`;
+  - worked TDD cycles and a testing anti-pattern catalog;
+  - layer selection, fixtures, flakiness and per-ecosystem commands for `testing`;
+  - Playwright patterns, flake triage and an exploration flow;
+  - debugging playbooks by symptom, bisection, instrumentation and stack traces;
+  - evidence by claim and completion reports;
+  - defect patterns and per-language review checklists;
+  - a constraint catalog, ratchets and waivers, and bar-lowering detection;
+  - elicitation techniques and a discovery example;
+  - spec examples, acceptance criteria, an NFR catalog and ambiguity words;
+  - detection passes and a worked analysis;
+  - sizing, a worked plan, plan anti-patterns and plan execution;
+  - architecture decisions and ADRs, patterns, data and API design;
+  - implementation slicing, conventions and finishing a branch;
+  - release readiness and versioning, rollout and rollback;
+  - research sources, version pinning, local proof and citation;
+  - orchestration delegation, the review loop, worktrees and context budget;
+  - exploration recipes and entry points;
+  - onboarding knowledge files and verification;
+  - documentation types, ADRs, runbooks, API docs and freshness;
+  - skill triggers, pressure testing, persuasion, eval design and grading.
+- Skill content grows from 147 KB to 798 KB (5.4×). The median `SKILL.md` grows from 3.1 KB to 5.5 KB, and every `SKILL.md` stays under 130 lines. Skill descriptions are unchanged, so measured trigger accuracy is unaffected.
+- All content is rewritten in Axiom's wording and attributed per file. A 12-word phrase check found at most 3.7% overlap with any source. See `docs/acknowledgements.md`.
+- The plan template gains a Global constraints section.
+- New `notes-api` fixture with four seeded vulnerabilities and a safe decoy, and a new `security-audit` behavior case (B2).
+- New `tenant-billing` fixture (6 subtle multi-file vulnerabilities, 2 decoys, 4 correctness bugs) with `security-audit` B3 and `code-review` B2.
+- `run_evals.py --case` filters behavior cases.
+- Old vs deepened skills, Codex-graded: no difference with Opus (security 18/18 both; review 14/15 both). With Haiku, code review rose from 10/15 to 13/15 and security was unchanged. The sample is small. See `evaluations/results/2026-11-17-depth-comparison.md`.
+
 ### M8–M12: adoption pass (2026-11-16)
 
 - **M8 Behavior:** add the always-on Axiom kernel and a project instructions block with Pitfalls; add `verification-before-completion`; rewrite `tdd`, `debugging` (with root-cause tracing, condition-based waiting, and test-pollution bisection references), and `code-review` (spec-first, gap analysis, lenses, bar-lowering detection, blast radius, adversarial review). Add an optional read-only Claude Code SessionStart hook that prints the kernel.

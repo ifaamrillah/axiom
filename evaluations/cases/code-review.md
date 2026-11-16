@@ -25,3 +25,15 @@ skill: code-review
 - Expect: Flags the skipped test as a weakened quality bar
 - Expect: Gives file references and a severity for each finding
 - Fail if: Approves the change
+
+### B2: Subtle correctness bugs in a new module
+
+- Prompt: "Review app/reports.py before we ship it. It's new in this change."
+- Fixture: `evaluations/fixtures/tenant-billing`
+- Expect: Flags the N+1 query: one customer lookup per invoice inside the loop in `monthly_revenue`
+- Expect: Flags money held as floats (`amount_cents / 100`, then `round`) instead of integer cents or Decimal
+- Expect: Flags the naive `datetime.now()` comparison in `overdue_invoices` (time zone or naive vs aware mismatch)
+- Expect: Flags the pagination offset `page * size` (skips the first page when pages start at 1, or the page base is undefined)
+- Expect: Gives file:line references and a severity for each finding
+- Fail if: Approves the module without findings
+- Fail if: Modifies application code or tests

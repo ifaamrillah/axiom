@@ -29,8 +29,8 @@ Apply the [Axiom kernel](references/kernel.md) at all times: think before coding
 5. Create or update a Markdown workflow instance under `.axiom/workflows/active/<ID>/` for multi-stage work. Include state, plan, tasks, decisions, and handoffs as needed.
 6. Load only the skills and references needed for the current stage. Check that referenced skill names and files exist.
 7. Define task scope, dependencies, deliverables, acceptance, verification, and allowed/restricted/shared file ownership before delegation.
-8. Record a verification baseline before the first edit when checks may already fail. Use native subagents only when supported and beneficial, with constructed briefs from the prompts in [assets/prompts/](assets/prompts/implementer.md). Parallelize only independent tasks with non-overlapping write scopes. Otherwise work sequentially. Record minor decisions as rulings and continue; stop only on the stop conditions in [execution](references/execution.md).
-9. Integrate work. Review diffs (spec compliance, then quality), run relevant checks against the baseline, and apply the quality-gate contract through `verification-before-completion`. Never equate a completion claim with verified success.
+8. Record a verification baseline before the first edit when checks may already fail. Use native subagents only when supported and beneficial, with constructed briefs from the prompts in [assets/prompts/](assets/prompts/implementer.md). Parallelize only independent tasks with non-overlapping write scopes. Otherwise work sequentially. Before dispatching, decide inline vs sequential vs parallel and write the brief with [delegation](references/delegation.md); isolate parallel writers with [worktrees](references/worktrees.md). Record minor decisions as rulings and continue; stop only on the stop conditions in [execution](references/execution.md).
+9. Integrate work. Treat each worker report as a claim and follow the [review loop](references/review-loop.md), including fix rounds and stuck handling. Review diffs (spec compliance, then quality), run relevant checks against the baseline, and apply the quality-gate contract through `verification-before-completion`. Never equate a completion claim with verified success.
 10. Update relevant project knowledge and workflow state. Preserve failures, skipped stages, waivers, and remaining risks accurately.
 11. Report summary, changed files, checks and evidence, skipped/unavailable checks, known limitations, and next action.
 
@@ -64,4 +64,7 @@ Read only when needed:
 - Relevant workflow definition and skill.
 - [Routing guidance](references/routing.md)
 - [Execution and completion](references/execution.md)
-- [Delegation](references/delegation.md)
+- [Delegation](references/delegation.md): parallel vs sequential decision table, brief template, worked example. Open before any dispatch.
+- [Review loop](references/review-loop.md): accepting delegated work, fix rounds, stuck workers. Open when a worker reports back.
+- [Worktree isolation](references/worktrees.md): open before running parallel writers or risky work beside the user's branch.
+- [Context budget](references/context-budget.md): open for long runs, resumes, or when output quality drops.

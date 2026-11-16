@@ -18,6 +18,12 @@ One user-facing goal, stated as an observable result.
 - In scope:
 - Out of scope:
 
+### Global constraints
+
+Exact values copied from the spec and constitution (limits, names, messages, units) so every task uses the same ones.
+
+- 
+
 ## Constitution check
 
 | Principle | Result | Note |

@@ -23,8 +23,8 @@ If these files already exist and the user is not changing them, read and follow 
 
 1. **Inspect** the existing CI, linters, type checker, test coverage, and performance or accessibility tooling. Record which checks exist and which ones block merges.
 2. **Ask which dimensions matter** (correctness, coverage, types, security, accessibility, performance, bundle size, documentation). Ask one question at a time and recommend a default.
-3. **Propose numbers** when the user has none. Use the defaults in the [constraints template](assets/constraints.md) as a starting point, and mark them as defaults.
-4. **Bind each constraint to a check:** the command, where it runs (local or CI), and whether it blocks. A constraint without a check is a wish. Record it as such.
+3. **Propose numbers** when the user has none. Use the defaults in the [constraints template](assets/constraints.md) as a starting point, and mark them as defaults. The [constraint catalog](references/constraint-catalog.md) gives a default, its reason, and the enforcing command per ecosystem for complexity, size, coverage, types, lint, bundle, latency, and dependency policy. If the project fails a proposed number today, use a ratchet instead (see [ratchets and waivers](references/ratchets-and-waivers.md)).
+4. **Bind each constraint to a check:** the command, where it runs (local or CI), and whether it blocks. A constraint without a check is a wish. Record it as such. Before calling a row enforced, run its command once on a known violation and once on a clean control, and confirm the exit codes. Keep the edit loop under about 5 seconds; move slow checks to task end or CI.
 5. **Write** the files and link them from the project's instructions file (see the [Axiom block](../project-documentation/assets/agents-md-block.md)).
 
 In non-interactive contexts (CI or autonomous runs), do not interview. Apply the floor below, record that defaults were used, and flag the rest for a human.
@@ -51,7 +51,17 @@ Inspect the diff (and the CI configuration diff) for these patterns. Each one is
 | Relaxed thresholds | coverage, performance budget, lint level, or `--max-warnings` lowered; CI step made non-blocking (`continue-on-error`, `|| true`) |
 | Stubs | `NotImplementedError`, `todo!()`, `throw new Error("TODO")` in code reported as done |
 
+Exact per-language grep patterns, a diff-scoping recipe that includes untracked files, a one-shot scan, and a table for judging each hit are in [bar-lowering detection](references/bar-lowering-detection.md). Open it whenever you review a diff for a lowered bar.
+
 Report each one with file:line, the pattern, and the requirement it undermines. The remedy is to fix the underlying issue or obtain an explicit waiver (reason, scope, approver) under the quality gate contract (`core/contracts/QUALITY-GATE-CONTRACT.md` in the Axiom repository).
+
+## Ratchets and waivers
+
+- **Ratchet** when the codebase cannot meet a number today: record the current value, commit, and date; fail only when it gets worse; tighten when it improves. Never set a threshold the main branch fails.
+- **Waiver** when one change needs an exception: one rule, one scope, a reason, an owner, an approver who is not the author, an expiry (90 days by default), and a tracking issue. Cite the waiver ID at each suppression site.
+- Loosening a threshold, a rule, or a CI stage is a separate, approved change. Tightening needs no approval.
+
+Templates, a worked waiver example, and check scripts are in [ratchets and waivers](references/ratchets-and-waivers.md).
 
 ## Outputs and gate
 
@@ -59,5 +69,8 @@ Written constitution and constraints, each constraint bound to a check, or a low
 
 ## References
 
+- [Constraint catalog](references/constraint-catalog.md): measurable constraints, defaults, and commands per ecosystem
+- [Ratchets and waivers](references/ratchets-and-waivers.md)
+- [Bar-lowering detection](references/bar-lowering-detection.md): grep patterns per language and a one-shot scan
 - [Code review](../code-review/SKILL.md) step 6
 - [Definition of done](assets/definition-of-done.md)
