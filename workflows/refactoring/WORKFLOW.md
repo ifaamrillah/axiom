@@ -13,7 +13,7 @@ Use when structural improvement is the goal and behavior should remain stable. I
 Identify structural goal, affected boundaries, behavior to preserve, repository instructions, current work, and available verification. Establish a baseline where feasible.
 
 ## Adaptive stages
-1. **Scope and inspect (Required; no dependencies):** inspect call sites, boundaries, tests, current work, and patterns. Output scope and invariants.
+1. **Scope and inspect (Required; no dependencies):** inspect call sites, boundaries, tests, current work, and patterns. Map dependents with [blast radius](../../.agents/skills/code-review/references/blast-radius.md) and record the verification baseline. Output scope, invariants, and the classified dependent list.
 2. **Design (Conditional; depends on inspection):** required for cross-module or API changes; otherwise choose a small sequence. Output target structure and compatibility constraints.
 3. **Plan and refactor (Required; depends on scope, and design when required):** make small behavior-preserving steps and exclude feature work. **Output:** incremental structural changes; exit when the intended structure is reached without scope expansion.
 4. **Verify (Required; depends on refactor):** run relevant checks and compare behavior/final diff. **Output:** verification evidence and gaps; exit when behavior-preservation claims are supported or qualified.

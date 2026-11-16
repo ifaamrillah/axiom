@@ -17,3 +17,7 @@ jobs:
           python-version: "3.x"
       - name: Validate skills, workflows, and Markdown links
         run: python3 scripts/validate_repository.py
+      - name: Check eval case structure (does not run models)
+        run: python3 scripts/run_evals.py --check
+      - name: Test maintainer scripts
+        run: python3 -m unittest discover -s scripts/tests

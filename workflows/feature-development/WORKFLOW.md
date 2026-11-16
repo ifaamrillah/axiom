@@ -3,7 +3,7 @@
 ## Metadata
 
 - ID: feature-development
-- Version: 1.0.0
+- Version: 1.1.0
 - Status: Experimental
 - Scope: end-to-end implementation of a new or substantial product capability
 
@@ -22,128 +22,76 @@ For a small isolated change, use a lighter bug-fix or implementation path instea
 ## Inputs and preconditions
 
 - User request and expected outcome.
-- Accessible repository and project instructions.
+- Accessible repository and project instructions (including the Axiom kernel).
 - Existing project knowledge, or a scoped onboarding pass.
-- Known constraints, approvals, and target environments.
+- Constitution and constraints when present; known approvals and target environments.
 
 ## Execution strategy
 
-Adapt stages to complexity and risk. Record a workflow instance under `.axiom/workflows/active/<ID>/`. Do not force irrelevant stages. Clarify blocking ambiguity; record reversible assumptions.
+**Step-file loading:** this file is the index. Read only the current stage's file in `stages/` when you enter that stage; do not preload the others. Record a workflow instance under `.axiom/workflows/active/<ID>/` with the [workflow state](../../templates/workflows/workflow-state.md). To resume, read the state and the plan's `status:` frontmatter, then open the stage file for the current stage. Do not force irrelevant stages. Clarify blocking ambiguity; record reversible assumptions.
 
 ## Stages
 
 ### 1. Discovery
 
-- **Skill:** `product-discovery` when present; otherwise orchestrator-led discovery.
-- **Required:** Yes.
-- **Dependencies:** none.
-- **Outputs:** user problem, goals, non-goals, actors, assumptions, constraints.
-- **Exit criteria:** intended outcome and success signal are understood.
+Skill `product-discovery` · Required · Dependencies: none · Outputs: problem, goals, non-goals, actors, assumptions, success signal · Detail: [stages/01-discovery.md](stages/01-discovery.md)
 
 ### 2. Technical research
 
-- **Skill:** `technical-research`.
-- **Required:** Conditional.
-- **Condition:** correctness depends on external, current, or version-specific knowledge not adequately represented in verified project context.
-- **Dependencies:** stage 1.
-- **Outputs:** concise research brief with authoritative sources and version scope.
-- **Exit criteria:** material external assumptions are verified or recorded as unresolved.
+Skill `technical-research` · Conditional (version-specific or external facts) · Dependencies: stage 1 · Outputs: research brief with sources and versions · Detail: [stages/02-technical-research.md](stages/02-technical-research.md)
 
 ### 3. Visual and interaction design
 
-- **Skill:** `ui-ux-design` when present; otherwise use design guidance and existing system patterns.
-- **Required:** Conditional.
-- **Condition:** change affects user-facing layout, navigation, interaction, content presentation, or responsive behavior.
-- **Dependencies:** stage 1; stage 2 when research is relevant.
-- **Outputs:** user flows, states, responsive behavior, accessibility notes, mockups where useful.
-- **Exit criteria:** interaction and visual expectations are clear enough to specify and implement.
+Skill `ui-ux-design` · Conditional (user-facing change) · Dependencies: stage 1, and stage 2 when relevant · Outputs: flows, state inventory, accessibility notes, mockups · Detail: [stages/03-design.md](stages/03-design.md)
 
 ### 4. Requirements and acceptance
 
-- **Skill:** `requirements-analysis`.
-- **Required:** Yes.
-- **Dependencies:** stages 1–3 when applicable.
-- **Outputs:** specification, functional/non-functional requirements, edge cases, acceptance criteria.
-- **Exit criteria:** all must-have requirements are testable; assumptions and open questions are visible.
+Skill `requirements-analysis` · Required · Dependencies: stages 1–3 when applicable · Outputs: approved spec with Given/When/Then scenarios; **hard gate: owner approval before any build** · Detail: [stages/04-requirements.md](stages/04-requirements.md)
 
 ### 5. Architecture and risk
 
-- **Skill:** `architecture-design`.
-- **Required:** Yes for cross-cutting or non-trivial work; lightweight design note for simple features.
-- **Dependencies:** stage 4.
-- **Outputs:** component boundaries, API/data contracts, migration strategy, ADRs, security considerations.
-- **Exit criteria:** implementation approach satisfies constraints and material risks have mitigation.
+Skill `architecture-design` · Required for non-trivial work · Dependencies: stage 4 · Outputs: boundaries, contracts, migration strategy, ADRs, risk mitigations · Detail: [stages/05-architecture.md](stages/05-architecture.md)
 
 ### 6. Planning and ownership
 
-- **Skill:** `task-planning`.
-- **Required:** Yes for multi-step work; lightweight checklist for a small change.
-- **Dependencies:** stages 4 and 5.
-- **Outputs:** tasks, dependencies, ownership, file scopes, integration and verification plan.
-- **Exit criteria:** each task has scope, deliverable, acceptance, and verification.
+Skills `task-planning`, `spec-analysis` · Required for multi-step work · Dependencies: stages 4 and 5 · Outputs: Ready-for-Development `PLAN.md`, coverage map, analysis report · Detail: [stages/06-planning.md](stages/06-planning.md)
 
 ### 7. Implementation
 
-- **Skill:** `implementation`.
-- **Required:** Yes.
-- **Dependencies:** stage 6, or stage 5 for a small sequential change.
-- **Outputs:** source changes and tests.
-- **Exit criteria:** implementation meets task acceptance criteria and relevant focused checks run.
+Skills `implementation`, `tdd` · Required · Dependencies: stage 6 (or 5 for a small sequential change) · Outputs: source changes, tests, task ledger, rulings · Detail: [stages/07-implementation.md](stages/07-implementation.md)
 
 ### 8. Verification and QA
 
-- **Skill:** `testing`; use E2E, visual, accessibility, performance, or API procedures when relevant.
-- **Required:** Yes.
-- **Dependencies:** stage 7.
-- **Outputs:** test report and evidence.
-- **Exit criteria:** required checks pass or a blocker/waiver is explicitly recorded; regressions are addressed.
+Skills `testing`, `e2e-testing`, `verification-before-completion`, `spec-analysis` (converge) · Required · Dependencies: stage 7 · Outputs: baseline-relative test report, visual evidence, convergence result · Detail: [stages/08-verification.md](stages/08-verification.md)
 
 ### 9. Security review
 
-- **Skill:** `security-audit`.
-- **Required:** Conditional risk-based review; basic secure engineering checks always apply.
-- **Condition:** authentication, authorization, sensitive data, payments, external input, dependencies, infrastructure, secrets, or material attack surface changes; also execute when user/policy requires.
-- **Dependencies:** stages 4–8 as applicable.
-- **Outputs:** validated findings, severity, remediation, residual risks.
-- **Exit criteria:** no unresolved blocking findings, or an authorized documented waiver exists.
+Skill `security-audit` · Conditional, risk-based · Dependencies: stages 4–8 as applicable · Outputs: validated findings, remediation, residual risks · Detail: [stages/09-security.md](stages/09-security.md)
 
 ### 10. Independent code review
 
-- **Skill:** `code-review`.
-- **Required:** Yes for substantial or security-sensitive changes; optional self-review for trivial changes.
-- **Dependencies:** implementation and relevant verification.
-- **Outputs:** findings-first review report and resolved findings.
-- **Exit criteria:** blocking findings are fixed or explicitly escalated.
+Skill `code-review` · Required for substantial changes · Dependencies: stages 7 and 8 · Outputs: findings-first review, resolved findings · Detail: [stages/10-review.md](stages/10-review.md)
 
 ### 11. Documentation and knowledge update
 
-- **Skill:** `project-documentation`.
-- **Required:** Yes when behavior, configuration, operations, public API, or architecture changes; otherwise record why no update is needed.
-- **Dependencies:** implementation and review.
-- **Outputs:** updated docs, decisions, workflow state.
-- **Exit criteria:** relevant living knowledge is current or marked needing review.
+Skill `project-documentation` · Required when behavior, config, API, or architecture changes · Dependencies: stages 7 and 10 · Outputs: updated docs, decisions, pitfalls, workflow state · Detail: [stages/11-documentation.md](stages/11-documentation.md)
 
 ### 12. Delivery and release readiness
 
-- **Skill:** `release-management`.
-- **Required:** Conditional.
-- **Condition:** user requests release/deployment, or delivery scope explicitly includes staging/production preparation.
-- **Dependencies:** required verification, review, security, and documentation.
-- **Outputs:** release notes, readiness report, staging evidence, rollback plan.
-- **Exit criteria:** requested readiness evidence is complete. Production deployment or publishing still requires explicit authorization.
+Skill `release-management` · Conditional (release requested) · Dependencies: required verification, review, security, and documentation · Outputs: release notes, readiness report, rollback plan · Detail: [stages/12-delivery.md](stages/12-delivery.md)
 
 ## Parallelization
 
-After planning, independent tasks may run in parallel only with disjoint write scopes and satisfied dependencies. A single integrator owns shared files, conflict resolution, integration, and final verification.
+After planning, independent tasks marked `[P]` may run in parallel only with disjoint write scopes and satisfied dependencies. A single integrator owns shared files, conflict resolution, integration, and final verification.
 
 ## Quality gates
 
-- Requirements and acceptance criteria are clear.
-- Relevant tests and build checks have evidence.
-- Review findings are resolved or disclosed.
-- Risk-based security checks are complete.
-- Documentation and workflow state are accurate.
-- Required approvals exist for consequential actions.
+- Spec approved; must-have requirements testable with no clarification markers.
+- Plan meets the Ready for Development standard; spec analysis shows no critical findings.
+- Relevant tests and build checks have fresh evidence with no new failures compared with the baseline.
+- No unapproved lowering of the quality bar.
+- Review findings are resolved or disclosed; risk-based security checks are complete.
+- Documentation and workflow state are accurate; required approvals exist for consequential actions.
 
 ## Recovery
 
@@ -151,7 +99,7 @@ Preserve completed valid work. If tests, review, or security checks invalidate a
 
 ## State semantics
 
-Record each stage as Pending, Ready, In Progress, Completed, Blocked, Failed, Skipped, or Cancelled. Record quality gates separately as Pending, Passed, Failed, Blocked, or Waived. A skipped stage is not a passed gate. A dependent stage may proceed after a skip only when its required inputs are independently satisfied. Use the shared [workflow state template](../../templates/workflows/workflow-state.md) for multi-stage work.
+Record each stage as Pending, Ready, In Progress, Completed, Blocked, Failed, Skipped, or Cancelled. Record quality gates separately as Pending, Passed, Failed, Blocked, or Waived. A skipped stage is not a passed gate. A dependent stage may proceed after a skip only when its required inputs are independently satisfied.
 
 ## Completion criteria
 

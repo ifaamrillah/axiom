@@ -1,29 +1,43 @@
 ---
 name: ui-ux-design
 description: >
-  Shape user-facing interaction flows, content, accessibility, and visual
-  behavior for a software change. Use when a feature changes screens,
-  navigation, forms, or user feedback.
+  Shape user-facing flows, states, accessibility, and visual decisions for a
+  software change using a priority-ordered rule set with measurable checks and a
+  persisted design-system master. Use when a feature changes screens, navigation,
+  forms, components, layout, styling, motion, or user feedback, or when reviewing
+  UI for usability and accessibility.
 ---
 
 # UI/UX Design
 
+## Purpose
+
+Make interfaces usable, accessible, and consistent before and after implementation. Decide things in priority order: an accessible, usable plain screen beats a beautiful inaccessible one.
+
+## When to use / avoid
+
+Use it whenever a change affects how something looks, feels, moves, or is interacted with. Skip it for pure backend, infrastructure, or non-visual work.
+
 ## Procedure
 
-1. Identify users, tasks, platform constraints, and existing design system.
-2. Map the primary flow, alternate states, loading, empty, error, and success states.
-3. Check accessibility, keyboard use, responsive behavior, and content clarity.
-4. Reuse established components and visual patterns; document deviations.
-5. Review design against acceptance criteria before implementation and verify the rendered result when tools are available.
+1. **Detect, never assume, the stack.** Check `package.json` dependencies (react, next, vue, svelte, angular), `pubspec.yaml` (Flutter), `Package.swift` or `*.xcodeproj` (SwiftUI), `composer.json` (Laravel), and React Native markers. Ask if the stack is unclear and it matters.
+2. **Load the design system.** If `.axiom/design/MASTER.md` exists, it is the source of truth for tokens, components, and patterns. A page override (`.axiom/design/pages/<page>.md`) wins for that page only. If neither exists and the work is a new product or page, propose a master (see [design-system master](../../../templates/design/master.md)).
+3. **Map the flow and the states.** Cover the primary path and alternates, plus loading, empty, error, success, partial, and offline states, and the permission-denied state where relevant.
+4. **Apply the rules in priority order** from the [UI rules](references/ui-rules.md). Resolve CRITICAL and HIGH categories before styling details.
+5. **Reuse established components and patterns.** Document any deviation and why.
+6. **Specify** using the [design brief](../../../templates/design/brief.md): flows, a state inventory, responsive behavior, accessibility notes, and mockups where useful.
+7. **Verify the rendered result** when browser tooling is available ([e2e-testing](../e2e-testing/SKILL.md)): screenshots at mobile and desktop widths, keyboard pass, contrast and accessibility scan. Run the [pre-delivery checklist](references/ui-rules.md#pre-delivery-checklist). Label unverified visual claims.
 
-## Outputs and gates
+## Outputs and gate
 
-Flow notes, state inventory, or concise design spec. Gate: critical states and accessibility needs are addressed; unsupported visual checks are labeled.
+Flow notes, a state inventory, a design spec or mockups, and an updated master or override when design decisions change. Gate: all CRITICAL rules pass or carry an approved exception, every state is specified, and visual checks are either evidenced or labeled unverified.
 
 ## Fallback
 
-If design tooling is unavailable, produce a textual interaction specification and implement using the repository's established patterns.
+Without design or browser tooling, produce a textual interaction spec. Implement it with the repository's established patterns, and list the visual checks that a human must perform.
 
 ## References
 
-See [design brief template](../../../templates/design/brief.md) and [Feature Development workflow](../../../workflows/feature-development/WORKFLOW.md).
+- [UI rules and pre-delivery checklist](references/ui-rules.md)
+- [Design-system master template](../../../templates/design/master.md), [design brief](../../../templates/design/brief.md)
+- [Feature Development workflow](../../../workflows/feature-development/WORKFLOW.md)

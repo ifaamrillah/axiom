@@ -27,6 +27,21 @@ Stage status values: Pending, Ready, In Progress, Completed, Blocked, Failed, Sk
 
 Gate outcomes: Pending, Passed, Failed, Blocked, Waived. Skipped stages are not gate outcomes and must never be represented as Passed.
 
+## Verification baseline
+
+Recorded before the first edit. Gates compare against it: no new failures.
+
+- Command(s):
+- Commit:
+- Date:
+- Pre-existing failures: none recorded.
+
+## Task ledger
+
+| Task | Status | Commit/diff | Review (spec / quality) | Evidence |
+|---|---|---|---|---|
+| | | | | |
+
 ## Blockers
 
 - None.

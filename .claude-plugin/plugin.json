@@ -1,0 +1,29 @@
+{
+  "name": "axiom",
+  "displayName": "Axiom",
+  "description": "Skills-first software engineering harness: lifecycle skills, Markdown workflows, evidence-based quality gates, and an optional session-start kernel.",
+  "author": {
+    "name": "Axiom contributors"
+  },
+  "homepage": "https://github.com/ifaamrillah/axiom",
+  "repository": "https://github.com/ifaamrillah/axiom",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "workflow",
+    "tdd",
+    "code-review",
+    "security",
+    "specification"
+  ],
+  "skills": [
+    "./.agents/skills/"
+  ],
+  "hooks": "./adapters/claude-code/hooks/hooks.json",
+  "agents": [
+    "./adapters/claude-code/agents/reviewer.md",
+    "./adapters/claude-code/agents/security-reviewer.md",
+    "./adapters/claude-code/agents/researcher.md",
+    "./adapters/claude-code/agents/implementer.md"
+  ]
+}

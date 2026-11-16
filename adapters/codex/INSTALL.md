@@ -8,6 +8,12 @@ Codex discovers repository skills from `.agents/skills/`. Keep the canonical dir
 
 Codex documentation lists `~/.agents/skills/` for user-wide skills. Copy selected skill directories there only if global availability is desired.
 
+## Bootstrap and role mapping
+
+Paste the [Axiom block](../../templates/project/agents-md-block.md) into the project's `AGENTS.md` so that the kernel and skill routing are always loaded. Map role metadata from `agents/roles/` to the host's agent or model settings where it supports them: `capability` (deep, standard, fast) selects the model tier, and `writes: false` means a read-only agent. Where the host has no such controls, follow the role cards as instructions.
+
+Optional installer: `npx skills add ifaamrillah/axiom -a codex` (see the [adapter overview](../README.md)).
+
 ## Verify
 
 Start or refresh the Codex session and ask it to list or use `axiom-orchestrator`. Confirm a known instruction is applied. If not discovered, inspect the working root, exact `SKILL.md` path, frontmatter, and host version. The docs were checked; Axiom's behavior has not been live-tested here.

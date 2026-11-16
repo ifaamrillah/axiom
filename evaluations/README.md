@@ -1,6 +1,11 @@
 # Evaluations
 
-The fixtures are human-reviewable prompts and expected behavioral signals. They are not tests of an AI model and do not establish that any host follows Axiom correctly.
+Two kinds of evaluation material live here:
+
+- **Runnable cases** in [`cases/`](cases/README.md): trigger prompts (positive and negative with an owner) and behavior cases with observable expectations, run by [`scripts/run_evals.py`](../scripts/run_evals.py) against an installed host. Disposable fixture projects live in [`fixtures/`](fixtures/), and recorded runs in [`results/`](results/README.md).
+- **Scenario fixtures** in `skills/`, `workflows/`, `cross-agent/`, and `efficiency/`: human-reviewable prompts and expected signals.
+
+Neither kind is evidence until it has been run and recorded. A recorded result applies only to its host version and model.
 
 ## Recording an actual run
 

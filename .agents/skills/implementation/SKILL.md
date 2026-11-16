@@ -19,4 +19,4 @@ description: Implement an approved software change in an existing codebase while
 
 ## Rules
 
-Do not broaden scope without coordination. Do not claim tests passed without executing them. Avoid needless abstraction, dependency changes, and unrelated formatting.
+Do not broaden scope without coordination. Do not claim tests passed without executing them; apply [verification-before-completion](../verification-before-completion/SKILL.md) before reporting. Compare check results against the recorded baseline. Avoid needless abstraction, dependency changes, and unrelated formatting. Never skip, delete, or weaken tests, or add suppressions, to reach green (see [quality-constraints](../quality-constraints/SKILL.md)). For new behavior, prefer [tdd](../tdd/SKILL.md).

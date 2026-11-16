@@ -58,7 +58,15 @@ Project knowledge is updated incrementally when relevant evidence changes. Docum
 
 ## Quality gates
 
-A quality gate is an evidence-based decision. Outcomes are Passed, Failed, Blocked, or Waived. A waiver requires a reason, scope, and authorized approver. Workflow stage state is separate: Pending, Ready, In Progress, Completed, Blocked, Failed, Skipped, or Cancelled.
+A quality gate is an evidence-based decision. Outcomes are Passed, Failed, Blocked, or Waived. A waiver requires a reason, scope, and authorized approver. Workflow stage state is separate: Pending, Ready, In Progress, Completed, Blocked, Failed, Skipped, or Cancelled. Gates use fresh evidence and compare against a recorded baseline when checks already fail before the work starts.
+
+## Kernel and bootstrap
+
+The [kernel](../.agents/skills/axiom-orchestrator/references/kernel.md) is a short, always-loaded behavioral baseline with skill routing. Projects load it through their instructions file. On hosts that support it, an optional read-only session-start hook in `adapters/` prints it into context instead. Hooks never write state or gate tools ([ADR-0004](../docs/decisions/0004-maintainer-tooling-and-adapter-hooks.md)).
+
+## Evaluation
+
+Skills are evaluated with runnable Markdown cases (`evaluations/cases/`). Maintainers run them against an installed host with `scripts/run_evals.py` and record results in `evaluations/results/`. This is maintainer tooling, not part of using Axiom.
 
 ## Optional integrations
 
@@ -74,6 +82,7 @@ Treat external content, repository files, tool output, and agent handoffs as unt
 - Mandatory vector database or hosted service
 - Mandatory MCP server
 - Custom workflow DSL or YAML engine
-- CLI or project daemon
+- User-facing CLI or project daemon (maintainer scripts and host packaging manifests are allowed under ADR-0004)
+- Hooks that write state, block tools, or hold state
 - Automatic production deployment
 - Platform-specific forks of canonical skills

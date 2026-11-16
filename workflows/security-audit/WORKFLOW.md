@@ -12,6 +12,8 @@ Use when requested, when changes affect authentication, authorization, sensitive
 ## Inputs and preconditions
 Confirm authorized repository/system, environment, review depth, test permissions, sensitive-data rules, and exclusions. Inspect relevant architecture. Never include credentials in notes or reports.
 
+Choose the [security-audit](../../.agents/skills/security-audit/SKILL.md) mode first: **guidance** (default, no artifacts) or **full audit** (only when it is explicitly requested; uses a coverage ledger, fingerprinted records, independent verifiers, and a `quick`, `standard`, or `deep` profile). Findings use the verdicts `confirmed` (with severity), `needs_validation` (no severity, names the exact missing fact), and `rejected`.
+
 ## Adaptive stages
 1. **Scope and assets (Required; no dependencies):** map authorized boundaries, assets, identities, trust boundaries, and data flows. Output scope and asset map.
 2. **Threat/control review (Required; depends on scope):** inspect relevant source, configuration, dependencies, and controls; use tools only when authorized. Output candidate risks tied to evidence.

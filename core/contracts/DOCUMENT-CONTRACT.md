@@ -17,6 +17,19 @@ For important living documents, record:
 
 Freshness is separate from lifecycle status. Freshness values: Current, Needs Review, Stale, Unknown.
 
+Machine-checkable form, recommended for `.axiom/` documents:
+
+```yaml
+---
+status: active
+sources: [<paths or globs this document describes>]
+verified_at_commit: <sha>
+verified_on: <YYYY-MM-DD>
+---
+```
+
+A document is **Current** when none of its `sources` changed since `verified_at_commit`, and **Needs Review** otherwise. This lets agents skip re-reading unchanged knowledge and target only the documents that drifted.
+
 ## Source-of-truth rules
 
 - Source code and executable configuration are authoritative for implemented behavior.

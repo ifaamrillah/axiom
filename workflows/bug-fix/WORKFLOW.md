@@ -15,7 +15,7 @@ Expected and observed behavior, impact, environment, reproduction if available, 
 ## Adaptive stages
 1. **Triage (Required; no dependencies):** establish impact, scope, reproducibility, and affected versions. Output a defect brief. Exit when expected and observed behavior are clear enough to investigate; otherwise record unknowns.
 2. **Inspect (Required; depends on triage):** inspect relevant code, recent changes, configuration, and tests; use debugging and codebase exploration as needed. Output evidence and candidate causes. Exit when a cause is supported or the issue is explicitly unresolved.
-3. **Repair (Required when a cause is supported; depends on inspection):** make the smallest root-cause change; use TDD when practical. Output a focused change and regression check.
+3. **Repair (Required when a cause is supported; depends on inspection):** write a failing regression test that shows the symptom ([tdd](../../.agents/skills/tdd/SKILL.md)), then make the smallest root-cause change. No fix without a confirmed root-cause hypothesis ([debugging](../../.agents/skills/debugging/SKILL.md)); after three failed fixes, return to inspection. Output a focused change and regression check.
 4. **Verify and review (Required; depends on repair):** run authorized focused checks, inspect neighboring behavior and final diff, and apply security review when the defect affects a security boundary. Output evidence and limitations.
 5. **Document and deliver (Required; depends on verification):** update knowledge if behavior, operations, or risk changed. **Output:** cause, fix, evidence, remaining uncertainty, and documentation links; exit when the handoff is accurate.
 
