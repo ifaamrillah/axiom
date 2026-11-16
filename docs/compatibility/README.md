@@ -43,11 +43,26 @@ Total on the latest runs: 32/32. Not run: `axiom-orchestrator`, `quality-constra
 
 Other behavior cases have not been run.
 
+## Subagent harness evidence (2026-11-16, Claude Code desktop)
+
+When the CLI account hit its usage limit, runs continued as in-session subagents. This is a different harness: skills were read from files on instruction, not discovered natively. Records: [behavior](../../evaluations/results/2026-11-16-1400-subagent-behavior.md), [routing](../../evaluations/results/2026-11-16-1400-subagent-routing.md).
+
+- **Behavior:** 7 cases × 5 runs, graded by a separate Sonnet grader against host-recorded tool calls and workspace state. Six cases scored 5/5: debugging, release-management, task-planning, technical-research, testing, and requirements-analysis. skill-factory scored 2/5, rose to 5/5 after its cases-first rule, and still has no observed baseline.
+- **Description routing:** 113/113 on both independent routers across all 24 skills. Choosing from a list of descriptions is easier than native discovery.
+
+Earlier on the same day, CLI behavior runs with the independent grader produced these scores:
+- 5/5: tdd, verification-before-completion, quality-constraints, security-audit, architecture-design, axiom-orchestrator, codebase-exploration, product-discovery, spec-analysis, codebase-onboarding, e2e-testing, implementation, project-documentation, skill-evaluator.
+- 4/4 graded: ui-ux-design and project-onboarding, each with one ungraded run.
+- 4/5: code-review.
+- 3/5: requirements-analysis. The failures came from a runner limitation that has since been fixed.
+
 ## What has not been checked
 
 - User-scope (global) installs with any installer.
 - Any live run on Codex, OpenCode, or Antigravity. The eval runner supports only Claude Code.
-- Behavior cases other than `debugging/B1` and `tdd/B1`; independent grading; repeated runs large enough to measure variance.
+- Native (CLI) trigger accuracy for the 18 skills whose run was invalidated by the usage limit.
+- Observed baselines for skills created test-first in a subagent.
+- Grading by a different model family; graders here were Claude models.
 - Results may differ with other models, versions, or user settings.
 
 ## Graceful fallbacks

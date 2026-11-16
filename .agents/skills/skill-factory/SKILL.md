@@ -16,17 +16,33 @@ Writing a skill is test-driven development applied to instructions. If you have 
 | Green | Run with the skill shows compliance |
 | Refactor | Close new loopholes and rerun |
 
+## The rule
+
+```
+NO SKILL.md BEFORE ITS EVAL CASE FILE EXISTS
+```
+
+Create `evaluations/cases/<skill>.md` first, in its own write, and only then create `SKILL.md`. If the skill was drafted first, delete the draft, write the cases, then rewrite the skill against them.
+
 ## When to create a skill
 
 Create one when a technique is non-obvious, recurs across projects, and needs judgment. Do not create one for one-off fixes, project-specific conventions (put those in the project's instructions file), or mechanical rules that a linter, test, or validator can enforce. Automate those instead.
 
 Check existing skills first. Extending or composing beats a near-duplicate.
 
+## Red flags
+
+| Thought | Answer |
+|---|---|
+| "I'll write the skill first, then the cases" | The cases define what the skill must change. Write them first. |
+| "I can't run a baseline here, so I'll skip it" | Record predicted failures, label them unobserved, and report the baseline as owed. |
+| "The skill is obviously right" | Unobserved failures are guesses. Keep it Experimental. |
+
 ## Procedure
 
 1. **Define the job.** State the recurring task, the user, the activation cases, the non-activation cases, and the expected output.
 2. **Write eval cases first** in `evaluations/cases/<skill>.md`: at least 2 positive triggers, 1 negative with its owner, and 1 behavior case with observable expectations and failure signals. See the case format (`evaluations/cases/README.md` in the Axiom repository).
-3. **Run the baseline (red).** Run the behavior case without the skill, or with the current version. Record the exact failures and the rationalizations the agent used ("this is too simple to test").
+3. **Run the baseline (red).** Run the behavior case without the skill, or with the current version, in a fresh session or subagent. Record the exact failures and the rationalizations the agent used ("this is too simple to test"). If you cannot start a fresh run here, write the failures you predict under `## Baseline` in the case file, label them **predicted, not observed**, and say in your report that the baseline is still owed.
 4. **Write the minimum skill (green):**
    - Frontmatter has only `name` (equal to the directory) and `description`. The description says what the skill does and contains a "Use when/for …" trigger clause with the words users actually type.
    - The body has purpose, the rule (if a discipline skill), procedure, outputs and gate, failure handling, and references.
