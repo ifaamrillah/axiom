@@ -100,9 +100,94 @@ class RepositoryCasesTest(unittest.TestCase):
             shutil.rmtree(with_kernel)
             shutil.rmtree(without)
 
+    def test_tool_trace_attaches_results(self):
+        stream = "\n".join([
+            json.dumps({"type": "assistant", "message": {"content": [
+                {"type": "tool_use", "id": "t1", "name": "Bash", "input": {"command": "python3 -m unittest"}}]}}),
+            json.dumps({"type": "user", "message": {"content": [
+                {"type": "tool_result", "tool_use_id": "t1", "content": "FAILED (failures=1)"}]}}),
+        ])
+        trace = run_evals.tool_trace(stream)
+        self.assertEqual(len(trace), 1)
+        self.assertIn("python3 -m unittest", trace[0])
+        self.assertIn("FAILED (failures=1)", trace[0])
+
+    def test_accept_alias_parsed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "x.md"
+            path.write_text("---\nskill: codebase-onboarding\naccept: project-onboarding\n---\n", encoding="utf-8")
+            case = run_evals.parse_case(path)
+        self.assertEqual(case.accept, ["project-onboarding"])
+
     def test_repository_cases_are_valid(self):
         self.assertEqual(run_evals.check(run_evals.load_cases()), [])
 
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class GraderTest(unittest.TestCase):
+    """grade() must accept only well-formed boolean verdicts; anything else is ungraded."""
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        path = Path(tmp.name) / "debugging.md"
+        path.write_text(CASE, encoding="utf-8")
+        self.behavior = run_evals.parse_case(path).behaviors[0]
+        self.args = type("Args", (), {"grader_model": None, "timeout": 5})()
+        self.original = run_evals.run_host
+        self.addCleanup(setattr, run_evals, "run_host", self.original)
+
+    def grade_reply(self, reply: str):
+        stream = json.dumps({"type": "result", "subtype": "success", "result": reply})
+        run_evals.run_host = lambda cmd, cwd, timeout: (0, stream)
+        return run_evals.grade(self.behavior, "1. Bash: x", "final", self.args)
+
+    def test_valid_pass_and_fail(self):
+        self.assertTrue(self.grade_reply('{"expect": [true, true], "fail_if": [false], "reason": "ok"}')["pass"])
+        self.assertFalse(self.grade_reply('{"expect": [true, false], "fail_if": [false]}')["pass"])
+        self.assertFalse(self.grade_reply('{"expect": [true, true], "fail_if": [true]}')["pass"])
+
+    def test_malformed_replies_are_ungraded(self):
+        for reply in ('{"expect": [1, 1], "fail_if": [null]}',
+                      '{"expect": ["true", "true"], "fail_if": ["false"]}',
+                      '{"expect": [true], "fail_if": [false]}',
+                      '{"expect": "ab", "fail_if": [false]}',
+                      'no json here'):
+            with self.subTest(reply=reply):
+                self.assertIsNone(self.grade_reply(reply))
+
+
+class RunCompletedTest(unittest.TestCase):
+    def test_budget_stop_is_not_completed(self):
+        for subtype, expected in (("success", True), ("error_max_turns", True),
+                                  ("error_max_budget_usd", False), ("error_during_execution", False)):
+            with self.subTest(subtype=subtype):
+                stream = json.dumps({"type": "result", "subtype": subtype})
+                self.assertEqual(run_evals.run_completed(stream), expected)
+
+    def test_usage_limit_is_not_completed(self):
+        stream = json.dumps({"type": "result", "subtype": "success", "is_error": True,
+                             "result": "You've hit your 5-hour limit"})
+        self.assertFalse(run_evals.run_completed(stream))
+
+
+class WriteResultsTest(unittest.TestCase):
+    def test_never_overwrites(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        original = run_evals.RESULTS_DIR, run_evals.host_version
+        self.addCleanup(lambda: (setattr(run_evals, "RESULTS_DIR", original[0]),
+                                 setattr(run_evals, "host_version", original[1])))
+        run_evals.RESULTS_DIR = Path(tmp.name)
+        run_evals.host_version = lambda host: "test"
+        args = type("Args", (), {"host": "claude-code", "model": None, "skill": None, "max_turns": 1,
+                                 "repeat": 1, "grade": False, "grader_model": None, "no_isolate": False,
+                                 "no_kernel": False, "budget": 0})()
+        first = run_evals.write_results("trigger", args, "one")
+        second = run_evals.write_results("trigger", args, "two")
+        self.assertNotEqual(first, second)
+        self.assertIn("one", first.read_text(encoding="utf-8"))
+        self.assertIn("two", second.read_text(encoding="utf-8"))

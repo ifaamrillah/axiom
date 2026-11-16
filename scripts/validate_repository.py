@@ -180,9 +180,12 @@ def check_local_links() -> None:
 
 def check_skill_self_containment() -> None:
     """Links inside a skill must resolve within .agents/skills/; name repository files as plain text."""
-    pattern = re.compile(r"(?<!!)\[[^\]]*\]\(([^)]+)\)")
+    # Inline links and images, plus reference-style definitions such as "[x]: ../path".
+    inline = re.compile(r"\[[^\]]*\]\(([^)\s]+)[^)]*\)")
+    reference = re.compile(r"(?m)^\s*\[[^\]]+\]:\s*(\S+)")
     for source in SKILLS_ROOT.rglob("*.md"):
-        for target in pattern.findall(source.read_text(encoding="utf-8")):
+        text = source.read_text(encoding="utf-8")
+        for target in inline.findall(text) + reference.findall(text):
             target = target.strip().strip("<>").split("#", 1)[0]
             if not target or "://" in target or target.startswith("mailto:"):
                 continue

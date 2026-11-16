@@ -8,6 +8,7 @@ One file per skill, named `<skill>.md`. These cases can be run by [`scripts/run_
 ---
 skill: <skill-name>
 fixture: evaluations/fixtures/<name>   # optional; trigger runs start from this project
+accept: <other-skill>                  # optional; comma-separated aliases that also count as a hit
 ---
 
 # Eval cases: <skill-name>
