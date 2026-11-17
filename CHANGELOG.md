@@ -13,6 +13,13 @@ All notable changes to Axiom are documented here.
 - Add structural validation, CI, and human-reviewable skill, workflow, cross-agent, and context-efficiency fixtures.
 - Clarify that fixture definitions and official documentation inspection are not live model or platform test results.
 
+### Trigger run after the adoption pass (2026-11-17)
+
+- Claude Code 2.1.326, one run per prompt: 125/131 across 27 skills; the 24 original skills hold at 110/113. Two misses predate this change (orchestrator vs onboarding on a combined request; acceptance criteria with no spec in the workspace). A rerun of the skills with new misses passed 16/16.
+- The first run found a regression: a "cache or not, weigh the options" prompt went to `performance-optimization`. Its description no longer mentions caches and now hands design trade-offs to `architecture-design`; the prompt passes again.
+- Two `writing-quality` trigger prompts referred to text that was not in the workspace; they now include the text.
+- Run records `2026-11-17-1438` and `-1440` include host errors from a five-hour usage limit on the CLI login; they are kept as records, not counted as skill failures.
+
 ### Measurement and distribution pass (2026-11-17)
 
 - `run_evals.py --routing`: an offline TF-IDF routing report over skill descriptions and kernel rows. `--check` now fails when two descriptions are at least 0.75 similar. First report: top-1 48/73, top-3 61/73, negatives clear 56/58, no collisions. This is a proxy; live trigger accuracy remains the evidence.
