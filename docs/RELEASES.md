@@ -16,9 +16,17 @@ Versions follow [ADR-0005](decisions/0005-versioning-and-upgrades.md): tags `vX.
    git tag -a vX.Y.Z -m "Axiom vX.Y.Z" && git push origin vX.Y.Z
    ```
 
+   The notes page uses links relative to `docs/releases/`, which break on the GitHub release page. Publish a copy with absolute links to the tag:
+
    ```bash
-   gh release create vX.Y.Z --title "Axiom vX.Y.Z" --notes-file docs/releases/vX.Y.Z.md
+   B=https://github.com/ifaamrillah/axiom/blob/vX.Y.Z; sed -e "s#](\.\./\.\./#]($B/#g" -e "s#](\.\./#]($B/docs/#g" docs/releases/vX.Y.Z.md > /tmp/axiom-vX.Y.Z-notes.md
    ```
+
+   ```bash
+   gh release create vX.Y.Z --title "Axiom vX.Y.Z" --notes-file /tmp/axiom-vX.Y.Z-notes.md --verify-tag
+   ```
+
+   Check that `grep -c '](\.\.' /tmp/axiom-vX.Y.Z-notes.md` prints `0` before publishing. Links within `docs/releases/` (such as `](v0.1.0.md)`) are not rewritten; avoid them in notes pages.
 
 The validator fails when the four version places or the newest changelog heading disagree, or when the notes page for the current version is missing.
 
