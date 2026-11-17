@@ -6,7 +6,9 @@ New entries go under **Unreleased**, grouped as Breaking, Added, Changed, Fixed.
 
 ## [Unreleased]
 
-Nothing yet.
+### Fixed
+
+- `docs/RELEASES.md`: the publish step now rewrites the notes' relative links to absolute links at the tag. Published as-is, they broke on the GitHub release page (seen on v0.1.0, whose release text was corrected by hand).
 
 ## [0.1.0] - 2026-11-17
 
