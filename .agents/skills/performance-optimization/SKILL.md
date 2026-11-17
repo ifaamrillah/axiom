@@ -3,9 +3,9 @@ name: performance-optimization
 description: >
   Make code faster or lighter by measuring first, finding the real bottleneck,
   changing one thing, and proving the gain with the same workload. Use when
-  something is slow, times out, uses too much memory or CPU, when a page or
-  endpoint misses a latency target, or before adding a cache, index, or
-  concurrency for speed.
+  something is slow, times out, uses too much memory or CPU, or when a page or
+  endpoint misses a latency target. A design trade-off with no measured slowness
+  ("cache or not, weigh the options") belongs to architecture-design.
 ---
 
 # Performance Optimization

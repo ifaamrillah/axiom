@@ -6,8 +6,8 @@ skill: writing-quality
 
 ## Should trigger
 
-- "Humanize this paragraph, it sounds like ChatGPT wrote it"
-- "Tighten this PR description, it's too fluffy"
+- "Humanize this, it sounds like ChatGPT wrote it: 'In today's fast-paced world, our robust API seamlessly empowers teams to unlock their full potential.'"
+- "Tighten this PR description, it's too fluffy: 'This PR delves into the checkout flow and leverages a robust new approach to elevate the overall user experience. In short, it makes things better.'"
 - "Make this README intro less salesy and more direct"
 
 ## Should not trigger
