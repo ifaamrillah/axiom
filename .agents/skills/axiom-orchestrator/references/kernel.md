@@ -1,4 +1,4 @@
-# Axiom Kernel
+# Axiom Kernel (v0.1.0)
 
 The always-on baseline for any agent working in a project that uses Axiom. Keep it loaded (project instructions, a session-start hook, or the orchestrator). It is deliberately short; skills carry the depth.
 

@@ -19,7 +19,7 @@ The same Markdown works in Claude Code, Codex, OpenCode, and Antigravity. There 
         always on: the kernel (rules plus routing) · on demand: 27 skills
 ```
 
-> **Status:** pre-1.0. Measured on Claude Code and Codex (November 2026). See [Evidence](#evidence).
+> **Version:** v0.1.0 (pre-1.0). [Release notes](docs/releases/README.md) · [Upgrading](docs/UPGRADING.md) · [Changelog](CHANGELOG.md). Measured on Claude Code and Codex (November 2026); see [Evidence](#evidence).
 
 ---
 
@@ -134,13 +134,15 @@ Copy `.agents/skills/` to wherever your host discovers `SKILL.md` folders, and p
 
 </details>
 
+**Update later.** Each release has [notes](docs/releases/README.md) that say what changed and whether the kernel changed. [Upgrading](docs/UPGRADING.md) gives the update command for each install path and how to pin a version, for example `npx skills add ifaamrillah/axiom#v0.1.0`.
+
 **Check the install.** In a new session, ask:
 
 ```text
-What is rule 5 of the Axiom kernel, and which skill handles a failing test?
+Which Axiom version is loaded, what is rule 5 of the kernel, and which skill handles a failing test?
 ```
 
-A correct answer quotes **"Reproduce before fixing"** and names **`debugging`**.
+A correct answer names the version (for example **v0.1.0**), quotes **"Reproduce before fixing"**, and names **`debugging`**.
 
 ---
 

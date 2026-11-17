@@ -1,6 +1,6 @@
 # ADR-0003: Use semantic version labels for releases
 
-- **Status:** Accepted
+- **Status:** Accepted; refined by [ADR-0005](0005-versioning-and-upgrades.md)
 - **Date:** 2026-11-15
 
 ## Context

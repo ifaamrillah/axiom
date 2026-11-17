@@ -15,6 +15,6 @@ Axiom ships no installer, custom runtime, or CLI of its own. Choose one path:
 
 Then load the kernel: paste the [Axiom block](../../templates/project/agents-md-block.md) into the project's `AGENTS.md` or `CLAUDE.md`, unless the Claude Code plugin hook already injects it. Keep .agents/skills/ as the source copy.
 
-To update a clone, review upstream changes and use your normal Git workflow (fetch/pull or merge/rebase) after protecting local edits. For copied skills, compare and copy the updated skill directory together with referenced files. Review the changelog and compatibility notes before adopting behavior changes. Do not overwrite project-specific instructions or state.
+To update, follow [Upgrading](../UPGRADING.md): it covers the plugin, `npx skills`, clones, and copies, how to pin a version, and when to re-paste the kernel. Read the [release notes](../releases/README.md) between your version and the target first. Do not overwrite project-specific instructions or state.
 
 If automatic skill discovery is unavailable, read the relevant SKILL.md and workflow as ordinary Markdown.

@@ -60,5 +60,44 @@ class SkillChecksTest(unittest.TestCase):
         self.assertEqual(len(vr.ERRORS), 1)
 
 
+
+class VersionCheckTest(unittest.TestCase):
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.root = Path(tmp.name).resolve()
+        saved = vr.ROOT, list(vr.ERRORS)
+        self.addCleanup(self.restore, saved)
+        vr.ROOT = self.root
+        vr.ERRORS.clear()
+        self.write(".claude-plugin/plugin.json", '{"name": "axiom", "version": "1.2.3"}')
+        self.write(".agents/skills/axiom-orchestrator/references/kernel.md", "# Axiom Kernel (v1.2.3)\n")
+        self.write("templates/project/agents-md-block.md", "<!-- axiom:begin v1.2.3 -->\n")
+        self.write("CHANGELOG.md", "## [Unreleased]\n\n## [1.2.3] - 2026-01-01\n")
+        self.write("docs/releases/v1.2.3.md", "# notes\n")
+
+    @staticmethod
+    def restore(saved):
+        vr.ROOT = saved[0]
+        vr.ERRORS[:] = saved[1]
+
+    def write(self, relative, text):
+        path = self.root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+
+    def test_consistent_versions_pass(self):
+        vr.check_version()
+        self.assertEqual(vr.ERRORS, [])
+
+    def test_mismatch_and_missing_notes_fail(self):
+        self.write("CHANGELOG.md", "## [Unreleased]\n\n## [1.2.2] - 2026-01-01\n")
+        (self.root / "docs/releases/v1.2.3.md").unlink()
+        vr.check_version()
+        self.assertEqual(len(vr.ERRORS), 2)
+        self.assertIn("1.2.2 does not match", vr.ERRORS[0])
+        self.assertIn("release notes missing", vr.ERRORS[1])
+
+
 if __name__ == "__main__":
     unittest.main()

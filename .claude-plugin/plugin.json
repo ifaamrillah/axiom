@@ -1,6 +1,7 @@
 {
   "name": "axiom",
   "displayName": "Axiom",
+  "version": "0.1.0",
   "description": "Skills-first software engineering harness: lifecycle skills, Markdown workflows, evidence-based quality gates, and an optional session-start kernel.",
   "author": {
     "name": "Axiom contributors"
