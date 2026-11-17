@@ -5,7 +5,7 @@ Paste the block below into the consuming project's instructions file (`AGENTS.md
 Fill only verified facts. Remove placeholder lines you cannot verify.
 
 ```markdown
-<!-- axiom:begin -->
+<!-- axiom:begin v0.1.0 -->
 ## Axiom
 
 <copy the Behavior, Routing, and Proportionality sections of
@@ -30,6 +30,8 @@ Add an entry only after a mistake actually happened; remove it when the cause is
 ```
 
 ## Maintenance
+
+- The marker records which Axiom release the pasted kernel came from. When a release note says the kernel changed, re-paste the Behavior, Routing, and Proportionality sections and update the marker. Keep your Project facts and Pitfalls.
 
 - Re-verify project facts when build tooling changes; update the date and commit.
 - Pitfalls are a learning loop: record the concrete mistake and the preventive rule, not a narrative.

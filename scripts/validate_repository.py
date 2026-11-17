@@ -216,6 +216,35 @@ def check_bundled_assets(sync: bool) -> None:
                  "`python3 scripts/validate_repository.py --sync`")
 
 
+VERSION_RE = r"(\d+\.\d+\.\d+)"
+
+
+def check_version() -> None:
+    """One version in four places (ADR-0005), plus release notes for it."""
+    manifest = ROOT / ".claude-plugin" / "plugin.json"
+    if not manifest.exists():
+        return
+    version = json.loads(manifest.read_text(encoding="utf-8")).get("version")
+    if not version or not re.fullmatch(VERSION_RE, str(version)):
+        fail(".claude-plugin/plugin.json: 'version' must be set as MAJOR.MINOR.PATCH")
+        return
+    places = {
+        ".agents/skills/axiom-orchestrator/references/kernel.md": r"(?m)^# Axiom Kernel \(v" + VERSION_RE + r"\)$",
+        "templates/project/agents-md-block.md": r"<!-- axiom:begin v" + VERSION_RE + r" -->",
+        "CHANGELOG.md": r"(?m)^## \[" + VERSION_RE + r"\]",
+    }
+    for relative, pattern in places.items():
+        path = ROOT / relative
+        found = re.search(pattern, path.read_text(encoding="utf-8")) if path.exists() else None
+        if not found:
+            fail(f"{relative}: version marker missing (expected v{version})")
+        elif found.group(1) != version:
+            fail(f"{relative}: version {found.group(1)} does not match plugin.json {version}")
+    notes = ROOT / "docs" / "releases" / f"v{version}.md"
+    if not notes.exists():
+        fail(f"docs/releases/v{version}.md: release notes missing for the current version")
+
+
 def main() -> int:
     check_bundled_assets(sync="--sync" in sys.argv[1:])
     check_skills()
@@ -223,6 +252,7 @@ def main() -> int:
     check_workflows()
     check_local_links()
     check_json()
+    check_version()
     if ERRORS:
         for error in ERRORS:
             print(f"ERROR: {error}")

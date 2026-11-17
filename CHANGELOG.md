@@ -1,8 +1,21 @@
 # Changelog
 
-All notable changes to Axiom are documented here.
+All notable changes to Axiom are documented here. Versions follow [ADR-0005](docs/decisions/0005-versioning-and-upgrades.md); user-facing summaries and upgrade steps for each release are in [release notes](docs/releases/README.md). To update an installed copy, see [Upgrading](docs/UPGRADING.md).
 
-## Unreleased
+New entries go under **Unreleased**, grouped as Breaking, Added, Changed, Fixed. A release moves them under its version heading.
+
+## [Unreleased]
+
+Nothing yet.
+
+## [0.1.0] - 2026-11-17
+
+First versioned release. Kernel: new (paste the Axiom block). Everything below shipped in this version.
+
+### Versioning and upgrades
+
+- Version 0.1.0 set in the plugin manifest, the kernel heading, and the Axiom block marker; the validator keeps them and this changelog in step.
+- Release notes per version in `docs/releases/`, and an upgrade guide for plugin, `npx skills`, clone, and copy installs in `docs/UPGRADING.md`.
 
 - Establish the initial repository foundation.
 - Define the skills-first, native-first, Markdown-first architecture.

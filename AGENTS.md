@@ -40,6 +40,7 @@ Build Axiom as a universal, skills-first software engineering harness. Keep the 
 - Structure and links: `python3 scripts/validate_repository.py` (`--sync` refreshes bundled skill assets after editing their source)
 - Eval case structure: `python3 scripts/run_evals.py --check`
 - Tooling tests: `python3 -m unittest discover -s scripts/tests`
+- Releases: version in four places kept in step by the validator; procedure in `docs/RELEASES.md` (ADR-0005). Record changes under `## [Unreleased]` in `CHANGELOG.md`.
 - Live evals (spend model quota; maintainers only): `python3 scripts/run_evals.py --host claude-code --kind trigger|behavior [--repeat N --grade]`
 
 ## Pitfalls

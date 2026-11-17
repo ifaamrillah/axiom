@@ -24,7 +24,7 @@ For a local checkout during development:
 claude --plugin-dir /path/to/axiom
 ```
 
-Plugin skills are namespaced, for example `axiom:debugging`. Version pinning: the manifest sets no `version`, so updates follow the marketplace source. Pin a ref or commit SHA in your marketplace source if you need a fixed version, for example `claude plugin marketplace add "https://github.com/ifaamrillah/axiom.git#<ref>"`.
+Plugin skills are namespaced, for example `axiom:debugging`. Versions: the manifest sets `version`, which each release bumps (see [Upgrading](../../docs/UPGRADING.md)). Update with `claude plugin marketplace update axiom`, then `claude plugin update axiom@axiom`, and restart. To stay on one release, add the marketplace at its tag, for example `claude plugin marketplace add "https://github.com/ifaamrillah/axiom.git#v0.1.0"`.
 
 Verified 2026-11-16 on Claude Code 2.1.325: adding the marketplace from GitHub at a branch ref and running `claude plugin install axiom@axiom` (both at `--scope local` in a scratch project) loaded all 24 `axiom:` skills (the count at that date), the 4 `axiom:` subagents, and the kernel through the session-start hook.
 
