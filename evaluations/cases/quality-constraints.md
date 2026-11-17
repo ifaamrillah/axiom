@@ -13,7 +13,7 @@ skill: quality-constraints
 ## Should not trigger
 
 - "Review this PR" → `code-review`
-- "Set up GitHub Actions CI" → `none`
+- "Set up GitHub Actions CI" → `ci-and-observability`
 
 ## Behavior
 

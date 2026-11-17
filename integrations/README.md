@@ -6,5 +6,5 @@ Axiom works with repository access and a capable host agent. Integrations below 
 - [Documentation search](context7/README.md)
 - [Browser automation](playwright/README.md)
 - [Token-efficient command output](rtk/README.md)
-- [Codebase graph/memory](codebase-memory/README.md)
+- [Code graph tools: codebase-memory, Graphify](codebase-memory/README.md)
 - [Security tooling](security-tools/README.md)

@@ -65,7 +65,7 @@ After a local merge, run the tests on the merged result. If they fail, stop and 
 
 ## 6. PR description
 
-Use the repository's PR template if one exists (`.github/pull_request_template.md`). Otherwise:
+Use the repository's PR template if one exists (`.github/pull_request_template.md`). Give the final text a pass with `writing-quality` in embedded mode. Otherwise:
 
 ```markdown
 ## Summary

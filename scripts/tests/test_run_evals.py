@@ -123,10 +123,6 @@ class RepositoryCasesTest(unittest.TestCase):
         self.assertEqual(run_evals.check(run_evals.load_cases()), [])
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class GraderTest(unittest.TestCase):
     """grade() must accept only well-formed boolean verdicts; anything else is ungraded."""
 
@@ -216,3 +212,49 @@ class CodexStreamTest(unittest.TestCase):
 
     def test_failed_turn_is_not_completed(self):
         self.assertFalse(run_evals.run_completed(json.dumps({"type": "turn.failed"})))
+
+
+class RoutingReportTest(unittest.TestCase):
+    def _case(self, skill, positive, negative=()):
+        return run_evals.CaseFile(path=Path(f"{skill}.md"), skill=skill,
+                                  positive=list(positive), negative=list(negative))
+
+    def test_ranks_matching_description_first(self):
+        docs = {"debugging": "Find the root cause of a failing test or bug before fixing",
+                "release-management": "Prepare a release, changelog, version tag, and rollout"}
+        cases = [self._case("debugging", ["the failing test has a bug"],
+                            [("cut a release with a changelog", "release-management")])]
+        errors, misses, stats = run_evals.routing_report(cases, docs)
+        self.assertEqual(errors, [])
+        self.assertEqual(misses, [])
+        self.assertEqual((stats["top1"], stats["negative_clear"]), (1, 1))
+
+    def test_near_identical_descriptions_collide(self):
+        docs = {"alpha": "Review a diff for defects and missing tests",
+                "beta": "Review a diff for defects and missing tests now"}
+        errors, _, _ = run_evals.routing_report([], docs)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("alpha and beta", errors[0])
+
+    def test_tokens_drop_stopwords_and_suffixes(self):
+        self.assertEqual(run_evals._tokens("Use when the tests are failing"), ["test", "fail"])
+
+
+
+class UsageTest(unittest.TestCase):
+    def test_claude_result_usage_includes_cache(self):
+        stream = json.dumps({"type": "result", "subtype": "success", "usage": {
+            "input_tokens": 10, "cache_creation_input_tokens": 100, "cache_read_input_tokens": 1000,
+            "output_tokens": 7}})
+        self.assertEqual(run_evals.run_usage(stream), (1110, 7))
+
+    def test_codex_turns_are_summed(self):
+        turn = json.dumps({"type": "turn.completed", "usage": {"input_tokens": 50, "output_tokens": 5}})
+        self.assertEqual(run_evals.run_usage(turn + "\n" + turn), (100, 10))
+
+    def test_missing_usage_is_none(self):
+        self.assertIsNone(run_evals.run_usage(json.dumps({"type": "result", "subtype": "success"})))
+
+
+if __name__ == "__main__":
+    unittest.main()

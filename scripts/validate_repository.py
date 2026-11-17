@@ -16,9 +16,12 @@ REQUIRED_SKILLS = {
     "project-documentation", "release-management", "requirements-analysis", "security-audit",
     "skill-evaluator", "skill-factory", "task-planning", "tdd", "technical-research",
     "testing", "ui-ux-design", "verification-before-completion", "spec-analysis",
-    "quality-constraints",
+    "quality-constraints", "writing-quality", "performance-optimization", "ci-and-observability",
 }
 SKILL_MAX_LINES = 250
+# obra/superpowers caps skills below 20,000 bytes because Claude Code truncates long skills it
+# re-attaches after compaction (their finding; not reproduced here). Axiom skills are far below it.
+SKILL_MAX_BYTES = 20_000
 REQUIRED_WORKFLOWS = {
     "bug-fix", "codebase-onboarding", "feature-development", "performance-audit",
     "refactoring", "release", "security-audit",
@@ -42,6 +45,7 @@ BUNDLED_ASSETS = {
     "quality-constraints/assets/definition-of-done.md": "core/standards/definition-of-done.md",
     "requirements-analysis/assets/spec.md": "templates/specifications/spec.md",
     "requirements-analysis/assets/requirements.md": "templates/specifications/requirements.md",
+    "requirements-analysis/assets/change.md": "templates/specifications/change.md",
     "task-planning/assets/PLAN.md": "templates/workflows/PLAN.md",
     "task-planning/assets/TASK.md": "templates/workflows/TASK.md",
     "ui-ux-design/assets/master.md": "templates/design/master.md",
@@ -97,6 +101,9 @@ def check_skills() -> None:
         line_count = len(text.splitlines())
         if line_count > SKILL_MAX_LINES:
             fail(f"{relative}: {line_count} lines exceeds the {SKILL_MAX_LINES}-line budget; move depth to references/")
+        size = len(text.encode("utf-8"))
+        if size > SKILL_MAX_BYTES:
+            fail(f"{relative}: {size} bytes exceeds the {SKILL_MAX_BYTES}-byte budget; move depth to references/")
         check_reference_reachability(path, text)
 
 

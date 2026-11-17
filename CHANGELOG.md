@@ -13,6 +13,28 @@ All notable changes to Axiom are documented here.
 - Add structural validation, CI, and human-reviewable skill, workflow, cross-agent, and context-efficiency fixtures.
 - Clarify that fixture definitions and official documentation inspection are not live model or platform test results.
 
+### Measurement and distribution pass (2026-11-17)
+
+- `run_evals.py --routing`: an offline TF-IDF routing report over skill descriptions and kernel rows. `--check` now fails when two descriptions are at least 0.75 similar. First report: top-1 48/73, top-3 61/73, negatives clear 56/58, no collisions. This is a proxy; live trigger accuracy remains the evidence.
+- Behavior results record tokens per run and the median per case, for Claude Code and Codex streams.
+- The validator caps `SKILL.md` at 20,000 bytes in addition to 250 lines.
+- `skill-evaluator` documents variant evals: test whether a section earns its tokens, with at least 10 runs per side.
+- Code graph tools share one integration page (`integrations/codebase-memory/`): codebase-memory for code, Graphify only when documents must be mapped with code; never install or build without approval, and check coverage before relying on results.
+- The RTK integration page now covers detection, the three cases that require an uncondensed rerun, and why a compressor summary is not verification evidence; `verification-before-completion` names compressed output as a trap.
+- Native plugins for Codex, OpenCode, and Antigravity were not shipped: no host was available to test a manifest. The reason is recorded in the adapter overview.
+- The test file's `unittest.main()` guard sat above two test classes, so running the file directly skipped them; it now sits at the end.
+
+### Adoption pass (2026-11-17)
+
+- New skills: `writing-quality` (AI writing tells, fact-preserving edits, embedded mode), `performance-optimization` (baseline, profile, re-measure), and `ci-and-observability` (pipelines from real commands; logs, metrics, traces, alerts). Each has eval cases; none has recorded runs yet.
+- `requirements-analysis` gains change proposals with ADDED, MODIFIED, REMOVED, and RENAMED deltas and a bundled change template; `spec-analysis` converge checks removed requirements in reverse and uses `not verified` for unrun checks.
+- `ui-ux-design` gains critique, audit, polish, and harden modes, a craft floor with Verify and Refuse lists, an unanchored critique with heuristic scores, and surface modes in the design master.
+- Kernel rule 2 names what minimalism never cuts. `implementation` gains a reuse-first decision ladder and `shortcut:` markers, which `code-review` treats as decisions.
+- `debugging` requires a feedback loop before hypotheses. `architecture-design` adds prototype and deprecation sections. `project-documentation` adds retros. The orchestrator records the base commit before dispatch and refutes plan claims during review. Negative search claims need a search record. Bug Fix ends with a verified, partial, or failed verdict.
+- Descriptions of `debugging`, `tdd`, and `verification-before-completion` now say they apply even when the change looks obvious. Trigger accuracy after this change is not yet measured.
+- Claude Code plugin adds `/axiom:spec`, `/axiom:plan`, `/axiom:review`, and `/axiom:ship`, all user-invoked only.
+- Not adopted: binaries and CLIs (detectors, spec CLIs), auto-installing tools, persona agents, and moving canonical skills to host-specific `disable-model-invocation` frontmatter, which would break kernel routing and portability.
+
 ### Skill depth pass (2026-11-17)
 
 - Deepen all 24 skills with focused references:

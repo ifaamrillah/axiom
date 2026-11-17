@@ -43,7 +43,7 @@ Default to **analyze**. Use **converge** only when the user asks what is left, o
 ## Converge procedure
 
 1. Treat spec, plan, and tasks as the only source of intent, with the constitution as governing constraints.
-2. Inspect the current code and tests for each requirement and scenario. Checked boxes are claims, not evidence. Classify each one as met, partial, missing, contradicts (code conflicts with intent), or unrequested (code with no requirement), with file evidence.
+2. Inspect the current code and tests for each requirement and scenario. Checked boxes are claims, not evidence. Classify each one as met, partial, missing, contradicts (code conflicts with intent), or unrequested (code with no requirement), with file evidence. For a REMOVED requirement in a change proposal, check in reverse: search for the old behavior, and classify it `still present` if it remains. A check you could not run is `not verified`, never met.
 3. Append one section, `## Convergence N (YYYY-MM-DD)`, to the task list. It contains new tasks for the remaining work, each traced to its requirement ID and gap type, with file paths and verification. Number new tasks after the highest existing ID. Put contradictions and constitution violations first. An unrequested item becomes a review task; converge never deletes code. See the [convergence example](references/worked-analysis.md#converge-mode-after-an-implementation-pass).
 4. **Never** edit the spec or plan, rewrite, renumber, reorder, or delete existing tasks, or change application code.
 5. If everything is met, leave the task list byte-for-byte unchanged and report a clean result.

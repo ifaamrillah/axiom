@@ -65,6 +65,7 @@ Interfaces and conventions:
 - <signature, type, endpoint shape, or pattern file to copy>
 
 Verify with: <exact commands>
+Base: <commit SHA recorded before dispatch (`git rev-parse HEAD`)>
 Baseline: <pre-existing failures to ignore, or "clean">
 
 Constraints: <no new dependencies / no schema change / keep public API>

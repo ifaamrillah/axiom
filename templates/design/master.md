@@ -12,6 +12,10 @@ Global source of truth for visual and interaction decisions. Save it as `.axiom/
 
 Product type, audience, usage context, and brand personality (3 adjectives).
 
+Surface mode, which sets how much visual ambition fits: **persuade** (marketing, landing), **operate** (dashboards, admin, forms), **read** (docs, articles), or **experience** (games, media). Pages may override it.
+
+Product facts here come from the user or the repository only. Never invent claims such as customer counts, metrics, or testimonials; leave a placeholder and ask.
+
 ## Stack
 
 Detected framework, styling system (Tailwind, CSS modules, …), and component library, with the evidence (file paths).

@@ -4,8 +4,8 @@ description: >
   Shape user-facing flows, states, accessibility, and visual decisions for a
   software change using a priority-ordered rule set with measurable checks and a
   persisted design-system master. Use when a feature changes screens, navigation,
-  forms, components, layout, styling, motion, or user feedback, or when reviewing
-  UI for usability and accessibility.
+  forms, components, layout, styling, motion, or user feedback, or when reviewing,
+  critiquing, auditing, or polishing UI.
 ---
 
 # UI/UX Design
@@ -18,15 +18,27 @@ Make interfaces usable, accessible, and consistent before and after implementati
 
 Use it whenever a change affects how something looks, feels, moves, or is interacted with. Skip it for pure backend, infrastructure, or non-visual work.
 
+## Modes
+
+| Request | Mode | Do |
+|---|---|---|
+| Build or change UI (default) | design | The procedure below |
+| "Critique", "what's wrong with this screen" | critique | [Critique](references/critique.md): unanchored assessment, heuristic scores |
+| "Audit", accessibility or quality check | audit | [Critique](references/critique.md) phases plus [UI rules](references/ui-rules.md); no edits |
+| "Polish", "make it look less generic" | polish | Fix [craft floor](references/craft-floor.md) items only; no layout or flow changes |
+| "Harden" | harden | Procedure step 3 states (empty, error, long content, offline) only |
+
+Critique and audit modes report; they do not edit code.
+
 ## Procedure
 
 1. **Detect, never assume, the stack.** Check `package.json` dependencies (react, next, vue, svelte, angular), `pubspec.yaml` (Flutter), `Package.swift` or `*.xcodeproj` (SwiftUI), `composer.json` (Laravel), and React Native markers. Ask if the stack is unclear and it matters. Then open the [stack notes](references/stack-notes.md) for that framework's UI rules and verification commands.
 2. **Load the design system.** If `.axiom/design/MASTER.md` exists, it is the source of truth for tokens, components, and patterns. A page override (`.axiom/design/pages/<page>.md`) wins for that page only. If neither exists and the work is a new product or page, propose a master (see [design-system master](assets/master.md)). Choose style, palette, fonts, and tokens from the product type with the [visual language](references/visual-language.md) tables, and check every color pair's contrast.
 3. **Map the flow and the states.** Cover the primary path and alternates, plus loading, empty, error, success, partial, and offline states, and the permission-denied state where relevant. Use the state matrices in [interaction patterns](references/interaction-patterns.md); for numbers, charts, or tables, pick forms with [data display](references/data-display.md).
-4. **Apply the rules in priority order** from the [UI rules](references/ui-rules.md). Resolve CRITICAL and HIGH categories before styling details. Use its accessibility thresholds table for exact numbers and its anti-pattern table when reviewing existing UI.
+4. **Apply the rules in priority order** from the [UI rules](references/ui-rules.md). Resolve CRITICAL and HIGH categories before styling details. Use its accessibility thresholds table for exact numbers and its anti-pattern table when reviewing existing UI. Right before writing UI code, open the [craft floor](references/craft-floor.md) and avoid its Refuse patterns.
 5. **Reuse established components and patterns.** Document any deviation and why.
 6. **Specify** using the [design brief](assets/brief.md): flows, a state inventory, responsive behavior, accessibility notes, and mockups where useful.
-7. **Verify the rendered result** when browser tooling is available ([e2e-testing](../e2e-testing/SKILL.md)): screenshots at mobile and desktop widths, keyboard pass, contrast and accessibility scan. Run the [pre-delivery checklist](references/ui-rules.md#pre-delivery-checklist). Label unverified visual claims.
+7. **Verify the rendered result** when browser tooling is available ([e2e-testing](../e2e-testing/SKILL.md)): run the rendered review phases in [critique](references/critique.md#rendered-review-phases) at 375, 768, and 1280 px. Run the [pre-delivery checklist](references/ui-rules.md#pre-delivery-checklist). Label unverified visual claims.
 
 ## Outputs and gate
 
@@ -39,6 +51,8 @@ Without design or browser tooling, produce a textual interaction spec. Implement
 ## References
 
 - [UI rules, accessibility thresholds, anti-patterns, pre-delivery checklist](references/ui-rules.md): every task.
+- [Craft floor](references/craft-floor.md): right before writing UI code, and in polish mode.
+- [Critique and audit](references/critique.md): critique and audit modes; rendered review phases.
 - [Visual language](references/visual-language.md): new product, page, or master; restyling; palette or font choice.
 - [Interaction patterns](references/interaction-patterns.md): component and screen states, forms, feedback, motion, breakpoints, navigation.
 - [Data display](references/data-display.md): charts, tables, dashboards.

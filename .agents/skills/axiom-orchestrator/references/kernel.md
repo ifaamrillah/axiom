@@ -5,7 +5,7 @@ The always-on baseline for any agent working in a project that uses Axiom. Keep 
 ## Behavior
 
 1. **Think before coding.** State assumptions. If a request has several readings, name them instead of picking one silently. Ask only when the answer changes scope or risk; otherwise record a reversible assumption and continue.
-2. **Smallest sufficient change.** No features, abstractions, options, or error handling that the task does not need. If 200 lines could be 50, rewrite.
+2. **Smallest sufficient change.** No features, abstractions, options, or error handling that the task does not need. If 200 lines could be 50, rewrite. Never cut validation at trust boundaries, data-loss handling, security, or accessibility to make a change smaller.
 3. **Surgical edits.** Every changed line traces to the request. Match local style. Do not reformat or refactor neighbors. Remove only what your own change orphaned; mention unrelated dead code instead of deleting it.
 4. **Goal-driven work.** Turn the request into a checkable goal ("write a failing test, then make it pass"). For multi-step work, write `step → verify: <check>` for each step.
 5. **Reproduce before fixing.** For a reported bug or failing behavior, first run a command or test that shows the failure, and state the root cause, before editing production code. With a test harness, the reproduction is a failing regression test. This applies to one-line fixes too.
@@ -28,7 +28,10 @@ Before your first tool call, check this table. When a row matches, load that ski
 | Turn a spec into tasks, or "plan the work" | `task-planning` |
 | Implement a planned task or specced feature | `implementation` |
 | Spec, plan, and tasks exist; check consistency or remaining work | `spec-analysis` |
-| Design choice, trade-off, or "which approach" question | `architecture-design` |
+| Design choice, trade-off, "which approach", prototype, or deprecating an API | `architecture-design` |
+| Slow, timeouts, memory or CPU use, latency target | `performance-optimization` |
+| CI pipeline, logging, metrics, tracing, alerts | `ci-and-observability` |
+| Edit prose for clarity, or "humanize" text | `writing-quality` |
 | Where is X, how is X used, map or trace the code | `codebase-exploration` |
 | New to a repository, or set up project knowledge | `project-onboarding` |
 | Add or plan unit, integration, or regression tests | `testing` |

@@ -34,3 +34,7 @@ Verified 2026-11-16 with `skills@1.8.1` and Claude Code 2.1.325, from a scratch 
 **Bootstrap:** paste the [Axiom block](../templates/project/agents-md-block.md) into the project's `AGENTS.md` (or `CLAUDE.md`), or use the Claude Code plugin hook.
 
 See each install guide. Do not assume paths work identically in global scope, nested workspaces, or older host versions. Verify discovery in the actual host.
+
+## Native plugins for other hosts (not shipped)
+
+Only Claude Code gets a plugin with the kernel hook. Codex, OpenCode, and Antigravity still need the Axiom block pasted into `AGENTS.md`. Other projects ship native plugin manifests for these hosts, but none of these hosts was available to install and test a manifest on 2026-11-17. An untested manifest that fails to load is worse than a documented paste step, so none is shipped. Add one only with a recorded install in that host: skills discovered, kernel loaded, and the install check in the README answered.

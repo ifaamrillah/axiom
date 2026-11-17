@@ -64,6 +64,27 @@ A rule with no case is untested. A case with no rule is either a missing rule or
 - Keep the host, model, kernel setting, and fixture constant between baseline and skill runs. Otherwise the comparison is invalid.
 - Use `--no-kernel` when you need to measure the skill description alone, because the kernel can change routing.
 
+## Variant evals: does a section earn its place?
+
+Every line of a skill costs context each time it loads. Test whether a section, reference, or rule changes outcomes before keeping it.
+
+1. **Pick one variable:** one section, one reference, or one rule. Two changes at once cannot be told apart.
+2. **Build the variant** in a separate git worktree with only that change (removed, or added). The other side stays the current version.
+3. **Use a case that needs it.** If a strong model passes the case without the content, the case cannot show its value. Write a case whose answer depends on what the section says.
+4. **Run both sides** with the same host, model, kernel setting, fixture, and grader, at least 10 runs per side. Record the graded pass rate and the median tokens from the run summary.
+5. **Decide:**
+
+| Result | Action |
+|---|---|
+| Pass rate higher with the content, beyond run-to-run spread | Keep it |
+| Same pass rate, more tokens | Cut it, or move it to a reference opened only when needed |
+| Same pass rate, same tokens | Keep only if it covers a case the evals do not yet test; add that case |
+| Lower pass rate with the content | Cut or rewrite it |
+
+Fewer than 10 runs per side is a hint, not a result. Record both sides in `evaluations/results/` with the variant named in the file name.
+
+Offline first: `python3 scripts/run_evals.py --routing` ranks skills for every case prompt by text similarity and fails on near-duplicate descriptions. It costs nothing, so run it after any description change. It is a proxy only; a live trigger run is still the evidence.
+
 ## Common design mistakes
 
 | Mistake | Effect | Fix |

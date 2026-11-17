@@ -5,7 +5,8 @@ description: >
   minimal fix with a regression check. Use when something returns or does X but
   should do Y, when asked to "fix" a bug or error, and for failing or flaky tests,
   build failures, regressions, performance anomalies, and any unexpected
-  behavior, before editing code.
+  behavior, before editing code, even when the code is pasted inline and the fix
+  looks obvious.
 ---
 
 # Debugging
@@ -27,7 +28,7 @@ Classify the symptom first: crash, wrong value, regression, intermittent, perfor
 ## Phase 1: Investigate (no edits to production code)
 
 1. **Read the failure completely.** Read the full error, stack trace, and log lines. Note the exact message, file, and line. For how to read traces per language and find the first repository frame, see [reading stack traces](references/reading-stack-traces.md).
-2. **Reproduce reliably.** Find the smallest command or steps that show the failure. Record the frequency if it is intermittent.
+2. **Reproduce reliably.** Find the smallest command or steps that show the failure. Record the frequency if it is intermittent. No command that can show the failure means no Phase 3: build that feedback loop first (a test, a script, a loop over the flaky case, a bisect run), or report that you could not.
 3. **Check what changed.** Look at recent commits, dependency or lockfile updates, config, environment, and data. Use `git log`, `git diff`, and `git bisect` when a known-good revision exists. For scripted `git bisect run`, input minimization, and lockfile bisection, see [bisection](references/bisection.md).
 4. **Trace backward from the symptom.** Follow the bad value to where it first went wrong, and fix it there. See [root-cause tracing](references/root-cause-tracing.md).
 5. **Instrument boundaries** in multi-component systems. Log inputs and outputs at each layer once, then find the first layer that is wrong. Per-language recipes (Python, JS/TS, Go, Java, PHP): [instrumentation](references/instrumentation.md).
