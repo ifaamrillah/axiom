@@ -1,5 +1,6 @@
 ---
 skill: axiom-orchestrator
+fixture: evaluations/fixtures/discount-bug
 ---
 
 # Eval cases: axiom-orchestrator

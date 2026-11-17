@@ -24,7 +24,7 @@ The text, its reader, and its type (reference doc, how-to, PR, release note, cha
 
 ## Procedure
 
-1. **Lock the facts.** List every name, number, date, version, path, command, quote, link, and claim in the text. These must survive unchanged.
+1. **Lock the facts.** List every name, number, date, version, path, command, quote, link, and claim in the text. These must survive unchanged, and must not get stronger: do not add "all", "only", "every", "always", or a new comparison.
 2. **Mark the tells.** Scan with the [tell catalog](references/tells.md). A strong tell justifies an edit on one sighting; a weak tell needs another tell nearby.
 3. **Rewrite.** For each marked passage: state the point first, cut the staging, replace inflated words with specific ones, and match the reader's knowledge. Keep the author's deliberate choices (terms of art, a defined tone, a required structure).
 4. **Check facts first, then style.** Compare against the list from step 1. Restore anything lost or altered. Then re-scan for the tells that most often survive a rewrite (`not X but Y`, triads, a closing summary line).

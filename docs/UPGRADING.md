@@ -7,7 +7,7 @@ How to see which Axiom a project runs, update it, and pin a version. Versions fo
 | Install | Check |
 |---|---|
 | Any | Ask the agent: "Which Axiom version is loaded?" It reads the kernel heading, `# Axiom Kernel (vX.Y.Z)`. |
-| Copied or `npx skills` | `head -1 .agents/skills/axiom-orchestrator/references/kernel.md` |
+| Copied or `npx skills` | `head -1 .agents/skills/axiom-orchestrator/references/kernel.md` (or `.claude/skills/…` when `npx skills` installed for Claude Code only) |
 | Pasted Axiom block | The marker in `AGENTS.md` or `CLAUDE.md`: `<!-- axiom:begin vX.Y.Z -->` |
 | Claude Code plugin | `claude plugin list` |
 
@@ -46,7 +46,7 @@ npx skills check
 npx skills update
 ```
 
-`skills-lock.json` records the source and commit, so commit it with the update. To pin a version, install from a tag: `npx skills add ifaamrillah/axiom#v0.1.0`.
+`skills-lock.json` records the source and commit, so commit it with the update. `#ref` accepts a branch or tag, not a commit SHA. To pin a version, install from a tag: `npx skills add ifaamrillah/axiom#v0.1.0`.
 
 ### Clone with symlinks
 

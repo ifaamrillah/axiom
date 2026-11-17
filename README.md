@@ -338,8 +338,9 @@ Axiom makes the disciplined path the default, and it does that in a way you can 
 
 | What | Result | Record |
 |---|---|---|
-| Trigger accuracy (right skill loaded or correctly not loaded), Claude Code 2.1.326 | **125/131** prompts, 27 skills; the 24 original skills stay at **110/113**. A rerun of the three skills with misses passed 16/16, so single misses there are run-to-run variance | [run](evaluations/results/2026-11-17-1438-claude-code-trigger.md), [rerun](evaluations/results/2026-11-17-1512-claude-code-trigger.md), [rerun](evaluations/results/2026-11-17-1519-claude-code-trigger.md) |
+| Trigger accuracy (right skill loaded or correctly not loaded), Claude Code 2.1.326 | **131/131** prompts, 27 skills, one run per prompt | [run](evaluations/results/2026-11-17-1635-claude-code-trigger.md) |
 | Trigger accuracy, Codex CLI 0.169.0 | **107/113** | [compatibility](docs/compatibility/README.md) |
+| Behavior, three newest skills | **7/9** graded runs (3 per skill, separate grader); every run loaded the skill | [record](evaluations/results/2026-11-17-1943-claude-code-behavior.md) |
 | Behavior | All 24 original cases run repeatedly. Graded by a separate Claude grader and by Codex (a non-Claude model) | [compatibility](docs/compatibility/README.md#behavior-after-the-kernel-routing-change-2026-11-16) |
 | OpenCode 1.19.5 | All 24 skills discovered; model invocation not tested | [adapter](adapters/opencode/INSTALL.md) |
 | Antigravity | Not tested | [adapter](adapters/antigravity/INSTALL.md) |
@@ -349,7 +350,7 @@ Axiom makes the disciplined path the default, and it does that in a way you can 
 - **Fixtures are small.** A strong model finds the seeded issues with or without the deeper references. The added depth showed a small gain only with a weaker model, on few runs ([comparison](evaluations/results/2026-11-17-depth-comparison.md)).
 - **Commands are unverified.** Commands in the references come from general practice. They have not been run in every ecosystem.
 - **Grading is model-only.** No human grading yet.
-- **The 2026-11-17 adoption pass is measured for triggers only.** Trigger runs are recorded; behavior runs for the three new skills and the new references are not.
+- **Behavior evidence for the newest skills is thin.** Three runs per case, one case per skill; the new references and modes have no behavior case yet.
 
 ---
 

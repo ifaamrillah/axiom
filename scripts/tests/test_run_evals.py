@@ -256,5 +256,17 @@ class UsageTest(unittest.TestCase):
         self.assertIsNone(run_evals.run_usage(json.dumps({"type": "result", "subtype": "success"})))
 
 
+
+class KindDefaultsTest(unittest.TestCase):
+    def test_behavior_gets_room_and_explicit_values_win(self):
+        import argparse
+        args = argparse.Namespace(kind="behavior", max_turns=None, budget=None)
+        run_evals.apply_kind_defaults(args)
+        self.assertEqual((args.max_turns, args.budget), (25, 1.5))
+        args = argparse.Namespace(kind="trigger", max_turns=None, budget=2.0)
+        run_evals.apply_kind_defaults(args)
+        self.assertEqual((args.max_turns, args.budget), (4, 2.0))
+
+
 if __name__ == "__main__":
     unittest.main()

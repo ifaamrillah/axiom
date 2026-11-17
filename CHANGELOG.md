@@ -6,9 +6,25 @@ New entries go under **Unreleased**, grouped as Breaking, Added, Changed, Fixed.
 
 ## [Unreleased]
 
+Kernel: changed (one routing row). Projects that pasted the Axiom block re-paste it at the next release.
+
+### Changed
+
+- Kernel routing: chained requests ("onboard, then add X") go to `axiom-orchestrator`.
+- `ci-and-observability` requires a timeout on every CI job; `performance-optimization` lists inputs whose result could differ before keeping a change; `writing-quality` forbids strengthening a claim (adding "all", "only", "every").
+- `run_evals.py` defaults: behavior runs use 25 turns and a $1.50 cap, trigger runs keep 4 turns and $0.50. A behavior run at 4 turns was cut off and read as skill failures.
+
 ### Fixed
 
+- Eval cases: the orchestrator case gains a fixture, because its prompt says "this repo"; the requirements case asks for criteria from stated rules instead of a spec that does not exist.
+- `docs/UPGRADING.md`: `npx skills` installs for Claude Code only land in `.claude/skills/`, and `#ref` takes a branch or tag, not a commit SHA.
+
 - `docs/RELEASES.md`: the publish step now rewrites the notes' relative links to absolute links at the tag. Published as-is, they broke on the GitHub release page (seen on v0.1.0, whose release text was corrected by hand).
+
+### Evidence
+
+- Trigger, Claude Code 2.1.326, one run per prompt: 131/131 across 27 skills ([record](evaluations/results/2026-11-17-1635-claude-code-trigger.md)).
+- Behavior, three new skills, 3 runs each, separate grader, 25 turns: 6/9 before the skill changes above, 7/9 after (`ci-and-observability` 3/3, `performance-optimization` 2/3, `writing-quality` 2/3); every run loaded the skill ([before](evaluations/results/2026-11-17-1647-claude-code-behavior.md), [after](evaluations/results/2026-11-17-1943-claude-code-behavior.md)). A 4-turn run that cut agents off is kept as a record ([record](evaluations/results/2026-11-17-1639-claude-code-behavior.md)).
 
 ## [0.1.0] - 2026-11-17
 

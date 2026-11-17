@@ -19,7 +19,7 @@ Before your first tool call, check this table. When a row matches, load that ski
 
 | Situation | Skill |
 |---|---|
-| Meaningful multi-step engineering request, or a new feature in an existing codebase | `axiom-orchestrator` |
+| Meaningful multi-step engineering request, including chained stages ("onboard, then add X"), or a new feature in an existing codebase | `axiom-orchestrator` |
 | About to claim completion, commit, or open a PR | `verification-before-completion` |
 | Bug, failing test, unexpected behavior, "X returns Y, should be Z" | `debugging` (load it before the first edit) |
 | Behavior change or bug fix with a test harness; "failing test first" | `tdd` |

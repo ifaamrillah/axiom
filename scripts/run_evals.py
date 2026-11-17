@@ -660,6 +660,17 @@ def write_results(kind: str, args: argparse.Namespace, body: str) -> Path:
             n += 1
 
 
+KIND_DEFAULTS = {"trigger": {"max_turns": 4, "budget": 0.5},
+                 "behavior": {"max_turns": 25, "budget": 1.5}}
+
+
+def apply_kind_defaults(args: argparse.Namespace) -> None:
+    """Behavior runs need room to act; 4 turns cut them off and read as skill failures."""
+    for key, value in KIND_DEFAULTS[args.kind].items():
+        if getattr(args, key) is None:
+            setattr(args, key, value)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--check", action="store_true", help="validate case files only")
@@ -670,10 +681,12 @@ def main() -> int:
     parser.add_argument("--kind", choices=("trigger", "behavior"), default="trigger")
     parser.add_argument("--skill", help="skill name, or several separated by commas")
     parser.add_argument("--model")
-    parser.add_argument("--max-turns", type=int, default=4)
+    parser.add_argument("--max-turns", type=int, default=None,
+                        help="default: 4 for trigger runs, 25 for behavior runs")
     parser.add_argument("--timeout", type=int, default=300)
-    parser.add_argument("--budget", type=float, default=0.5,
-                        help="per-run spend cap in USD passed to the host (0 disables)")
+    parser.add_argument("--budget", type=float, default=None,
+                        help="per-run spend cap in USD passed to the host (0 disables); "
+                             "default: 0.5 for trigger runs, 1.5 for behavior runs")
     parser.add_argument("--no-isolate", action="store_true",
                         help="also load the maintainer's user-level host settings")
     parser.add_argument("--no-kernel", action="store_true",
@@ -687,6 +700,7 @@ def main() -> int:
                         help="host that runs the grader (codex gives a non-Claude grader)")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
+    apply_kind_defaults(args)
     if args.repeat < 1:
         parser.error("--repeat must be at least 1")
 

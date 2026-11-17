@@ -8,7 +8,7 @@ skill: requirements-analysis
 
 - "Write a spec for a loyalty discount for repeat customers"
 - "Turn this idea into testable requirements: customers get 5% off after 3 orders"
-- "What are the acceptance criteria for the coupon feature?"
+- "Write the acceptance criteria for a coupon feature: 10% off orders over $50, one use per customer"
 
 ## Should not trigger
 
