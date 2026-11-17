@@ -1,6 +1,6 @@
 ---
 name: architecture-design
-description: Design or evaluate software architecture for a feature or system using requirements, codebase context, constraints, quality attributes, and operational considerations. Use for cross-cutting changes, new components, data/API design, or architecture reviews.
+description: Design or evaluate software architecture for a feature or system using requirements, codebase context, constraints, quality attributes, and operational considerations. Use for cross-cutting changes, new components, data/API design, deprecating a contract, prototyping a design question, or architecture reviews.
 ---
 
 # Architecture Design
@@ -42,6 +42,19 @@ Make the few decisions that are expensive to reverse, make them on evidence, and
 | New endpoint inside an existing module, same patterns | Steps 1, 5, 6. No ADR unless a contract becomes public. |
 | New module, new datastore table, new external integration | Steps 1 to 8. One ADR if an alternative was rejected. |
 | New service, new datastore technology, sync-to-async change, multi-team contract | All steps, ADRs, failure analysis, rollout plan, user review before build. |
+
+## Prototype mode
+
+When a decision hinges on a question that reading cannot answer ("can the queue keep ordering per tenant?", "does this library stream?"), build a throwaway prototype:
+
+1. Write the one question and the result that would decide it.
+2. Build the least code that answers it, outside production paths (a scratch directory or a separate branch). Set a time box.
+3. Record the answer, the evidence (command and output), and the decision in the ADR or proposal.
+4. Delete the prototype or leave it out of the merge. Production code is written afterward, test-first.
+
+## Deprecating a contract
+
+To retire an endpoint, field, event, or public function: announce it (changelog, docs, a deprecation header or warning), measure remaining use, migrate consumers, then remove it after the stated window. Never remove in the same release that announces it. The expand-and-contract steps in [data and API design](references/data-and-api.md) apply.
 
 ## Outputs
 

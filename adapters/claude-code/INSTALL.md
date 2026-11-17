@@ -26,7 +26,7 @@ claude --plugin-dir /path/to/axiom
 
 Plugin skills are namespaced, for example `axiom:debugging`. Version pinning: the manifest sets no `version`, so updates follow the marketplace source. Pin a ref or commit SHA in your marketplace source if you need a fixed version, for example `claude plugin marketplace add "https://github.com/ifaamrillah/axiom.git#<ref>"`.
 
-Verified 2026-11-16 on Claude Code 2.1.325: adding the marketplace from GitHub at a branch ref and running `claude plugin install axiom@axiom` (both at `--scope local` in a scratch project) loaded all 24 `axiom:` skills, the 4 `axiom:` subagents, and the kernel through the session-start hook.
+Verified 2026-11-16 on Claude Code 2.1.325: adding the marketplace from GitHub at a branch ref and running `claude plugin install axiom@axiom` (both at `--scope local` in a scratch project) loaded all 24 `axiom:` skills (the count at that date), the 4 `axiom:` subagents, and the kernel through the session-start hook.
 
 ## Option B: project skills without a plugin
 
@@ -59,6 +59,10 @@ Without the plugin, either paste the kernel into `CLAUDE.md` using the [Axiom bl
 ```
 
 The hook needs a POSIX `sh` (on Windows, Git Bash). If no shell is available, use the `CLAUDE.md` block.
+
+## Slash commands
+
+The manifest's `commands` key adds four user-invoked commands from [commands/](commands/): `/axiom:spec`, `/axiom:plan`, `/axiom:review`, and `/axiom:ship`. Each sets `disable-model-invocation: true`, so the model never loads them on its own. They only name canonical skills and subagents; all procedure lives in the skills. Not yet verified in a live session.
 
 ## Role mapping
 

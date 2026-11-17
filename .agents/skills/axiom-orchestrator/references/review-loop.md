@@ -10,8 +10,8 @@ dispatch → report → triage status → review (spec, then quality) → verify
 ```
 
 1. **Triage the status** (table below). Only DONE and DONE_WITH_CONCERNS go to review.
-2. **Inspect the diff yourself.** `git diff --stat <base>..HEAD` first. Files outside the allowed set are an automatic finding.
-3. **Spec review first.** Does the change do what the acceptance criteria say, no less and no more? Use the [task reviewer prompt](../assets/prompts/task-reviewer.md). Spec gaps block quality review: no point polishing the wrong thing.
+2. **Inspect the diff yourself.** `git diff --stat <base>..HEAD` first, where `<base>` is the SHA recorded in the brief before dispatch, never `HEAD~1` (a worker may have made several commits or none). Files outside the allowed set are an automatic finding.
+3. **Spec review first.** Does the change do what the acceptance criteria say, no less and no more? Use the [task reviewer prompt](../assets/prompts/task-reviewer.md). Spec gaps block quality review: no point polishing the wrong thing. Treat the plan and the report as testimony: for each factual claim they make ("`Money` already rounds", "no other caller uses this"), try to refute it against the code. A claim that fails becomes a finding.
 4. **Quality review second.** Correctness risks, error handling, tests that prove behavior, conventions, needless complexity.
 5. **Verify fresh.** Rerun the brief's verification commands now, in the integrated tree. Compare with the baseline. Output older than the last edit does not count.
 6. **Resolve "cannot verify from diff" items.** A reviewer may flag requirements that live in unchanged code or span tasks. You hold the cross-task context, so check each one yourself. A confirmed gap enters the fix loop.

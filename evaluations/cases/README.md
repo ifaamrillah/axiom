@@ -43,7 +43,8 @@ Rules:
 ## Running
 
 ```sh
-python3 scripts/run_evals.py --check                         # structure only (CI)
+python3 scripts/run_evals.py --check                         # structure and description collisions (CI)
+python3 scripts/run_evals.py --routing                       # offline routing proxy; no host, no quota
 python3 scripts/run_evals.py --host claude-code --kind trigger --dry-run
 python3 scripts/run_evals.py --host claude-code --kind trigger --skill debugging
 python3 scripts/run_evals.py --host claude-code --kind behavior --skill tdd

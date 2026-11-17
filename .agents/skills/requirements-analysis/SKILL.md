@@ -26,6 +26,8 @@ The request, discovery output (if any), existing product behavior, architecture,
 9. **Cross-check** against the constitution, constraints, existing behavior, and architecture. Surface conflicts. Do not reconcile them silently.
 10. **Set status:** `draft` while markers remain on must-haves, `clarified` when none remain, and `approved` only after the user or owner accepts it.
 
+When a spec already exists and behavior changes, write a change proposal with ADDED, MODIFIED, REMOVED, and RENAMED deltas instead of editing the spec in place. Open [change proposals](references/change-proposals.md).
+
 ## Outputs
 
 `spec.md` (or the lighter [requirements checklist](assets/requirements.md) for small changes) containing goals, non-goals, stories, requirements, scenarios, edge cases, assumptions, clarifications, and open questions.
@@ -45,4 +47,5 @@ The request, discovery output (if any), existing product behavior, architecture,
 - [Writing acceptance criteria](references/acceptance-criteria.md): open when writing scenarios, examples tables, and edge cases.
 - [NFR catalog](references/nfr-catalog.md): open when writing non-functional requirements.
 - [Ambiguity word list](references/ambiguity-words.md): open when scanning a draft for vague language, including the grep command.
+- [Change proposals](references/change-proposals.md): open when changing behavior that already has a spec.
 - [Product discovery](../product-discovery/SKILL.md), [spec analysis](../spec-analysis/SKILL.md)

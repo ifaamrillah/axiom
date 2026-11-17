@@ -32,3 +32,26 @@ A second pass deepened all 24 skills with references: checklists, worked example
 | yeachan-heo/oh-my-claudecode | Agent catalog, verifier, explore agent, deep-init, persistence loop | `axiom-orchestrator`, `codebase-exploration`, `project-onboarding`, `skill-evaluator` |
 | abryant710/auto-codebase-documenter | What to document for each file and module | `project-onboarding` |
 
+
+## Adoption pass (2026-11-17)
+
+A comparison with sixteen skill and tooling projects added the ideas below, rewritten in Axiom's own words. Ideas already present in Axiom (finding format with a trigger, read-versus-inferred labels, stable requirement IDs, "Not covered" in reviews) were not added again. Tools that need a binary or CLI were not adopted; Axiom stays Markdown-only.
+
+| Project | License | Ideas adapted | Where in Axiom |
+|---|---|---|---|
+| [dietrichgebert/ponytail](https://github.com/dietrichgebert/ponytail) | MIT | Reuse-first decision ladder; never-cut list; `shortcut:` markers reviewed as decisions | Kernel rule 2, `implementation/references/simplicity.md`, `code-review` rules |
+| [Fission-AI/OpenSpec](https://github.com/Fission-AI/OpenSpec) | MIT | Delta specs (ADDED, MODIFIED, REMOVED, RENAMED), full-block rule for MODIFIED, archive-and-merge, reverse check for removed behavior | `requirements-analysis/references/change-proposals.md`, change template, `spec-analysis` converge |
+| [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | Apache-2.0 | Verify and Refuse lists with stable IDs; unanchored critique with a degraded banner; heuristic scores with `n/a`; surface modes; mode vocabulary (critique, audit, polish, harden) | `ui-ux-design` modes, `craft-floor.md`, `critique.md`, design master |
+| [blader/humanizer](https://github.com/blader/humanizer) | MIT | Tell catalog ordered by strength; fact check before style check; review, file, and embedded output modes | `writing-quality` |
+| [mattpocock/skills](https://github.com/mattpocock/skills) | MIT | Feedback-loop gate before hypotheses; throwaway prototypes; session retros; user-invoked commands | `debugging`, `architecture-design`, `project-documentation`, Claude Code commands |
+| [bmad-code-org/BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) | unclear | Claims check: treat the plan and report as testimony and try to refute them (ideas only) | Orchestrator review loop |
+| [obra/superpowers](https://github.com/obra/superpowers) | MIT | Record the base commit before dispatch; never diff against `HEAD~1` | Orchestrator delegation and review loop |
+| [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) | MIT | "Even when it looks obvious" description clauses; performance, CI/CD, and observability skills; `/ship` fan-out to GO or NO-GO | `debugging`, `tdd`, `verification-before-completion` descriptions; `performance-optimization`; `ci-and-observability`; `/axiom:ship` |
+| [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | MIT | Phased rendered review at fixed viewports | `ui-ux-design/references/critique.md` |
+| [DeusData/codebase-memory-mcp](https://github.com/DeusData/codebase-memory-mcp) | MIT | Negative claims need a search record; coverage check before relying on graph results | `codebase-exploration` search recipes, `integrations/codebase-memory/` |
+| [rtk-ai/rtk](https://github.com/rtk-ai/rtk) | Apache-2.0 | Trust condensed output except on three conditions; rerun uncondensed for evidence | `integrations/rtk/`, `verification-before-completion` reading output |
+| [github/spec-kit](https://github.com/github/spec-kit) | MIT | Bug-fix verdicts: verified, partial, failed | Bug Fix workflow |
+| [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) | MIT | Offline TF-IDF routing check with a collision threshold | `run_evals.py --routing`, `--check` |
+| [bmad-code-org/BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) | unclear | Variant evals that test whether a section earns its place (ideas only) | `skill-evaluator` eval design |
+| [obra/superpowers](https://github.com/obra/superpowers) | MIT | A byte budget for skills tied to re-attachment after compaction | `validate_repository.py` |
+| [Graphify-Labs/graphify](https://github.com/Graphify-Labs/graphify) | Apache-2.0 | Query an existing graph first; build-or-grep cost gate; inferred edges are hypotheses | `integrations/codebase-memory/` |

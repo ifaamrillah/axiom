@@ -1,6 +1,6 @@
 ---
 name: verification-before-completion
-description: Require fresh, observable evidence before claiming that work is complete, fixed, passing, or safe. Use when about to commit or push ("go ahead and commit", "ship it"), open a pull request, report or mark a task or gate as done, or accept another agent's success report.
+description: Require fresh, observable evidence before claiming that work is complete, fixed, passing, or safe. Use when about to commit or push ("go ahead and commit", "ship it"), open a pull request, report or mark a task or gate as done, or accept another agent's success report, even when the change looks trivially correct.
 ---
 
 # Verification Before Completion
@@ -23,7 +23,7 @@ Before any status claim, or before expressing satisfaction with the result:
 
 1. **Identify** the command or observation that would prove the claim.
 2. **Run** it in full, fresh, after the last relevant change.
-3. **Read** the whole result: exit code, failure and skip counts, warnings. Watch for partial runs, cached results, skipped tests, and filtered or piped output; see [reading output](references/reading-output.md).
+3. **Read** the whole result: exit code, failure and skip counts, warnings. Watch for partial runs, cached results, skipped tests, and filtered, compressed, or piped output; see [reading output](references/reading-output.md).
 4. **Compare** the output with the claim.
    - If it does not support the claim, state the real status with the evidence.
    - If it does, state the claim together with the evidence.

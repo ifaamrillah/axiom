@@ -15,6 +15,7 @@ Turn an approved plan into a small, correct, reviewable diff. Build in thin slic
 |---|---|
 | Slice the work, run the step and verify loop, see a worked example, decide whether a refactor fits | [slicing and the verify loop](references/slicing-and-loop.md) |
 | Discover the repository's conventions and commands; error handling, logging, and configuration rules | [conventions and code rules](references/conventions-and-code-rules.md) |
+| Before writing new code; marking a deliberate shortcut; simplifying existing code | [simplicity](references/simplicity.md) |
 | Final checks, cleanup, commit hygiene, and the PR description | [finishing a branch](references/finishing-a-branch.md) |
 
 ## Procedure
@@ -25,7 +26,7 @@ Turn an approved plan into a small, correct, reviewable diff. Build in thin slic
 4. **Slice.** Split the work into slices that each leave the build green and can be verified alone. Prefer vertical slices; put the riskiest unknown first.
 5. **Loop per slice:**
    1. Write or update the test for the slice and watch it fail for the right reason (see [tdd](../tdd/SKILL.md)).
-   2. Write the smallest code that makes it pass, in the local style.
+   2. Write the smallest code that makes it pass, in the local style. Climb the [decision ladder](references/simplicity.md#decision-ladder) first: reuse, stdlib, or an installed dependency beats new code. Mark deliberate limits with a `shortcut:` comment.
    3. Run the focused test, then the affected checks (type check, lint).
    4. Read your own diff for the slice. Fix anything unrelated or accidental.
    5. Commit the slice if the workflow uses commits per slice.

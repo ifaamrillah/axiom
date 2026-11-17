@@ -54,6 +54,7 @@ A cached pass proves the result for the inputs the cache keyed on. If you are no
 | `cmd \|\| true` | Forces success | Remove it for the verification run |
 | Quiet flags (`-q`, `--silent`) | May hide warnings and skips | Read the summary line and the exit code |
 | Truncated tool output | The failure may be in the hidden part | Rerun with the output saved to a file, then search the file |
+| Compressed output (an output-compressing hook such as RTK) | The decisive line may be summarized away | Rerun the proving command uncondensed (`rtk bypass <cmd>`) or save the full output to a file; quote the real line |
 
 ## Retries and flaky tests
 

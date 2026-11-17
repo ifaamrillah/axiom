@@ -16,7 +16,7 @@ The same Markdown works in Claude Code, Codex, OpenCode, and Antigravity. There 
  │Onboard │ ─▶ │  Idea  │ ─▶ │ Tasks  │ ─▶ │  TDD   │ ─▶ │ Review │ ─▶ │Release │
  │Explore │    │  Spec  │    │ Design │    │ Debug  │    │Security│    │  Docs  │
  └────────┘    └────────┘    └────────┘    └────────┘    └────────┘    └────────┘
-        always on: the kernel (rules plus routing) · on demand: 24 skills
+        always on: the kernel (rules plus routing) · on demand: 27 skills
 ```
 
 > **Status:** pre-1.0. Measured on Claude Code and Codex (November 2026). See [Evidence](#evidence).
@@ -35,10 +35,12 @@ You don't need commands or skill names. Describe the task. The always-on **kerne
 | Plan it | "Plan the work, don't implement yet" | `task-planning` | Small tasks, each with a check |
 | Build it test-first | "Use TDD to add a coupon code" | `tdd` | See it fail before you make it pass |
 | Fix a bug | "`apply_discount` returns 0, should be 900" | `debugging` | Reproduce before fixing |
+| Speed it up | "The revenue report is slow" | `performance-optimization` | Measure before and after |
 | Review it | "Review this PR before I merge" | `code-review` | Acceptance first, then what's missing |
 | Check security | "Audit this service for vulnerabilities" | `security-audit` | Only real trust-boundary issues, with evidence |
 | Finish | "Ship it" / "go ahead and commit" | `verification-before-completion` | No claim without fresh output |
 | Release | "Cut release 1.2.0" | `release-management` | Preparing is not permission to publish |
+| Edit prose | "Make this README less fluffy" | `writing-quality` | Keep every fact |
 
 For multi-step work the `axiom-orchestrator` skill picks a [workflow](#workflows), delegates to subagents where safe, and keeps state in Markdown so a later session can resume. To force a skill, name it: "use the security-audit skill", or `axiom:security-audit` in Claude Code.
 
@@ -54,9 +56,10 @@ For multi-step work the `axiom-orchestrator` skill picks a [workflow](#workflows
 ```
 
 This installs:
-- all 24 skills;
+- all 27 skills;
 - the kernel, loaded automatically by a session-start hook;
-- four [subagents](#subagents).
+- four [subagents](#subagents);
+- four [slash commands](#slash-commands): `/axiom:spec`, `/axiom:plan`, `/axiom:review`, `/axiom:ship`.
 
 Nothing else is needed.
 
@@ -153,7 +156,7 @@ A correct answer quotes **"Reproduce before fixing"** and names **`debugging`**.
 
 ---
 
-## All 24 Skills
+## All 27 Skills
 
 Each skill is a folder with a short `SKILL.md` (the procedure, under 130 lines) and `references/` that the agent opens only when needed. The references hold checklists, worked examples, anti-pattern catalogs, and per-language notes.
 
@@ -177,7 +180,7 @@ Each skill is a folder with a short `SKILL.md` (the procedure, under 130 lines) 
 | Skill | What it does | Use when |
 |---|---|---|
 | [product-discovery](.agents/skills/product-discovery/SKILL.md) | 12 elicitation techniques, one question at a time with a recommended answer, approval before building | The idea is vague |
-| [requirements-analysis](.agents/skills/requirements-analysis/SKILL.md) | User stories, numbered requirements, Given/When/Then scenarios, `[NEEDS CLARIFICATION]` markers, an NFR catalog | Writing a spec |
+| [requirements-analysis](.agents/skills/requirements-analysis/SKILL.md) | User stories, numbered requirements, Given/When/Then scenarios, `[NEEDS CLARIFICATION]` markers, an NFR catalog, change proposals with ADDED/MODIFIED/REMOVED deltas | Writing or changing a spec |
 | [spec-analysis](.agents/skills/spec-analysis/SKILL.md) | Checks consistency across spec, plan, and tasks (read-only), or appends the remaining work after implementation | Before building, or "what's left?" |
 | [quality-constraints](.agents/skills/quality-constraints/SKILL.md) | A numeric quality bar with ratchets and waivers, plus grep patterns that detect skipped tests and suppressions | Writing the bar down, or catching it being lowered |
 
@@ -185,15 +188,16 @@ Each skill is a folder with a short `SKILL.md` (the procedure, under 130 lines) 
 
 | Skill | What it does | Use when |
 |---|---|---|
-| [architecture-design](.agents/skills/architecture-design/SKILL.md) | Option comparison, ADRs, a pattern catalog, data modeling, API rules (REST, GraphQL, gRPC), safe migrations | Cross-cutting or structural changes |
-| [ui-ux-design](.agents/skills/ui-ux-design/SKILL.md) | Screen states, WCAG thresholds, style, palette, and type tables, design tokens, per-stack notes | Any user-facing change |
+| [architecture-design](.agents/skills/architecture-design/SKILL.md) | Option comparison, ADRs, a pattern catalog, data modeling, API rules (REST, GraphQL, gRPC), safe migrations, deprecation, throwaway prototypes | Cross-cutting or structural changes |
+| [ui-ux-design](.agents/skills/ui-ux-design/SKILL.md) | Screen states, WCAG thresholds, style, palette, and type tables, design tokens, per-stack notes; critique, audit, and polish modes with a list of generated-looking patterns to refuse | Any user-facing change |
 | [task-planning](.agents/skills/task-planning/SKILL.md) | Ready-for-development plans: S–M tasks, vertical slices, exact files, a check per task, checkpoints | Before multi-step or delegated work |
 
 ### Build: write the code
 
 | Skill | What it does | Use when |
 |---|---|---|
-| [implementation](.agents/skills/implementation/SKILL.md) | Thin slices with a step → verify loop, convention discovery, and branch finishing | Building a planned change |
+| [implementation](.agents/skills/implementation/SKILL.md) | Thin slices with a step → verify loop, a reuse-first decision ladder, `shortcut:` markers, convention discovery, and branch finishing | Building a planned change |
+| [performance-optimization](.agents/skills/performance-optimization/SKILL.md) | Baseline, profile, change one thing, re-measure; profiling recipes per ecosystem | Slow code, latency targets, before adding a cache |
 | [tdd](.agents/skills/tdd/SKILL.md) | Red → green → refactor with examples in Python, TypeScript, and Go; 13 testing anti-patterns; legacy-code seams | New behavior or a regression test |
 | [debugging](.agents/skills/debugging/SKILL.md) | Technique chosen by symptom, `git bisect run`, instrumentation in 5 languages, escalation after 3 failed fixes | Bugs, failing or flaky tests, regressions |
 
@@ -212,7 +216,9 @@ Each skill is a folder with a short `SKILL.md` (the procedure, under 130 lines) 
 | Skill | What it does | Use when |
 |---|---|---|
 | [release-management](.agents/skills/release-management/SKILL.md) | Readiness checklist, semver table, changelog, staged rollout, rollback plans, hotfix steps | Preparing a release |
-| [project-documentation](.agents/skills/project-documentation/SKILL.md) | Doc types, README, ADRs, runbooks, API docs, freshness metadata | Docs became stale or are missing |
+| [project-documentation](.agents/skills/project-documentation/SKILL.md) | Doc types, README, ADRs, runbooks, API docs, freshness metadata, session retros | Docs became stale or are missing |
+| [ci-and-observability](.agents/skills/ci-and-observability/SKILL.md) | CI pipelines from the project's real commands; logs, metrics, traces, alerts with runbooks | Adding or changing CI or instrumentation |
+| [writing-quality](.agents/skills/writing-quality/SKILL.md) | Removes AI writing tells while keeping every fact; embedded mode for PRs and release notes | Prose people will read |
 
 ### Meta: improve the skills themselves
 
@@ -235,6 +241,17 @@ The Claude Code plugin adds four subagents. Other hosts can follow the same [rol
 | [implementer](adapters/claude-code/agents/implementer.md) | Inherits | Yes | One planned task with explicit file ownership |
 
 Prompt templates for delegation (implementer, two-stage task reviewer, fix loop) live in [`agents/prompts/`](agents/prompts/).
+
+## Slash Commands
+
+The Claude Code plugin adds four commands. They run only when you type them (`disable-model-invocation`), so they add nothing to the model's context otherwise.
+
+| Command | Does |
+|---|---|
+| [`/axiom:spec`](adapters/claude-code/commands/spec.md) | Writes a spec, or a change proposal when a spec exists; stops before planning |
+| [`/axiom:plan`](adapters/claude-code/commands/plan.md) | Plans the work, then runs a read-only consistency check |
+| [`/axiom:review`](adapters/claude-code/commands/review.md) | Read-only review in the reviewer subagent, plus security review when a trust boundary is touched |
+| [`/axiom:ship`](adapters/claude-code/commands/ship.md) | Parallel review, security, and impact checks plus fresh verification, merged into GO or NO-GO with a rollback plan. Never pushes or publishes |
 
 ---
 
@@ -272,7 +289,7 @@ Workflow state lives in your project under `.axiom/workflows/active/<id>/` (spec
 └──────────────────────────────────────────────────────┘
 ```
 
-- **Always-on kernel, on-demand skills.** The [kernel](.agents/skills/axiom-orchestrator/references/kernel.md) is about 50 lines: 8 behavior rules plus a routing table covering all 24 skills. Everything else loads only when needed.
+- **Always-on kernel, on-demand skills.** The [kernel](.agents/skills/axiom-orchestrator/references/kernel.md) is about 50 lines: 8 behavior rules plus a routing table covering all 27 skills. Everything else loads only when needed.
 - **Evidence is required.** Every completion claim names the command it ran and quotes the decisive output line. A skipped check is reported as skipped, never as passed.
 - **Anti-rationalization.** Discipline skills (TDD, debugging, verification, quality bar, skill writing) include tables of the excuses agents use to cut corners, each with the answer.
 - **Proportional.** A one-line fix gets no plan or workflow files. The project's own stricter rules always win.
@@ -284,7 +301,7 @@ Workflow state lives in your project under `.axiom/workflows/active/<id>/` (spec
 
 | Layer | Paths | Purpose |
 |---|---|---|
-| Portable core | `.agents/skills/` (24 skills) | Canonical `SKILL.md` folders used by every host |
+| Portable core | `.agents/skills/` (27 skills) | Canonical `SKILL.md` folders used by every host |
 | Always-on rules | `.agents/skills/axiom-orchestrator/references/kernel.md`, `templates/project/agents-md-block.md` | Kernel and the block you paste into `AGENTS.md` / `CLAUDE.md` |
 | Playbooks | `workflows/` (7), `templates/` | Lifecycle workflows and the documents they fill |
 | Delegation | `agents/` | Role cards, subagent prompt templates, parallel and sequential patterns |
@@ -311,7 +328,7 @@ Axiom makes the disciplined path the default, and it does that in a way you can 
 - **Portable.** One set of skills for four hosts. Host-specific details live only in `adapters/`.
 - **Measured, not asserted.** Every skill has runnable eval cases. Results are recorded per host and model version, including the failures.
 - **Built to fit your project.** Verified project facts, a Pitfalls list, a constitution, and constraints make it your codebase's rules, not generic advice.
-- **Synthesized.** It brings together the best ideas from obra/superpowers, addyosmani/agent-skills, github/spec-kit, cloudflare/security-audit-skill, ui-ux-pro-max, BMAD, and others, rewritten and credited in [acknowledgements](docs/acknowledgements.md).
+- **Synthesized.** It brings together the best ideas from obra/superpowers, addyosmani/agent-skills, github/spec-kit, OpenSpec, cloudflare/security-audit-skill, ui-ux-pro-max, impeccable, ponytail, humanizer, BMAD, and others, rewritten and credited in [acknowledgements](docs/acknowledgements.md).
 
 ---
 
@@ -319,9 +336,9 @@ Axiom makes the disciplined path the default, and it does that in a way you can 
 
 | What | Result | Record |
 |---|---|---|
-| Trigger accuracy (right skill loaded or correctly not loaded), Claude Code 2.1.325 | **110/113** prompts, 24 skills | [run](evaluations/results/2026-11-16-1500-claude-code-trigger.md) |
+| Trigger accuracy (right skill loaded or correctly not loaded), Claude Code 2.1.325 | **110/113** prompts, 24 skills (measured before `writing-quality`, `performance-optimization`, and `ci-and-observability` were added; those three have eval cases but no recorded runs yet) | [run](evaluations/results/2026-11-16-1500-claude-code-trigger.md) |
 | Trigger accuracy, Codex CLI 0.169.0 | **107/113** | [compatibility](docs/compatibility/README.md) |
-| Behavior | All 24 cases run repeatedly. Graded by a separate Claude grader and by Codex (a non-Claude model) | [compatibility](docs/compatibility/README.md#behavior-after-the-kernel-routing-change-2026-11-16) |
+| Behavior | All 24 original cases run repeatedly. Graded by a separate Claude grader and by Codex (a non-Claude model) | [compatibility](docs/compatibility/README.md#behavior-after-the-kernel-routing-change-2026-11-16) |
 | OpenCode 1.19.5 | All 24 skills discovered; model invocation not tested | [adapter](adapters/opencode/INSTALL.md) |
 | Antigravity | Not tested | [adapter](adapters/antigravity/INSTALL.md) |
 | Real projects | Used on Axiom itself and on a private Laravel application; the findings changed several skills | [dogfood](evaluations/dogfood/README.md) |
@@ -330,6 +347,7 @@ Axiom makes the disciplined path the default, and it does that in a way you can 
 - **Fixtures are small.** A strong model finds the seeded issues with or without the deeper references. The added depth showed a small gain only with a weaker model, on few runs ([comparison](evaluations/results/2026-11-17-depth-comparison.md)).
 - **Commands are unverified.** Commands in the references come from general practice. They have not been run in every ecosystem.
 - **Grading is model-only.** No human grading yet.
+- **The 2026-11-17 adoption pass is unmeasured.** Three new skills, the new references, and the description changes passed structural checks only. No live trigger or behavior run has been recorded for them yet.
 
 ---
 
@@ -355,7 +373,13 @@ python3 scripts/run_evals.py --check
 python3 -m unittest discover -s scripts/tests
 ```
 
-The first checks structure, links, and the sync of bundled assets (add `--sync` after editing a bundled template). The second checks that eval case files are well formed, and the third runs the tooling tests.
+The first checks structure, links, size budgets, and the sync of bundled assets (add `--sync` after editing a bundled template). The second checks that eval case files are well formed and that no two skill descriptions nearly duplicate each other, and the third runs the tooling tests.
+
+```bash
+python3 scripts/run_evals.py --routing
+```
+
+Ranks skills for every case prompt by text similarity, offline and free. It is a proxy for routing, not a measurement; live trigger runs remain the evidence.
 
 ```bash
 python3 scripts/run_evals.py --host claude-code --kind trigger --skill debugging
@@ -364,7 +388,7 @@ python3 scripts/run_evals.py --host claude-code --kind trigger --skill debugging
 Runs live evals against an installed host. These spend model quota.
 - Hosts: `--host claude-code` or `--host codex`.
 - Kinds: `--kind trigger` or `--kind behavior`.
-- Behavior options: `--repeat N`, `--grade`, `--grader-host codex`, and `--case B2`.
+- Behavior options: `--repeat N`, `--grade`, `--grader-host codex`, and `--case B2`. Behavior results record the median tokens per case, so a skill change can be checked for cost as well as quality.
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md) first. History: [changelog](CHANGELOG.md), [roadmap](docs/IMPLEMENTATION-ROADMAP.md), [decisions](docs/decisions/).
 

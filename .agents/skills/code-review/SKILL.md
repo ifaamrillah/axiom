@@ -80,7 +80,7 @@ For irreversible or security-critical decisions, add an adversarial pass: a fres
 
 ## Rules
 
-Do not approve work that was not inspected. Do not invent findings to look thorough. State the reviewed scope and what was not covered. Style nits that a formatter or linter would catch are not findings.
+Do not approve work that was not inspected. Do not invent findings to look thorough: no concrete trigger, no finding (turn it into a question). A `shortcut:` comment that states its limit and upgrade trigger is a recorded decision; flag it only when the limit is wrong for the stated scope, and flag unmarked shortcuts or markers with no trigger. State the reviewed scope and what was not covered. Style nits that a formatter or linter would catch are not findings.
 
 ## References
 

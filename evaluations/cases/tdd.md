@@ -13,7 +13,7 @@ fixture: evaluations/fixtures/discount-bug
 
 ## Should not trigger
 
-- "Why is the build slow?" → `none`
+- "Why is the build slow?" → `ci-and-observability`
 - "Review this diff for security issues" → `code-review`
 
 ## Behavior

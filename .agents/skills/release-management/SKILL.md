@@ -26,7 +26,7 @@ Ship changes that are reversible, observable, and incremental. Preparing a relea
    - Last release: `git describe --tags --abbrev=0`, then `git log <tag>..HEAD --oneline`.
 3. **Classify the changes** and decide the version bump with the semver table. Flag every breaking change, migration, new config, and dependency change.
 4. **Verify readiness** with the checklist: tests, build, security scan, migrations rehearsed, config present, docs updated. Record each item as passed (with evidence), failed, or not checked. A skipped item is not a passed item.
-5. **Prepare artifacts**: version bump, changelog entry, release notes, migration and rollback plan, rollout plan with go/no-go thresholds.
+5. **Prepare artifacts**: version bump, changelog entry, release notes, migration and rollback plan, rollout plan with go/no-go thresholds. Give release notes a final pass with [writing-quality](../writing-quality/SKILL.md) in embedded mode.
 6. **Check operations**: staging deploy and smoke test, dashboards and alerts for the changed paths, on-call owner and contact, communication plan for users if behavior changes.
 7. **Present a readiness report** (format below) with blockers first. Stop here unless the user authorizes the next step.
 8. **On explicit approval**, execute the release with the project's own tooling. Tag and publish only what was approved.

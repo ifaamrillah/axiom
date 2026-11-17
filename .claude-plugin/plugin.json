@@ -19,6 +19,12 @@
   "skills": [
     "./.agents/skills/"
   ],
+  "commands": [
+    "./adapters/claude-code/commands/spec.md",
+    "./adapters/claude-code/commands/plan.md",
+    "./adapters/claude-code/commands/review.md",
+    "./adapters/claude-code/commands/ship.md"
+  ],
   "hooks": "./adapters/claude-code/hooks/hooks.json",
   "agents": [
     "./adapters/claude-code/agents/reviewer.md",

@@ -6,7 +6,8 @@ description: >
   the user asks for TDD, test-first work, or to write a failing test before fixing
   a bug ("write a failing test for this bug first, then fix it"), and for new logic
   or bug fixes that need a regression test when the project has a runnable test
-  harness. When the bug's cause is still unknown, pair with debugging.
+  harness, even when the change looks too small to test. When the bug's cause is
+  still unknown, pair with debugging.
 ---
 
 # Test-Driven Development

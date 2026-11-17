@@ -103,6 +103,8 @@ Check co-located tests (`foo.test.ts`), mirrored trees (`tests/unit/...`), and f
 
 Combine the "who calls" recipe with build entry points. Zero text hits plus no dynamic reference plus not exported from a public package means probably dead. Exported from a library: callers may live in other repositories, so mark it "unused in this repo" only.
 
+A negative claim ("no callers", "unused", "not configured anywhere") needs a search record: list the patterns and naming variants searched and the paths covered, for example `rg -n "applyDiscount|apply_discount|'applyDiscount'" src/ tests/ scripts/`. Without the record, report the claim as unverified.
+
 ## Red flags
 
 | Red flag | Do instead |

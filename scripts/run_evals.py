@@ -9,6 +9,7 @@ authenticated. Results are written as Markdown evidence under evaluations/result
 Usage:
   python3 scripts/run_evals.py --check
   python3 scripts/run_evals.py --list
+  python3 scripts/run_evals.py --routing     # offline TF-IDF routing report; no host, no quota
   python3 scripts/run_evals.py --host claude-code --kind trigger [--skill NAME] [--model M] [--dry-run]
   python3 scripts/run_evals.py --host claude-code --kind behavior --skill NAME [--dry-run]
 
@@ -164,6 +165,114 @@ def kernel_block() -> str:
     return "<!-- axiom:begin -->\n# Axiom\n\n" + text[start:end].rstrip() + "\n<!-- axiom:end -->\n"
 
 
+# --- Offline routing check (no host, no model quota) -------------------------
+# A cheap proxy for trigger accuracy: rank skills for each case prompt by TF-IDF
+# cosine similarity against the text a host sees when choosing a skill (the
+# frontmatter description plus the skill's kernel routing row). It cannot replace
+# live trigger runs; it catches descriptions that collide or say too little.
+
+COLLISION_THRESHOLD = 0.75
+STOPWORDS = frozenset(
+    "a an and are as at be by for from has have how i if in into is it its me my of on or our "
+    "so that the their them then there these this to use used uses using was we what when "
+    "where which who why will with you your can do does should would it's".split()
+)
+
+
+def _tokens(text: str) -> list[str]:
+    words = re.findall(r"[a-z0-9]+", text.lower())
+    out = []
+    for word in words:
+        if word in STOPWORDS or len(word) < 2:
+            continue
+        for suffix in ("ing", "ed", "es", "s"):
+            if len(word) > len(suffix) + 3 and word.endswith(suffix):
+                word = word[: -len(suffix)]
+                break
+        out.append(word)
+    return out
+
+
+def routing_documents() -> dict[str, str]:
+    """Description plus kernel routing row for each skill."""
+    docs: dict[str, str] = {}
+    for path in sorted(SKILLS_DIR.glob("*/SKILL.md")):
+        front = path.read_text(encoding="utf-8").split("---\n", 2)[1]
+        block = re.search(r"(?ms)^description:(.*?)(?=^[a-z_-]+:|\Z)", front)
+        docs[path.parent.name] = " ".join(block.group(1).replace(">", " ").split()) if block else ""
+    if KERNEL.exists():
+        for row in re.findall(r"(?m)^\|([^|\n]+)\|\s*([^|\n]+)\|\s*$", KERNEL.read_text(encoding="utf-8")):
+            situation, owners = row
+            for name in re.findall(r"`([a-z0-9-]+)`", owners):
+                if name in docs:
+                    docs[name] += " " + situation.strip()
+    return docs
+
+
+def _vectors(docs: dict[str, str]):
+    import math
+    tokenized = {name: _tokens(text) for name, text in docs.items()}
+    df: dict[str, int] = {}
+    for toks in tokenized.values():
+        for tok in set(toks):
+            df[tok] = df.get(tok, 0) + 1
+    n = len(docs)
+    idf = {tok: math.log((1 + n) / (1 + count)) + 1 for tok, count in df.items()}
+
+    def vec(toks: list[str]) -> dict[str, float]:
+        tf: dict[str, float] = {}
+        for tok in toks:
+            if tok in idf:
+                tf[tok] = tf.get(tok, 0.0) + 1.0
+        weighted = {tok: count * idf[tok] for tok, count in tf.items()}
+        norm = math.sqrt(sum(v * v for v in weighted.values())) or 1.0
+        return {tok: v / norm for tok, v in weighted.items()}
+
+    return {name: vec(toks) for name, toks in tokenized.items()}, vec
+
+
+def _cosine(a: dict[str, float], b: dict[str, float]) -> float:
+    if len(a) > len(b):
+        a, b = b, a
+    return sum(v * b.get(tok, 0.0) for tok, v in a.items())
+
+
+def routing_report(cases: list[CaseFile], docs: dict[str, str] | None = None) -> tuple[list[str], list[str], dict[str, int]]:
+    """Return (errors, misses, stats). Errors are collisions; misses are informational."""
+    docs = docs if docs is not None else routing_documents()
+    skill_vecs, vec = _vectors(docs)
+    errors: list[str] = []
+    names = sorted(skill_vecs)
+    for i, left in enumerate(names):
+        for right in names[i + 1:]:
+            score = _cosine(skill_vecs[left], skill_vecs[right])
+            if score >= COLLISION_THRESHOLD:
+                errors.append(f"routing collision: {left} and {right} descriptions are {score:.2f} similar")
+    misses: list[str] = []
+    stats = {"positive": 0, "top1": 0, "top3": 0, "negative": 0, "negative_clear": 0}
+    for case in cases:
+        if case.skill not in skill_vecs:
+            continue
+        accepted = {case.skill, *case.accept}
+        for prompt in case.positive:
+            ranked = sorted(names, key=lambda s: _cosine(vec(_tokens(prompt)), skill_vecs[s]), reverse=True)
+            stats["positive"] += 1
+            if ranked[0] in accepted:
+                stats["top1"] += 1
+            else:
+                misses.append(f"{case.skill}: top is {ranked[0]} for \"{prompt[:70]}\"")
+            if accepted & set(ranked[:3]):
+                stats["top3"] += 1
+        for prompt, _owner in case.negative:
+            ranked = sorted(names, key=lambda s: _cosine(vec(_tokens(prompt)), skill_vecs[s]), reverse=True)
+            stats["negative"] += 1
+            if ranked[0] != case.skill:
+                stats["negative_clear"] += 1
+            else:
+                misses.append(f"{case.skill}: ranks first for a should-not-trigger prompt \"{prompt[:70]}\"")
+    return errors, misses, stats
+
+
 def prepare_workspace(fixture: str, kernel: bool = True) -> Path:
     """Create an isolated project: optional fixture copy, skills in the host path, and,
     by default, the kernel in the project instructions files as a documented install does."""
@@ -240,6 +349,29 @@ def run_completed(stream: str) -> bool:
                 return False
             return event.get("subtype", "success") in COMPLETED_SUBTYPES
     return False
+
+
+def run_usage(stream: str) -> tuple[int, int] | None:
+    """(input tokens including cache reads and writes, output tokens) as the host reported them,
+    or None when the stream carries no usage. Claude Code reports it on the final `result` event;
+    Codex on each `turn.completed` event (summed)."""
+    total_in = total_out = 0
+    found = False
+    for line in stream.splitlines():
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(event, dict) or event.get("type") not in ("result", "turn.completed"):
+            continue
+        usage = event.get("usage")
+        if not isinstance(usage, dict):
+            continue
+        found = True
+        total_in += sum(int(usage.get(key) or 0) for key in
+                        ("input_tokens", "cache_creation_input_tokens", "cache_read_input_tokens"))
+        total_out += int(usage.get("output_tokens") or 0)
+    return (total_in, total_out) if found else None
 
 
 def invoked_skills(stream: str) -> list[str]:
@@ -393,6 +525,7 @@ def run_behaviors(cases: list[CaseFile], args: argparse.Namespace) -> tuple[list
                       f"claude -p {json.dumps(behavior.prompt)[:80]}…")
                 continue
             passes, graded, invoked = 0, 0, 0
+            usages: list[tuple[int, int]] = []
             for run in range(1, args.repeat + 1):
                 workdir = prepare_workspace(behavior.fixture, not args.no_kernel)
                 code, out = run_host(cmd, workdir, args.timeout)
@@ -402,6 +535,9 @@ def run_behaviors(cases: list[CaseFile], args: argparse.Namespace) -> tuple[list
                 invoked += bool({case.skill, *case.accept} & set(skills))
                 trace = "\n".join(f"{i}. {c}" for i, c in enumerate(tool_trace(out), 1)) or "(no tool calls)"
                 completed = run_completed(out)
+                usage = run_usage(out)
+                if usage:
+                    usages.append(usage)
                 result = grade(behavior, trace, final, args) if args.grade and completed else None
                 if result is not None:
                     graded += 1
@@ -421,13 +557,17 @@ def run_behaviors(cases: list[CaseFile], args: argparse.Namespace) -> tuple[list
                 run_label = f" (run {run}/{args.repeat})" if args.repeat > 1 else ""
                 sections.append(
                     f"### {case.skill}/{behavior.case_id}{run_label}: {behavior.title}\n\n"
-                    f"- Exit code: {code}\n- Skills invoked: {', '.join(skills) or 'none'}\n- Verdict: {verdict}\n\n"
+                    f"- Exit code: {code}\n- Skills invoked: {', '.join(skills) or 'none'}\n"
+                    f"- Tokens (in/out): {f'{usage[0]}/{usage[1]}' if usage else 'not reported'}\n- Verdict: {verdict}\n\n"
                     f"Tool calls in order:\n\n```text\n{trace}\n```\n\n"
                     f"Expectations:\n\n{checks}\n\nFailure signals:\n\n{fails}\n\n"
                     f"Final answer:\n\n```text\n{final[:4000]}\n```\n")
                 print(f"ran {case.skill}/{behavior.case_id}{run_label}: exit {code}, {verdict[:60]}")
+            median = (lambda xs: sorted(xs)[len(xs) // 2])
+            tokens = (f"{median([u[0] for u in usages])}/{median([u[1] for u in usages])}"
+                      if usages else "not reported")
             summary.append(f"| {case.skill}/{behavior.case_id} | {args.repeat} | {invoked}/{args.repeat} | "
-                           f"{f'{passes}/{graded}' if graded else 'ungraded'} |")
+                           f"{f'{passes}/{graded}' if graded else 'ungraded'} | {tokens} |")
     return sections, summary
 
 
@@ -524,6 +664,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--check", action="store_true", help="validate case files only")
     parser.add_argument("--list", action="store_true", help="list cases")
+    parser.add_argument("--routing", action="store_true",
+                        help="offline TF-IDF routing report (no host, no model quota)")
     parser.add_argument("--host", choices=SUPPORTED_HOSTS)
     parser.add_argument("--kind", choices=("trigger", "behavior"), default="trigger")
     parser.add_argument("--skill", help="skill name, or several separated by commas")
@@ -550,6 +692,21 @@ def main() -> int:
 
     cases = load_cases()
     errors = check(cases)
+    collisions, misses, stats = routing_report(cases)
+    errors += collisions
+    if args.routing:
+        for line in misses:
+            print(f"miss: {line}")
+        p = stats["positive"] or 1
+        n = stats["negative"] or 1
+        print(f"Routing proxy (TF-IDF over descriptions and kernel rows; informational, not live accuracy): "
+              f"top-1 {stats['top1']}/{stats['positive']} ({100 * stats['top1'] // p}%), "
+              f"top-3 {stats['top3']}/{stats['positive']} ({100 * stats['top3'] // p}%), "
+              f"negatives clear {stats['negative_clear']}/{stats['negative']} ({100 * stats['negative_clear'] // n}%). "
+              f"Collisions at >= {COLLISION_THRESHOLD}: {len(collisions)}.")
+        for error in collisions:
+            print(f"ERROR: {error}")
+        return 1 if collisions else 0
     if args.check or not args.host:
         if args.list:
             for case in cases:
@@ -585,7 +742,7 @@ def main() -> int:
             return 0
         note = ("Graded by a separate headless session with no tools and no repository context.\n\n"
                 if args.grade else "Ungraded: unchecked boxes are not passes.\n\n")
-        body = (note + "| Case | Runs | Skill invoked | Graded pass |\n|---|---|---|---|\n" + "\n".join(summary)
+        body = (note + "| Case | Runs | Skill invoked | Graded pass | Median tokens (in/out) |\n|---|---|---|---|---|\n" + "\n".join(summary)
                 + "\n\n" + "\n".join(sections))
     print(f"Results written to {write_results(args.kind, args, body).relative_to(ROOT)}")
     return 0
