@@ -34,7 +34,7 @@ Turn an approved plan into a small, correct, reviewable diff. Build in thin slic
 7. **Run the full relevant checks** at the end: full test suite or the affected packages, lint, type check, build. Compare with the baseline.
 8. **Review the whole diff** for scope creep, debug output, secrets, commented-out code, missed edge cases, and missing docs.
 9. **Update documentation and state** that the change affects: README, API docs, changelog entry if the project keeps one, workflow state files.
-10. **Report** what changed, the exact commands run with their decisive output lines, checks not run and why, deviations, and follow-ups noticed but not done.
+10. **Report** what changed, the exact commands run with their decisive output lines, deviations, and follow-ups noticed but not done. End with the fixed closing block: `Not checked:` (what was not run or verified, or "none") and `Risk:` (the main residual risk, or "none known").
 
 ## Slice size limits
 
@@ -81,7 +81,10 @@ Checks:
 - npm test -- src/orders  -> 24 passed
 - npx tsc --noEmit        -> 0 errors
 - npm run lint            -> clean
-Not run: e2e suite (needs staging DB)
 Deviations: used existing Money type instead of number (plan assumed none existed)
 Follow-ups noticed: parseDate time-zone bug in src/utils/date.ts
+Not checked: e2e suite (needs staging DB)
+Risk: rounding of mixed-currency carts is covered by unit tests only
 ```
+
+The last two lines are always present, in that order. Write `Not checked: none` or `Risk: none known` rather than leaving one out.

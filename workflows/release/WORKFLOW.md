@@ -15,6 +15,9 @@ Identify target version or policy, release scope, Git state, changelog, compatib
 ## Adaptive stages
 1. **Scope and inventory (Required; no dependencies):** identify included changes, audience, and version constraints. Output release scope.
 2. **Readiness review (Required; depends on inventory):** assess checks, security, migrations, compatibility, dependencies, license, and risks. Output evidence and blockers.
+   - **Debt ledger:** search the release tree for `shortcut:` markers; list each with file:line, ceiling, and upgrade trigger; flag markers without a trigger as `no-trigger`. Record the search command and hit count, including zero.
+   - **Doc drift:** compare changed behavior and interfaces in the release diff with README, docs, and CHANGELOG; list docs that still describe old behavior. **Exit** when each drift item is fixed or recorded with an owner.
+   - Method: [debt ledger and doc drift](../../.agents/skills/release-management/references/debt-and-doc-drift.md).
 3. **Prepare (Required; depends on readiness):** draft version recommendation and release notes; prepare artifacts/rollback guidance only when relevant. No external action is implied. **Output:** candidate notes and delivery plan; exit when they match the reviewed scope.
 4. **Candidate verification (Required when an artifact can be built; depends on preparation):** verify checks and artifact identity. **Output:** build/check evidence or blocked/skipped rationale; exit when artifact identity and required checks are established.
 5. **Approval and delivery (Conditional; depends on readiness):** present a reviewable checklist. Perform tag, push, publication, or deployment only when the user explicitly authorized that action and safeguards are satisfied. **Output:** readiness handoff or authorized action evidence; exit when requested delivery is complete or blocked.
@@ -33,6 +36,7 @@ Independent notes/checklist review may be delegated. Version, artifact, and read
 - Confirm scope and version rationale.
 - Review verification, security, migration, and compatibility evidence.
 - Match the changelog to the candidate; require action-specific authorization.
+- No Ready recommendation while a doc drift item is neither fixed nor recorded. The debt ledger is in the readiness handoff, with `no-trigger` markers called out.
 
 ## Recovery and completion
 If changes or failed checks invalidate the candidate, return to inventory/readiness and preserve prior evidence. Completion means requested readiness deliverables are complete; it does not imply a release occurred.

@@ -22,6 +22,19 @@ A plan targets **one user-facing goal**. Split into separate plans only when par
 
 Keep the plan concise enough to hold in context. If it grows past a few pages, the scope is probably too large.
 
+## Scope mode
+
+The plan states one scope mode in a `Scope mode:` line under Scope. The default is **hold**.
+
+| Mode | Plan does | Use when |
+|---|---|---|
+| **hold** | Exactly the approved scope; nothing added, nothing cut | Default; the spec is approved and the request is clear |
+| **selective** | Holds the scope, but expands only the parts the user named | The user asks to go further on one area ("also harden the parser") |
+| **expand** | Adds closely related work the plan found (adjacent gaps, tests, cleanup) | The user asks for a fuller job, and each addition is listed for approval |
+| **reduce** | Cuts to the smallest slice that still delivers value; the rest is listed as deferred | Time or risk is tight, or the user asks for an MVP or a first slice |
+
+Expanded or deferred items are listed by name under Scope. An item outside the mode needs the user's approval or a spec change, not a silent addition.
+
 ## Procedure
 
 1. **Constitution check.** List each MUST principle as pass, fail, or not applicable. Justify unavoidable violations in a complexity-tracking table (see the [constitution template](../quality-constraints/assets/constitution.md)).
@@ -53,7 +66,7 @@ Set the plan frontmatter `status: ready` only when all six hold.
 
 ## Outputs
 
-`PLAN.md` from the [plan template](assets/PLAN.md), with frontmatter `status`, a constitution check, a file map, a task table, a coverage map, risks, and the integration order.
+`PLAN.md` from the [plan template](assets/PLAN.md), with frontmatter `status`, a `Scope mode:` line, a constitution check, a file map, a task table, a coverage map, risks, and the integration order.
 
 ## References
 

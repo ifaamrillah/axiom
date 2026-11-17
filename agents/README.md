@@ -9,6 +9,8 @@ Each card declares portable metadata. Adapters map it to host specifics (model c
 - **capability:** `deep` (complex reasoning, review, architecture), `standard` (implementation, testing), or `fast` (search, lookup, summarization).
 - **writes:** `true` if the role may edit files; `false` for read-only roles.
 
+The orchestrator's work categories (`quick`, `deep`, `visual`, `writing`) suggest tiers named `light`, `standard`, and `strong`, which equal `fast`, `standard`, and `deep` here. See [delegation](../.agents/skills/axiom-orchestrator/references/delegation.md#work-categories).
+
 | Role | Capability | Writes |
 |---|---|---|
 | [architect](roles/architect.md) | deep | false |
@@ -21,7 +23,7 @@ Each card declares portable metadata. Adapters map it to host specifics (model c
 
 ## Prompt templates
 
-- [Implementer](prompts/implementer.md): one task, constructed brief, structured status report.
+- [Implementer](prompts/implementer.md): one task, constructed brief (saved as `tasks/<n>-brief.md` in a workflow instance and dispatched by path), structured status report.
 - [Task reviewer](prompts/task-reviewer.md): two stages, spec compliance then code quality.
 - [Fix loop](prompts/fix-loop.md): bounded rounds for resolving review findings.
 

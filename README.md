@@ -350,6 +350,7 @@ Axiom makes the disciplined path the default, and it does that in a way you can 
 - **Fixtures are small.** A strong model finds the seeded issues with or without the deeper references. The added depth showed a small gain only with a weaker model, on few runs ([comparison](evaluations/results/2026-11-17-depth-comparison.md)).
 - **Commands are unverified.** Commands in the references come from general practice. They have not been run in every ecosystem.
 - **Grading is model-only.** No human grading yet.
+- **The second improvement pass (2026-11-17/18) has 3 runs per arm on 5 cases.** Trigger 147/150. The skill beat the bare host on 3 of the 5 cases. On `axiom-orchestrator` B5 the skill passed, but the bare host had no valid run to compare. `code-review` B3 is unmeasured: every run was invalid because a shell `for` loop was denied, and Claude Code cannot allowlist such a loop. See the [changelog](CHANGELOG.md).
 - **Behavior evidence for the newest skills is thin.** Three runs per case, one case per skill; the new references and modes have no behavior case yet.
 
 ---
@@ -391,7 +392,7 @@ python3 scripts/run_evals.py --host claude-code --kind trigger --skill debugging
 Runs live evals against an installed host. These spend model quota.
 - Hosts: `--host claude-code` or `--host codex`.
 - Kinds: `--kind trigger` or `--kind behavior`.
-- Behavior options: `--repeat N`, `--grade`, `--grader-host codex`, and `--case B2`. Behavior results record the median tokens per case, so a skill change can be checked for cost as well as quality.
+- Behavior options: `--repeat N`, `--grade`, `--grader-host codex`, `--case B2`, and `--arms skill,none,oneliner` to compare a skill with the bare host and a one-line instruction. Behavior results record the median tokens per case, so a skill change can be checked for cost as well as quality.
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md) first. History: [changelog](CHANGELOG.md), [roadmap](docs/IMPLEMENTATION-ROADMAP.md), [decisions](docs/decisions/).
 

@@ -6,31 +6,33 @@ Open this when you choose or audit the look of a new product, page, or design-sy
 
 Decide in this order: product type, then audience and context of use, then brand personality (three adjectives), then style. Data-heavy and accessibility-critical products constrain style the most.
 
-| Style | Use for | Avoid for | Accessibility risk and guard |
-|---|---|---|---|
-| Minimal / Swiss (grid, sans-serif, high contrast) | SaaS, admin, docs, enterprise tools | Playful consumer brands, entertainment | Low. Keep enough visual weight on primary actions |
-| Flat | MVPs, cross-platform apps, general web apps | Luxury, immersive showcases | Low. Borders or fills must still show control edges at 3:1 |
-| Soft UI (soft shadows, rounded, modern flat) | Modern SaaS, wellness, consumer productivity | Very dense data tools | Low to medium. Check card edges against background |
-| Accessible / inclusive (large type, strong contrast) | Government, health, education, finance, older users | Nothing; it fits anywhere | Lowest. Treat as the baseline for public services |
-| Data-dense dashboard (compact grid, small multiples) | BI, ops consoles, finance, monitoring | Marketing pages, casual consumers | Medium. Body text still ≥ 14 px; never color-only status |
-| Bento grid (modular cards of mixed size) | Feature overviews, home dashboards, product pages | Long reading, dense tables, complex forms | Low. Keep a logical DOM and reading order |
-| Dark (OLED / dev-tool dark) | Code tools, media, night use, monitoring walls | Print-first content, bright outdoor use | Medium. Re-check every pair; avoid pure #000 with pure #FFF body text for long reading |
-| Glassmorphism (blur, translucent layers) | Accent surfaces in modern SaaS, OS-aligned chrome | Text over busy images, low-end devices | Conditional. Add a solid fallback; test text on worst-case backdrop |
-| Neumorphism (embossed, low contrast) | Small, simple controls in wellness apps | Forms, dashboards, anything critical | High. Controls lose their edges; add borders or avoid |
-| Claymorphism (puffy 3D, pastel) | Kids, education, playful onboarding | Finance, health, serious tools | Medium. Pastels often fail 4.5:1 for text |
-| Neubrutalism (thick borders, flat bold color, hard shadows) | Startups, creative tools, Gen Z brands | Luxury, banking, healthcare | Low. High contrast by nature; watch saturated text |
-| Brutalism / raw | Portfolios, editorial experiments | Corporate, conversion-critical flows | Low to medium. Keep standard affordances |
-| Editorial / magazine (serif display, wide margins) | Publishing, blogs, long reads | Dense apps | Low. Measure 60-75 characters |
-| Exaggerated minimalism (huge type, few elements) | Luxury, agencies, fashion | Catalogs, forms, dashboards | Medium. Hidden navigation hurts findability |
-| Organic / nature (earth tones, soft shapes) | Wellness, sustainability, food | Dev tools, trading | Low to medium. Earth tones on cream often fail; check |
-| Trust and authority (navy, serif or sober sans, proof) | Legal, finance, health, B2B | Entertainment, viral consumer | Low |
-| Conversion landing (one CTA, proof, short form) | Sign-up, lead gen, product pages | Docs, complex explanations | Low. Do not hide the price or dismiss path |
-| Motion-driven / parallax / kinetic type | Brand stories, launches, portfolios | Dashboards, forms, SEO-critical pages | High. Needs `prefers-reduced-motion` path and a static final state |
-| Retro-futurism / cyberpunk / HUD / vaporwave | Games, music, sci-fi themes | Business software, public services | High. Neon on dark and glow text often fail; test |
-| AI-native (chat-first, streaming, suggestion chips) | Copilots, assistants | Pure data entry | Low. Label AI output; streaming must be announced politely |
-| Liquid glass / spatial (Apple platform materials) | Native Apple chrome, visionOS | Dense reading surfaces | Conditional. Use system materials, which handle contrast and reduce-transparency |
+| Style | Use for | Avoid for | Accessibility risk and guard | Status | RTL |
+|---|---|---|---|---|---|
+| Minimal / Swiss (grid, sans-serif, high contrast) | SaaS, admin, docs, enterprise tools | Playful consumer brands, entertainment | Low. Keep enough visual weight on primary actions | active | Good |
+| Flat | MVPs, cross-platform apps, general web apps | Luxury, immersive showcases | Low. Borders or fills must still show control edges at 3:1 | active | Good |
+| Soft UI (soft shadows, rounded, modern flat) | Modern SaaS, wellness, consumer productivity | Very dense data tools | Low to medium. Check card edges against background | active | Good |
+| Accessible / inclusive (large type, strong contrast) | Government, health, education, finance, older users | Nothing; it fits anywhere | Lowest. Treat as the baseline for public services | active | Good |
+| Data-dense dashboard (compact grid, small multiples) | BI, ops consoles, finance, monitoring | Marketing pages, casual consumers | Medium. Body text still ≥ 14 px; never color-only status | active | Good; keep numerals LTR |
+| Bento grid (modular cards of mixed size) | Feature overviews, home dashboards, product pages | Long reading, dense tables, complex forms | Low. Keep a logical DOM and reading order | active | Good; mirror the grid order |
+| Dark (OLED / dev-tool dark) | Code tools, media, night use, monitoring walls | Print-first content, bright outdoor use | Medium. Re-check every pair; avoid pure #000 with pure #FFF body text for long reading | active | Good |
+| Glassmorphism (blur, translucent layers) | Accent surfaces in modern SaaS, OS-aligned chrome | Text over busy images, low-end devices | Conditional. Add a solid fallback; test text on worst-case backdrop | supplemental (accents only) | Good |
+| Neumorphism (embossed, low contrast) | Small, simple controls in wellness apps | Forms, dashboards, anything critical | High. Controls lose their edges; add borders or avoid | deprecated → Soft UI | Good |
+| Claymorphism (puffy 3D, pastel) | Kids, education, playful onboarding | Finance, health, serious tools | Medium. Pastels often fail 4.5:1 for text | supplemental | Good |
+| Neubrutalism (thick borders, flat bold color, hard shadows) | Startups, creative tools, Gen Z brands | Luxury, banking, healthcare | Low. High contrast by nature; watch saturated text | active | Good; mirror offset shadows |
+| Brutalism / raw | Portfolios, editorial experiments | Corporate, conversion-critical flows | Low to medium. Keep standard affordances | supplemental | Check: asymmetric layouts must mirror |
+| Editorial / magazine (serif display, wide margins) | Publishing, blogs, long reads | Dense apps | Low. Measure 60-75 characters | active | Check: serif display fonts often lack Arabic and Hebrew |
+| Exaggerated minimalism (huge type, few elements) | Luxury, agencies, fashion | Catalogs, forms, dashboards | Medium. Hidden navigation hurts findability | supplemental | Check: huge display type needs script coverage |
+| Organic / nature (earth tones, soft shapes) | Wellness, sustainability, food | Dev tools, trading | Low to medium. Earth tones on cream often fail; check | active | Good |
+| Trust and authority (navy, serif or sober sans, proof) | Legal, finance, health, B2B | Entertainment, viral consumer | Low | active | Good |
+| Conversion landing (one CTA, proof, short form) | Sign-up, lead gen, product pages | Docs, complex explanations | Low. Do not hide the price or dismiss path | active | Good |
+| Motion-driven / parallax / kinetic type | Brand stories, launches, portfolios | Dashboards, forms, SEO-critical pages | High. Needs `prefers-reduced-motion` path and a static final state | supplemental | Check: directional motion and parallax must mirror |
+| Retro-futurism / cyberpunk / HUD / vaporwave | Games, music, sci-fi themes | Business software, public services | High. Neon on dark and glow text often fail; test | supplemental | Poor: display fonts are Latin-only |
+| AI-native (chat-first, streaming, suggestion chips) | Copilots, assistants | Pure data entry | Low. Label AI output; streaming must be announced politely | active | Good; `dir="auto"` on streamed text |
+| Liquid glass / spatial (Apple platform materials) | Native Apple chrome, visionOS | Dense reading surfaces | Conditional. Use system materials, which handle contrast and reduce-transparency | active (Apple platforms) | Good; system materials mirror |
 
 Rule: one style per product. Mixing glass, clay, and brutalist cards on one page reads as a template collage.
+
+Status: `active` styles fit as a product's main style. `supplemental` styles fit accents, single pages, or narrow product types; do not use them for a whole operate-mode product. `deprecated → X` means use X instead; a master that already records the deprecated style keeps it until a restyle. RTL: `Good` works with logical properties and mirroring; `Check` names what to test; `Poor` needs a different style or fonts for RTL products. See [RTL rules](ui-rules.md#right-to-left-interfaces).
 
 ## 2. Palette recipes by product type
 
@@ -128,6 +130,15 @@ Use a three-layer token model: primitive (`--blue-600: #2563EB`), semantic (`--c
 }
 :root[data-theme="dark"] { --color-bg: #0B1120; --color-fg: #E2E8F0; --color-primary: #60A5FA; --color-on-primary: #0B1120; }
 ```
+
+### Theme migration
+
+Use this to move an existing product to semantic tokens, add dark mode, or change the palette. Work in four passes; do not skip ahead.
+
+1. **Audit.** List every raw color, font, spacing, radius, and shadow value in styles and components (`rg -n '#[0-9a-fA-F]{3,8}\b|rgb\(|hsl\('`). Count them per file. Note inline styles and third-party overrides.
+2. **Map.** Assign each raw value to a semantic token in the master (`--color-fg`, `--color-surface`). Merge near-duplicates (`#334155` and `#333F55`). Record values that have no token yet and add the token before migrating.
+3. **Migrate.** Replace values file by file with token references, one component group per change. Keep the rendered result identical in the current theme; a visual change in this pass is a bug.
+4. **Verify.** Re-run the audit search: no raw values remain outside the token file. Check contrast for every pair in each theme, screenshot key screens at 375, 768, and 1280 px in each theme, and run the craft floor browser checks (V9-V14).
 
 ## 5. Icons and imagery
 

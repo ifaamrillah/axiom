@@ -15,6 +15,7 @@ Ship changes that are reversible, observable, and incremental. Preparing a relea
 |---|---|
 | Readiness checklist, semver decision, changelog, release notes | [readiness and versioning](references/readiness-and-versioning.md) |
 | Migration and rollback plans, feature flags, staged rollout, monitoring, hotfixes | [rollout, rollback, and hotfix](references/rollout-and-rollback.md) |
+| `shortcut:` debt ledger; docs that still describe old behavior | [debt ledger and doc drift](references/debt-and-doc-drift.md) |
 
 ## Procedure
 
@@ -26,6 +27,8 @@ Ship changes that are reversible, observable, and incremental. Preparing a relea
    - Last release: `git describe --tags --abbrev=0`, then `git log <tag>..HEAD --oneline`.
 3. **Classify the changes** and decide the version bump with the semver table. Flag every breaking change, migration, new config, and dependency change.
 4. **Verify readiness** with the checklist: tests, build, security scan, migrations rehearsed, config present, docs updated. Record each item as passed (with evidence), failed, or not checked. A skipped item is not a passed item.
+   - **Debt ledger:** search the release tree for `shortcut:` markers and list each with location, ceiling, and upgrade trigger. Flag markers with no trigger as `no-trigger`.
+   - **Doc drift:** map each changed behavior or interface to README, docs, and CHANGELOG. List docs that still describe the old behavior. Each one is fixed or recorded with an owner before GO.
 5. **Prepare artifacts**: version bump, changelog entry, release notes, migration and rollback plan, rollout plan with go/no-go thresholds. Give release notes a final pass with [writing-quality](../writing-quality/SKILL.md) in embedded mode.
 6. **Check operations**: staging deploy and smoke test, dashboards and alerts for the changed paths, on-call owner and contact, communication plan for users if behavior changes.
 7. **Present a readiness report** (format below) with blockers first. Stop here unless the user authorizes the next step.
@@ -51,6 +54,8 @@ Breaking changes: none
 Migrations: 0042 adds column (expand phase); rollback = drop column
 Flags: `new-invoices` default off; rollout 5% -> 25% -> 100%
 Rollback: redeploy v2.3.2 image (< 5 min); flag off (< 1 min)
+Debt ledger: `git grep -n "shortcut:"` -> 2 (1 new, 1 no-trigger: app/mail.py:12)
+Doc drift: 1 fixed (README.md:52), 0 open
 Monitoring: dashboard "billing-api"; alert on 5xx > 1% for 5 min
 Decision needed: approve deploy after blocker is cleared?
 ```
@@ -67,6 +72,7 @@ Decision needed: approve deploy after blocker is cleared?
 | Release on Friday evening or before a holiday with no on-call | Move the release or confirm coverage. |
 | Flag with no owner or removal date | Add both before release. |
 | Deploying because "the user said prepare the release" | Preparation is not approval. Ask. |
+| "Docs are updated" with no list of changed interfaces | Map each change to the doc line; list drift. |
 | Claiming a check passed without its output | Record the command and result, or mark it not run. |
 
 ## Rules

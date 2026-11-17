@@ -51,8 +51,9 @@ Severity: High when it touches security, money, data, or a P1 story; Medium othe
 | FR-008 "System MUST record status changes" — where, which fields, append-only? | FR-008 that lists actor, before, after, timestamp, reason |
 | T009 "Add tests for refunds" — no file, no command, no expected result | A task whose verify line is `npm test -- refunds/request.test.ts` → `4 passed` |
 | T012 edits `src/notifications/sms.ts`; spec says email only | — (this is also a scope-creep coverage finding; report once, under the pass that explains it best) |
+| `changes/refund-limits/proposal.md` has no Deltas entries and no `Specs: none — <reason>` line | A proposal that states `Specs: none — rename internal module; no behavior change` |
 
-Severity: High if it blocks a P1 task from being implemented without guessing; Medium otherwise.
+Severity: High if it blocks a P1 task from being implemented without guessing; Medium otherwise. A proposal missing both deltas and an opt-out is Medium; recommend the opt-out line or the delta, never an invented requirement.
 
 ## Constitution conflicts (C)
 
@@ -83,11 +84,13 @@ Report coverage as a number: "11/13 requirements have at least one task (85%)".
 
 ## Inconsistency (I)
 
-**Look for:** terminology drift across files; entities in the plan absent from the spec (or the reverse); contradictory values; task order that breaks a dependency; `[P]` on tasks that share a file or depend on each other.
+**Look for:** terminology drift across files, and against the project glossary if one exists; entities in the plan absent from the spec (or the reverse); contradictory values; task order that breaks a dependency; `[P]` on tasks that share a file or depend on each other.
 
 | Finding | Example |
 |---|---|
 | Terminology drift | Spec says "support agent"; plan and tasks say "admin" and create role `admin` |
+| Glossary drift | Glossary defines "refund request"; the spec calls it "refund claim" in FR-006 |
+| Wrong opt-out | Proposal says `Specs: none — internal change`, but "What changes" adds a new error message users see |
 | Value conflict | Spec FR-005: reason 10–500 chars; plan validation: `max(255)` |
 | Entity drift | Plan adds `RefundBatch` entity; spec has no batches |
 | State drift | Spec statuses include `failed`; plan's enum omits it |

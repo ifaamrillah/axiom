@@ -29,10 +29,10 @@ Default to **analyze**. Use **converge** only when the user asks what is left, o
 3. **Run the detection passes.** Open [detection passes](references/detection-passes.md) for the inventory commands, real findings versus non-findings for each pass, and how to phrase a finding.
    - **Duplication:** near-identical requirements or tasks.
    - **Ambiguity:** unquantified adjectives, leftover `[NEEDS CLARIFICATION]`, TODO or TBD placeholders.
-   - **Underspecification:** a requirement with no measurable outcome; a task with no file path or no verification.
+   - **Underspecification:** a requirement with no measurable outcome; a task with no file path or no verification; a change proposal with neither a delta nor a `Specs: none — <reason>` line.
    - **Constitution conflicts:** plan or task choices that violate a MUST principle.
    - **Coverage gaps:** requirements with no task; tasks that map to no requirement (scope creep).
-   - **Inconsistency:** terminology drift, contradictory decisions, task order that violates dependencies.
+   - **Inconsistency:** terminology drift (including words that differ from the project glossary), contradictory decisions, task order that violates dependencies, and a `Specs: none` opt-out on a proposal whose "What changes" describes observable behavior.
 4. **Assign severity:**
    - **Critical:** a constitution MUST violation, a must-have requirement with zero coverage, or a contradiction that blocks implementation.
    - **High:** a conflicting or ambiguous requirement affecting security, data, or a P1 story.

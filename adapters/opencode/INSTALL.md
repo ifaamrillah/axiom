@@ -14,6 +14,8 @@ OpenCode documents user-level directories and explicit `skills` configuration. U
 
 Paste the [Axiom block](../../templates/project/agents-md-block.md) into the project's `AGENTS.md` so that the kernel and skill routing are always loaded. Map role metadata from `agents/roles/` to the host's agent or model settings where it supports them: `capability` (deep, standard, fast) selects the model tier, and `writes: false` means a read-only agent. Where the host has no such controls, follow the role cards as instructions.
 
+Work categories in the orchestrator (`quick`, `deep`, `visual`, `writing`) suggest one of these capability tiers. OpenCode agents in `.opencode/agents/<name>.md` take a `model` field (`provider/model`) and `mode: subagent`; a subagent without `model` inherits the session model, and a read-only agent denies `edit` and `shell` in `permissions` (agents docs checked 2026-11-17). Not tested with Axiom.
+
 Optional installer: `npx skills add ifaamrillah/axiom -a opencode` (see the [adapter overview](../README.md)).
 
 ## Verify

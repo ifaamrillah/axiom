@@ -27,6 +27,7 @@ Use it whenever a change affects how something looks, feels, moves, or is intera
 | "Audit", accessibility or quality check | audit | [Critique](references/critique.md) phases plus [UI rules](references/ui-rules.md); no edits |
 | "Polish", "make it look less generic" | polish | Fix [craft floor](references/craft-floor.md) items only; no layout or flow changes |
 | "Harden" | harden | Procedure step 3 states (empty, error, long content, offline) only |
+| "Migrate the theme", "add dark mode", "move to tokens" | migrate | [Theme migration](references/visual-language.md#theme-migration): Audit → Map → Migrate → Verify |
 
 Critique and audit modes report; they do not edit code.
 
@@ -38,7 +39,7 @@ Critique and audit modes report; they do not edit code.
 4. **Apply the rules in priority order** from the [UI rules](references/ui-rules.md). Resolve CRITICAL and HIGH categories before styling details. Use its accessibility thresholds table for exact numbers and its anti-pattern table when reviewing existing UI. Right before writing UI code, open the [craft floor](references/craft-floor.md) and avoid its Refuse patterns.
 5. **Reuse established components and patterns.** Document any deviation and why.
 6. **Specify** using the [design brief](assets/brief.md): flows, a state inventory, responsive behavior, accessibility notes, and mockups where useful.
-7. **Verify the rendered result** when browser tooling is available ([e2e-testing](../e2e-testing/SKILL.md)): run the rendered review phases in [critique](references/critique.md#rendered-review-phases) at 375, 768, and 1280 px. Run the [pre-delivery checklist](references/ui-rules.md#pre-delivery-checklist). Label unverified visual claims.
+7. **Verify the rendered result** when browser tooling is available ([e2e-testing](../e2e-testing/SKILL.md)): run the rendered review phases in [critique](references/critique.md#rendered-review-phases) at 375, 768, and 1280 px, and end the handoff with one disposition (`recapture`, `rebuild`, `fix`, `ship`) after checking the evidence. Run the [pre-delivery checklist](references/ui-rules.md#pre-delivery-checklist). Label unverified visual claims.
 
 ## Outputs and gate
 
@@ -52,7 +53,7 @@ Without design or browser tooling, produce a textual interaction spec. Implement
 
 - [UI rules, accessibility thresholds, anti-patterns, pre-delivery checklist](references/ui-rules.md): every task.
 - [Craft floor](references/craft-floor.md): right before writing UI code, and in polish mode.
-- [Critique and audit](references/critique.md): critique and audit modes; rendered review phases.
+- [Critique and audit](references/critique.md): critique and audit modes; rendered review phases, cognitive-load checklist, disposition.
 - [Visual language](references/visual-language.md): new product, page, or master; restyling; palette or font choice.
 - [Interaction patterns](references/interaction-patterns.md): component and screen states, forms, feedback, motion, breakpoints, navigation.
 - [Data display](references/data-display.md): charts, tables, dashboards.

@@ -47,7 +47,8 @@ Mark every line as passed (with evidence), failed, not applicable (with reason),
 - [ ] Changelog entry written.
 - [ ] Release notes written for the audience (users, operators, API consumers).
 - [ ] Upgrade or migration guide for breaking changes.
-- [ ] API docs and README updated.
+- [ ] API docs and README updated: each changed interface mapped to its doc line; drift fixed or recorded ([doc drift](debt-and-doc-drift.md#doc-drift)).
+- [ ] Debt ledger of `shortcut:` markers listed; `no-trigger` markers have an owner ([debt ledger](debt-and-doc-drift.md#debt-ledger)).
 
 ## Semver decision table
 
@@ -152,6 +153,6 @@ Released 2026-03-10.
 Full changelog: v2.3.2...v2.4.0
 ```
 
-Rules: lead with what users can do now; give every breaking change or deprecation an action and a date; state migration duration and compatibility; link the full changelog.
+Rules: lead with what users can do now; give every breaking change or deprecation an action and a date; state migration duration and compatibility; link the full changelog. For each upgrade note that changes data or a public contract, say whether a downgrade undoes it (two-way door) or not (one-way door), so operators know before they upgrade.
 
 Sources: adapted from addyosmani/agent-skills (MIT) `skills/shipping-and-launch/SKILL.md`, and general practice (Semantic Versioning 2.0.0, Keep a Changelog, Conventional Commits).

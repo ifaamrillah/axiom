@@ -1,6 +1,6 @@
 # Completion Reports: Good and Bad
 
-A completion report lists each claim with its evidence, then what was not verified. It never upgrades a skipped or blocked check to passed.
+A completion report lists each claim with its evidence, then the gate integrity list, then a fixed closing block. It never upgrades a skipped or blocked check to passed.
 
 ## Structure
 
@@ -10,12 +10,15 @@ A completion report lists each claim with its evidence, then what was not verifi
 Verified (after the last edit):
 - <claim>: `<command>` -> <decisive output line>
 
-Not verified:
-- <check>: <not run | blocked> because <reason>. To run: `<command>`
+Gate integrity:
+- ASK <file:line> — <bar lowered>. Justification: <quoted, or none>.
+- (or) None found. Search: <what was searched>
 
-Known issues and risks:
-- <issue, with evidence or a pointer to it>
+Not checked: <check>: <not run | blocked> because <reason>. To run: `<command>`. (or "none")
+Risk: <the main residual risk, with evidence or a pointer>. (or "none known")
 ```
+
+The report always ends with `Not checked:` and `Risk:`, in that order. Write "none" or "none known" rather than dropping a line; a missing line reads as "forgot to look".
 
 "Done with limits" is honest when the core claims are proven and some checks could not run. "Done" requires every check the task needs to be verified.
 
@@ -37,8 +40,10 @@ Good:
 > - No regressions: `pytest -q` -> `588 passed, 3 skipped` (the 3 skips are the existing Postgres-only tests, same as the baseline).
 > - Types: `mypy app` -> `Success: no issues found in 142 source files`.
 >
-> Not verified:
-> - CI has not run on this branch yet.
+> Gate integrity: none found. Search: bar-lowering scan on the merge-base diff, timeout and snapshot greps; all empty.
+>
+> Not checked: CI has not run on this branch yet.
+> Risk: none known beyond CI.
 
 ## Example 2: feature with a UI
 
@@ -57,8 +62,10 @@ Good:
 > - Build: `npm run build` -> exit 0.
 > - Acceptance criteria: AC1 (CSV download) and AC2 (disabled while loading) are covered by `export.test.tsx`; AC3 (filename includes date) by `filename.test.ts`.
 >
-> Not verified:
-> - Browser behavior: no browser available in this session. To check: `npm run dev`, open `/reports`, click Export, confirm the file `report-YYYY-MM-DD.csv` downloads.
+> Gate integrity: none found. Search: bar-lowering scan on the merge-base diff; no snapshot files changed.
+>
+> Not checked: browser behavior; no browser available in this session. To check: `npm run dev`, open `/reports`, click Export, confirm the file `report-YYYY-MM-DD.csv` downloads.
+> Risk: the download may fail in Safari, which handles blob URLs differently; untested.
 
 ## Example 3: a check is blocked
 
@@ -73,10 +80,8 @@ Good:
 > Verified:
 > - Unit tests: `go test ./internal/... -count=1` -> all 9 packages `ok`.
 >
-> Not verified:
-> - Integration tests: blocked. `go test ./integration/...` fails at setup with `dial tcp 127.0.0.1:5432: connect: connection refused`; no database runs in this environment. To run: `docker compose up -d db && go test ./integration/... -count=1`.
->
-> The change touches the repository layer, which only the integration tests cover, so I cannot claim the feature works end to end.
+> Not checked: integration tests, blocked. `go test ./integration/...` fails at setup with `dial tcp 127.0.0.1:5432: connect: connection refused`; no database runs in this environment. To run: `docker compose up -d db && go test ./integration/... -count=1`.
+> Risk: the change touches the repository layer, which only the integration tests cover, so the feature may not work end to end.
 
 ## Example 4: reporting a failure
 
@@ -90,6 +95,9 @@ Good:
 >
 > - `npm test` -> `Tests: 2 failed, 286 passed, 288 total`.
 > - Both failures are in `billing/invoice.test.ts` (`expected 104.97, received 104.96`). The baseline on `main` has 0 failures, so my change caused them. Investigating the rounding path next.
+>
+> Not checked: none.
+> Risk: invoice totals are off by one cent; do not merge.
 
 ## Example 5: commit or pull request
 
@@ -108,6 +116,8 @@ Before "committed" or "opened a PR":
 | "Looks good" | What you checked and how |
 | "Ready to merge" | What is verified; what review or CI still has to happen |
 | "Fixed" | "The reproduction `<cmd>` now passes; it failed before with `<line>`" |
+| "Green after bumping the timeout" | "ASK: timeout raised 2s -> 30s at `<file:line>`; cause unknown; needs approval" |
+| "No risks" (or no closing block) | `Not checked: none` and `Risk: none known`, after actually looking |
 | "Unrelated failures" | The failing test IDs and the baseline evidence that they failed before your change |
 
 Sources: adapted from obra/superpowers (MIT) `skills/verification-before-completion/SKILL.md` and general practice.

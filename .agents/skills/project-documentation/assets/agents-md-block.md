@@ -23,9 +23,10 @@ Fill only verified facts. Remove placeholder lines you cannot verify.
 ### Pitfalls
 
 Observed agent mistakes in this repository and the rule that prevents each.
-Add an entry only after a mistake actually happened; remove it when the cause is gone.
+Promote a learning from `.axiom/learnings/` here only when it was seen in 2 sessions
+or the user confirmed it. Remove a line when its cause is gone or a check enforces it.
 
-- <YYYY-MM-DD> <what went wrong> → <rule to follow instead>
+- <YYYY-MM-DD> <what went wrong> → <rule> (enforce: lint | type | check | test | doc)
 <!-- axiom:end -->
 ```
 
@@ -34,5 +35,5 @@ Add an entry only after a mistake actually happened; remove it when the cause is
 - The marker records which Axiom release the pasted kernel came from. When a release note says the kernel changed, re-paste the Behavior, Routing, and Proportionality sections and update the marker. Keep your Project facts and Pitfalls.
 
 - Re-verify project facts when build tooling changes; update the date and commit.
-- Pitfalls are a learning loop: record the concrete mistake and the preventive rule, not a narrative.
+- Pitfalls are the promoted end of a learning loop: retros write candidates to `.axiom/learnings/<yyyy-mm-dd>-<slug>.md`; only repeated or user-confirmed ones become a line here. Each line names the strongest enforcement that could replace it (lint, type, check, test) so the list stays short.
 - Keep the whole block under roughly 80 lines. Move durable detail to `.axiom/` documents and link to it.

@@ -9,11 +9,14 @@ fixture: evaluations/fixtures/discount-bug
 
 - "Add tests for apply_discount edge cases"
 - "What test coverage do we need for the pricing module?"
+- "Use the testing skill to plan the test suite for pricing.py"
+- "Our pricing tests miss obvious cases, beef them up"
 
 ## Should not trigger
 
 - "Write an end-to-end browser test for checkout" → `e2e-testing`
 - "Use TDD to add a coupon" → `tdd`
+- "The pricing tests started failing after the merge, find out why" → `debugging`
 
 ## Behavior
 

@@ -62,13 +62,7 @@ Update docs in the same change when it alters setup, commands, configuration, pu
 
 ## Pitfall entries
 
-The Pitfalls section of the project's [Axiom block](../assets/agents-md-block.md) gets one line per observed, repeatable agent mistake:
-
-```markdown
-- 2026-11-16: Ran `npm test` (jest, legacy) instead of `pnpm test` (vitest); suite is vitest since 3f9c2e1. Use `pnpm test`.
-```
-
-Remove an entry when its cause is gone (the legacy script was deleted). Do not add hypothetical pitfalls.
+The Pitfalls section of the project's [Axiom block](../assets/agents-md-block.md) gets one line per promoted learning; see [learnings](learnings.md) for the file format, promotion rule, and enforcement levels. Remove an entry when its cause is gone (the legacy script was deleted). Do not add hypothetical pitfalls.
 
 ## Red flags
 

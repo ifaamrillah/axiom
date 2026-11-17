@@ -73,8 +73,11 @@ Every case was rerun with the updated kernel:
 
 ## What has not been checked
 
+- Checked once only: the Claude Code `SubagentStart` kernel hook (added 2026-11-17). The hook format follows the hooks reference, and the script's JSON output was checked locally to round-trip the kernel exactly. One live run per arm on Claude Code 2.1.326 showed the hook delivers it and that SessionStart context alone does not reach a general-purpose subagent ([record](../../evaluations/results/2026-11-17-2030-claude-code-subagent-kernel.md)).
+- The [GitHub Actions example](../../adapters/github-actions/INSTALL.md). No workflow run is recorded.
+
 - User-scope (global) installs with any installer.
-- Any live run on Codex, OpenCode, or Antigravity. The eval runner supports only Claude Code.
+- Any live run on Codex, OpenCode, or Antigravity. The eval runner supports Claude Code and Codex.
 - Observed baselines for skills created test-first in a subagent.
 - Human grading. Model graders came from two families: Claude (Sonnet) and OpenAI (via Codex).
 - Antigravity in any form, and OpenCode model invocation.

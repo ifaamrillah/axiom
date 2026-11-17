@@ -35,6 +35,28 @@ Full audit artifacts live in the run directory outside the target. Only the coor
 - Units: <ledger unit IDs>
 ````
 
+## Required fields by verdict
+
+Use the record format above as the template. Each verdict requires a different subset. A record that misses a required field is not final.
+
+| Verdict | Required | Must not have |
+|---|---|---|
+| `confirmed` | Title, severity, likelihood and impact, the six elements, root cause, intended behavior, trace with file:line per step, evidence (execution or validation output, or "static trace only" with the reason), exploitability score of at least 8/10, fix with regression test, units | — |
+| `needs_validation` | Title, claimed root cause, trace as far as source goes, the exact unresolved fact, a safe owner check, exploitability score with the part it is missing, units | Severity |
+| `rejected` | Title, the claim, why it fails: the refuting control (file:line) or the precedent and the condition checked, units | Severity |
+
+A rejected record:
+
+````markdown
+### web/comments:CommentBody:jsx-text:xss
+
+- Verdict: rejected
+- Title: Comment body rendered in JSX
+- Claim: user comment text reaches the page and could run script
+- Why it fails: src/components/Comment.tsx:22 renders `{comment.body}` as JSX text, which React escapes; no raw sink on the path (precedent: framework auto-escaping)
+- Units: web/comments × xss
+````
+
 ## Worked examples
 
 A confirmed record:
@@ -122,7 +144,7 @@ Every unit ends in `covered`, `candidate` (linked to a final record), `deferred`
 
 ## Consistency checks before finishing
 
-- Every confirmed record has a severity, a trace, evidence, and a fix. No `needs_validation` or `rejected` record has a severity.
+- Every record has the required fields for its verdict. No `needs_validation` or `rejected` record has a severity.
 - Every fingerprint in the report exists in `findings.md`, and the reverse.
 - Every final record links to at least one ledger unit, and every unit is in a terminal state (or the run is marked incomplete).
 - The report contains no secrets and no live-probe instructions.

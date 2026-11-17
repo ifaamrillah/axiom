@@ -12,6 +12,8 @@ Antigravity documents `~/.gemini/config/skills/<skill-folder>/SKILL.md` for glob
 
 Paste the [Axiom block](../../templates/project/agents-md-block.md) into the project's `AGENTS.md` so that the kernel and skill routing are always loaded. Map role metadata from `agents/roles/` to the host's agent or model settings where it supports them: `capability` (deep, standard, fast) selects the model tier, and `writes: false` means a read-only agent. Where the host has no such controls, follow the role cards as instructions.
 
+Work categories in the orchestrator (`quick`, `deep`, `visual`, `writing`) suggest one of these capability tiers. No per-agent model mapping is documented for Antigravity in this adapter; follow the role cards as instructions.
+
 Optional installer: `npx skills add ifaamrillah/axiom -a antigravity` (see the [adapter overview](../README.md)).
 
 ## Verify

@@ -28,7 +28,7 @@ For a small isolated change, use a lighter bug-fix or implementation path instea
 
 ## Execution strategy
 
-**Step-file loading:** this file is the index. Read only the current stage's file in `stages/` when you enter that stage; do not preload the others. Record a workflow instance under `.axiom/workflows/active/<ID>/` with the [workflow state](../../templates/workflows/workflow-state.md). To resume, read the state and the plan's `status:` frontmatter, then open the stage file for the current stage. Do not force irrelevant stages. Clarify blocking ambiguity; record reversible assumptions.
+**Step-file loading:** this file is the index. Read only the current stage's file in `stages/` when you enter that stage; do not preload the others. Record a workflow instance under `.axiom/workflows/active/<ID>/` with the [workflow state](../../templates/workflows/workflow-state.md). Apply a project overlay (`.axiom/workflows/overlays/feature-development.md`) and stage hooks from `.axiom/config.md` when present. To resume, read the state and the plan's `status:` frontmatter, check them against the ledger, decisions, and Git, report any conflict, then open the stage file for the current stage. Do not force irrelevant stages. Clarify blocking ambiguity; record reversible assumptions.
 
 ## Stages
 

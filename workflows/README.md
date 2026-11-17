@@ -15,6 +15,14 @@ Choose the smallest workflow that safely satisfies the request. A typo or isolat
 
 Create workflow instances in the consuming project's `.axiom/workflows/active/<WORKFLOW-ID>/`. Keep state, plan, tasks, decisions, and handoffs in Markdown. On completion, move or archive the instance under `.axiom/workflows/completed/` while preserving evidence.
 
+## Project customization
+
+A project adapts a workflow without forking it. `.axiom/workflows/overlays/<workflow>.md` adds, removes, or replaces stages; `## Stage hooks` in `.axiom/config.md` runs a named check or skill before or after a stage; `.axiom/overrides/<skill>.md` adds facts and steps to one skill. Customization may tighten a workflow, never loosen a kernel rule or gate, and an entry that cannot be read is reported, not skipped. See the orchestrator's [customization reference](../.agents/skills/axiom-orchestrator/references/customization.md).
+
+## Checkpoints and resume
+
+Write workflow state at stage boundaries: after research, after spec approval, after plan approval, and after each verified task. On resume, trust the state file, then the ledger and decisions, then Git, then the transcript, and report any conflict before acting. See the orchestrator's [context budget reference](../.agents/skills/axiom-orchestrator/references/context-budget.md).
+
 ## Stage semantics
 
 - **Required:** execute unless the workflow is explicitly re-scoped with an authorized reason.

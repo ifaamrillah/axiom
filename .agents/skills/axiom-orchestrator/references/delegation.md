@@ -44,35 +44,60 @@ A subagent does not inherit the session. Give it exactly what it needs and nothi
 
 Use the bundled prompt templates: [implementer](../assets/prompts/implementer.md), [task reviewer](../assets/prompts/task-reviewer.md), and [fix loop](../assets/prompts/fix-loop.md).
 
+### Brief files
+
+For a workflow instance, write each brief to a file and dispatch with its path, not pasted text:
+
+- Brief: `.axiom/workflows/active/<ID>/tasks/<n>-brief.md` (coordinator writes; the worker reads only).
+- Report: `.axiom/workflows/active/<ID>/tasks/<n>-report.md` (the worker writes; it is part of its allowed files).
+- Dispatch message: "Read and follow `<path to brief>`. Write your report to `<path to report>`." plus anything the host needs to start.
+
+A file brief survives compaction, lets a fix round or a fresh reviewer reuse the same text, and leaves an audit trail. Without a workflow instance (a one-off delegation), a pasted brief is fine. Never edit a brief after dispatch; write `<n>-brief-r<round>.md` for a new round and say what changed.
+
 ### Brief template
 
 ```markdown
-## Task <ID>: <one-line goal>
+# Brief <n>: <one-line goal>
 
+## TASK
 Context: <2-5 sentences: why this task exists, where it fits>
 Spec excerpt: <quote only the relevant requirement lines, or path#section>
 
-Acceptance:
+## DELIVERABLE
 - <observable result 1>
 - <observable result 2>
 
-Files:
-- Allowed (write): <paths or globs>
-- Restricted (do not touch): <paths>
+## SCOPE
+- Owned (write): <paths or globs>, plus this task's report file
+- Do not touch: <paths>
 - Shared (read only; ask coordinator to change): <paths>
+- Interfaces and conventions: <signature, type, endpoint shape, or pattern file to copy>
+- Constraints: <no new dependencies / no schema change / keep public API>
 
-Interfaces and conventions:
-- <signature, type, endpoint shape, or pattern file to copy>
+## VERIFY
+- Commands: <exact commands>
+- Base commit: <SHA recorded before dispatch (`git rev-parse HEAD`)>
+- Baseline: <pre-existing failures to ignore, or "clean">
 
-Verify with: <exact commands>
-Base: <commit SHA recorded before dispatch (`git rev-parse HEAD`)>
-Baseline: <pre-existing failures to ignore, or "clean">
-
-Constraints: <no new dependencies / no schema change / keep public API>
+## REPORT
 If blocked: stop and report BLOCKED or NEEDS_CONTEXT with what is missing. Do not guess.
-Return: status (DONE | DONE_WITH_CONCERNS | NEEDS_CONTEXT | BLOCKED), changed files,
-commands run with output summary, open concerns. Keep it under 40 lines.
+Status: WORKING (optional heartbeat) | DONE | DONE_WITH_CONCERNS | NEEDS_CONTEXT | BLOCKED
+Then: changed files, commands run with output summary, open concerns. Under 40 lines.
 ```
+
+### Status heartbeat
+
+The final status is one of `DONE`, `DONE_WITH_CONCERNS`, `NEEDS_CONTEXT`, or `BLOCKED`. On a long task the worker may also keep a first line `Status: WORKING — <current step>` in its report file and replace it with the final status at the end. `WORKING` is progress, never a result: do not review a task whose report still says `WORKING`. A report that keeps `WORKING` after the worker has stopped is treated as a silent worker (see [review loop](review-loop.md)).
+
+### Research subagents: iterative retrieval
+
+A read-only researcher or explorer rarely answers well from one brief. Run at most three rounds:
+
+1. **Brief:** the question, why it matters, where to look first, and the return format (facts with sources, confidence, open gaps).
+2. **Evaluate gaps:** check the answer against the question. Which claims lack a source? Which part of the question is unanswered?
+3. **Refine:** send only the gaps, with what was already learned, to the same researcher if the host allows, otherwise a fresh one.
+
+Stop after round three, or earlier when the remaining gaps do not change the decision. Report unresolved gaps as unknowns; do not fill them by guessing.
 
 ### Worked example
 
@@ -120,6 +145,19 @@ Role cards (`agents/roles/` in the Axiom repository) declare a capability tier (
 | Mechanical edit with a clear spec, 1-2 files | `fast` |
 | Multi-file integration, debugging, pattern matching | `standard` |
 | Architecture, final whole-change review, a task that failed twice | `deep` |
+
+### Work categories
+
+Classify each dispatch by the kind of work. The category suggests a role capability tier (`fast`, `standard`, `deep`, as in the role cards); adapters map tiers to host models.
+
+| Category | Work | Suggested capability |
+|---|---|---|
+| `quick` | Lookups, searches, small edits with a clear spec | fast |
+| `deep` | Design, review, debugging a hard issue, a task that failed twice | deep |
+| `visual` | UI work and checks of rendered output (screenshots, layout) | standard, on a model that reads images |
+| `writing` | Documentation, release notes, other prose | standard |
+
+The category is a suggestion. Raise the tier after a failed round (see [review loop](review-loop.md)); never lower it to save cost on review or security work.
 
 ## Integrate
 

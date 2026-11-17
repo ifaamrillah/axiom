@@ -33,7 +33,8 @@ Look for:
 | Generated or build artifacts | Remove; check `.gitignore` |
 | Lockfile changed without a manifest change | Explain or revert |
 | Whitespace-only or formatting churn in untouched code | Revert |
-| Tests skipped, deleted, or loosened | Restore; this blocks handoff |
+| Tests skipped, deleted, or loosened; timeouts raised; snapshots regenerated; suppressions added | Restore, or list each as ASK with its justification ([gate integrity](../../code-review/references/gate-integrity.md)); an unjustified one blocks handoff |
+| New `shortcut:` markers | Check each has a limit and an upgrade trigger |
 
 Secret scan if the project has one (`gitleaks detect`, `trufflehog git file://.`), or at least `git diff <base>...HEAD | rg -i "api[_-]?key|secret|password|token"`.
 
@@ -86,6 +87,14 @@ Marketing campaign in March needs codes (TICKET-412).
 - Migration up/down run locally on Postgres 15
 - Not run: e2e suite (needs staging data)
 
+## Merge danger
+- Reversibility: two-way door. Flag off undoes the behavior; the additive
+  migration can stay.
+- Blast radius: data (new table in the shared database).
+- Before: `curl -X POST /checkout -d '{"discount_code":"SPRING10"}'` ->
+  `400 unknown field discount_code`
+- After: same command -> `200 {"total_cents": 900}`; expired code -> `422 INVALID_DISCOUNT`
+
 ## Risk and rollout
 Behind `CHECKOUT_DISCOUNTS` flag, default off. Rollback: turn flag off;
 migration is additive and safe to leave.
@@ -97,6 +106,16 @@ Noticed, not changed: tax computed twice in checkout (TICKET-415).
 
 Rules: list the commands actually run and their results; list what was not run; call out breaking changes, migrations, and new config; keep it short enough to read in two minutes.
 
+The **Merge danger** section is required. It tells the person merging what they risk:
+
+| Line | Write |
+|---|---|
+| Reversibility | `two-way door` when a revert or flag fully undoes the change; `one-way door` when it cannot be fully undone (data rewritten or deleted, a published API or package, messages sent to users, a destructive migration). Say what makes it one-way. |
+| Blast radius | One word: `local` (this module's internals), `module` (callers in this codebase), `service` (other services or consumers), `data` (stored data or schemas), `users` (behavior users see). Pick the widest that applies. |
+| Before / after | The commands that show the change, each with its decisive output line before and after. A test name alone is not evidence of behavior. |
+
+A one-way door needs a sentence on how the change was rehearsed, and it is a reason to ask for review even on a small diff.
+
 ## 7. Handoff report
 
 ```
@@ -105,6 +124,11 @@ Checks on final tree: make test 219 passed; lint and typecheck clean
 Integration: awaiting user choice (PR / merge / keep)
 Deviations: 1 (reused DomainError)
 Follow-ups: TICKET-415
+Merge danger: two-way door; blast radius data
+Not checked: e2e suite (needs staging data)
+Risk: discount and tax interaction covered by unit tests only
 ```
+
+The handoff ends with `Not checked:` and `Risk:`, as in the [report format](../SKILL.md#report-format).
 
 Sources: adapted from obra/superpowers (MIT) `skills/finishing-a-development-branch/SKILL.md` and `skills/executing-plans/SKILL.md`, and general practice.

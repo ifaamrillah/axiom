@@ -37,11 +37,35 @@ Conversation memory does not survive compaction or a new session. Coordinators t
 
 - Keep progress in the workflow state file (`.axiom/workflows/active/<ID>/`), not only in the conversation.
 - After every accepted task, write: task ID, status, commit or diff reference, verification command and result, and rulings.
-- On resume, trust the state file plus `git log` and `git status` over recollection. Rerun verification when the recorded result predates later commits.
+- Append each decision to `DECISIONS.md` when it is made, not at recap time. The trail is append-only: correct an old entry with a new one that supersedes it, never by rewriting it.
+
+## Checkpoints
+
+A checkpoint is a stage boundary where you write state and where compaction or a fresh session is safe.
+
+| Checkpoint | Write before moving on |
+|---|---|
+| After research | Research brief path, open unknowns, sources |
+| After spec approval | Spec path, who approved and when |
+| After plan approval | Plan path and status, task list, base commit |
+| After each verified task | Ledger row: status, commit or diff, verification command and result, rulings |
+
+Never checkpoint mid-edit: a half-applied change with no ledger row is the state that resumes worst. Finish or revert the edit first, then write state.
+
+## Resume in trust order
+
+On resume, read sources from most to least trustworthy, and stop at the first one that answers each question:
+
+1. The workflow state file (`.axiom/workflows/active/<ID>/workflow-state.md`).
+2. The task ledger, task briefs and reports, and `DECISIONS.md`.
+3. Git: `git log` and `git diff` since the recorded base commit, and `git status`.
+4. The conversation transcript or summary, last.
+
+Compare them before acting. If two sources disagree (for example the ledger says T3 is done but Git has no T3 change, or the transcript says "approved" but the state file records no approval), report the conflict first, quoting both sources, and say which one you will trust and why. Do not redo or skip work until the conflict is stated. Rerun verification when the recorded result predates later commits.
 
 ## Safe session boundaries
 
-Start a fresh session or compact only at a task boundary, after persisting:
+Start a fresh session or compact only at a checkpoint, after persisting:
 
 1. accepted scope and rulings,
 2. finished tasks and the next pending task,

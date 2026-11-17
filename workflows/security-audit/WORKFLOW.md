@@ -17,7 +17,7 @@ Choose the [security-audit](../../.agents/skills/security-audit/SKILL.md) mode f
 ## Adaptive stages
 1. **Scope and assets (Required; no dependencies):** map authorized boundaries, assets, identities, trust boundaries, and data flows. Output scope and asset map.
 2. **Threat/control review (Required; depends on scope):** inspect relevant source, configuration, dependencies, and controls; use tools only when authorized. Output candidate risks tied to evidence.
-3. **Verify and rank (Required; depends on review):** validate issues safely and rank by impact/likelihood. **Output:** confirmed findings and labeled hypotheses; exit when each finding has evidence and severity rationale.
+3. **Verify and rank (Required; depends on review):** validate issues safely, apply the skill's precedents, and report only candidates that reach the skill's reporting threshold (8/10 exploitability after a refuting check); record the rest as `needs_validation` or `rejected`, never drop them. Rank by impact/likelihood. **Output:** confirmed findings and labeled hypotheses; exit when each finding has evidence and severity rationale.
 4. **Remediate or accept (Conditional; depends on verified findings):** implement approved in-scope fixes and re-check, or report owner decisions needed. Material risk acceptance requires an authorized approver. **Output:** fix evidence or an explicit decision request; exit when disposition is recorded.
 5. **Report and handoff (Required; depends on prior stages):** record reviewed areas, exclusions, findings, severity, evidence, mitigations, residual risk, and next steps with the [security review template](../../templates/security/review.md). **Output:** security report; exit when its scope and residual risk are clear.
 
