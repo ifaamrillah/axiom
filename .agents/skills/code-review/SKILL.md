@@ -28,7 +28,7 @@ The task or specification and its acceptance criteria, the complete diff (or pla
 4. **Security boundaries:** authorization at the last trusted decision point, input validation, output encoding, secrets, injection, and sensitive data in logs. Escalate to [security-audit](../security-audit/SKILL.md) for material attack-surface changes.
 5. **Tests and evidence:** do the tests fail without the change? Do they cover failure paths? Did the claimed checks actually run? See [verification gap](references/verification-gap.md) and the [test review checklist](references/api-and-test-review.md#test-review), including its quick mutation check.
    When the diff changes an endpoint, event, CLI, library export, or config key, also apply the [API and interface checklist](references/api-and-test-review.md#api-and-interface-review).
-6. **Bar-lowering detection:** new `@ts-ignore`, `eslint-disable`, `# type: ignore`, `noqa`, skipped or deleted tests, removed assertions, loosened thresholds, broadened catch-all error handling, TODO stubs presented as done. Each one is a finding unless it is justified and approved. See [quality-constraints](../quality-constraints/SKILL.md); run the per-language grep patterns in [bar-lowering detection](../quality-constraints/references/bar-lowering-detection.md).
+6. **Gate integrity (mandatory, before any verdict):** list every place the diff weakened the bar: assertions loosened or deleted, tests skipped, xfail, or `.only`, timeouts or retries raised, snapshots or golden files regenerated, coverage thresholds or lint rules lowered, suppressions added (`noqa`, `eslint-disable`, `@ts-ignore`, `# type: ignore`), broadened catch-all error handling, TODO stubs presented as done, and new `shortcut:` markers without an upgrade trigger. Each item is ASK: it needs a stated justification or user approval and never passes on its own. If none are found, state the search done. Use the [gate integrity](references/gate-integrity.md) procedure; it runs the grep patterns in [bar-lowering detection](../quality-constraints/references/bar-lowering-detection.md).
 7. **What is missing:** run the [gap analysis](references/review-lenses.md#gap-analysis). Look for migrations, docs, config, feature flags, rollback, observability, and tests that should exist and do not.
 8. **Lenses:** for code, apply the security, new-engineer, and operations lenses. For plans, apply the executor, stakeholder, and skeptic lenses. See [review lenses](references/review-lenses.md).
 9. **Maintainability and performance** where they matter: duplication, needless abstraction, hot-path complexity, N+1 queries.
@@ -56,6 +56,10 @@ Acceptance: AC1 met (test_x), AC2 not met (no handling for empty cart), …
 1. [Blocking] path/file.ts:42 — <defect>. Impact: <who/what breaks>. Evidence: <repro or trace>. Fix: <smallest change>.
 2. …
 
+### Gate integrity
+1. ASK path/test_file.py:12 — <bar lowered>. Justification: <quoted, or none>.
+(or) None found. Search: <what was searched>
+
 ### Missing
 - <expected artifact or test that is absent>
 
@@ -80,13 +84,14 @@ For irreversible or security-critical decisions, add an adversarial pass: a fres
 
 ## Rules
 
-Do not approve work that was not inspected. Do not invent findings to look thorough: no concrete trigger, no finding (turn it into a question). A `shortcut:` comment that states its limit and upgrade trigger is a recorded decision; flag it only when the limit is wrong for the stated scope, and flag unmarked shortcuts or markers with no trigger. State the reviewed scope and what was not covered. Style nits that a formatter or linter would catch are not findings.
+Do not approve work that was not inspected. Do not invent findings to look thorough: no concrete trigger, no finding (turn it into a question). A `shortcut:` comment that states its limit and upgrade trigger is a recorded decision; flag it only when the limit is wrong for the stated scope, and flag unmarked shortcuts or markers with no trigger. Search the added lines for `shortcut:` so every new marker is seen. Do not approve while a gate integrity item is still ASK with no justification or approval. State the reviewed scope and what was not covered. Style nits that a formatter or linter would catch are not findings.
 
 ## References
 
 - [Defect pattern catalog](references/defect-patterns.md): bad and good snippets for concurrency, errors, leaks, N+1, off-by-one, time, money, null, injection
 - [Per-language checklists](references/language-checklists.md): Python, TypeScript/JavaScript, Go, Java/Kotlin, PHP/Laravel, SQL and migrations
 - [API, interface, and test review](references/api-and-test-review.md)
+- [Gate integrity](references/gate-integrity.md): the mandatory weakened-bar list, its searches, and the ASK rule
 - [Writing a finding](references/writing-findings.md)
 - [Receiving review feedback](references/receiving-review.md)
 - [Reviewing AI-generated code](references/ai-generated-code.md)

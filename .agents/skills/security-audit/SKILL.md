@@ -41,12 +41,14 @@ For every candidate, name all six:
 
 Not findings: checklist deviations with no reachable violation, defense-in-depth advice, guesses about deployment behavior not visible in source, same-principal self-impact, and parser crashes with no security consequence. Report useful items of that kind as **hardening notes**, separately and without severity.
 
+Before reporting, check the [precedents](references/precedents.md): claims that are normally noise (operator-set environment, unguessable IDs, auto-escaped output, test-only code, and others), each with the condition that makes it reportable again. Precedents reduce noise; they never override a concrete exploit with evidence. When in doubt, use `needs_validation`.
+
 ## Verdicts and severity
 
 | Verdict | Meaning | Severity |
 |---|---|---|
 | `confirmed` | Source trace plus independent validation show the result | Required |
-| `needs_validation` | Source-grounded hypothesis blocked on a specific missing fact (deployment config, proxy behavior, IdP policy) | **None.** Name the exact missing fact and a safe owner-run check |
+| `needs_validation` | Source-grounded hypothesis blocked on a specific missing fact (deployment config, proxy behavior, IdP policy), or below the reporting threshold | **None.** Name the exact missing fact and a safe owner-run check |
 | `rejected` | Refuted by a control in source or by validation | None. Cite the refuting control |
 
 Severity anchors (only for `confirmed`; severity cannot exceed the demonstrated impact):
@@ -59,22 +61,33 @@ Severity anchors (only for `confirmed`; severity cannot exceed the demonstrated 
 
 The high/medium test: does the result **fully defeat** an explicit control for a consequential action, or only weaken it? If you cannot state the concrete damage, the severity is lower than it feels.
 
+### Reporting threshold (both modes)
+
+Report a candidate as a finding only when, **after a refuting check** (the verifier in a full audit, a deliberate attempt to disprove it in guidance mode), confidence that it is exploitable is at least **8/10**. Score three parts:
+
+- **Reachability (0–3):** a lower-trust principal reaches the entry point with input it controls, shown in source.
+- **Trace (0–4):** every step from entry to sink has file:line, and the strongest control on the path has been read and does not stop it.
+- **Impact (0–3):** the concrete result follows from the trace or was observed, not assumed.
+
+Below 8, settle the open part from source if you can (then report or reject). Otherwise record `needs_validation` with the exact unresolved fact. Never drop a candidate silently. The score gates reporting; it does not set severity, which follows the anchors above.
+
 ## Guidance mode procedure
 
 1. Scope the question: the component, the diff, or the reported behavior.
 2. Identify the trust boundaries the code touches ([reconnaissance](references/reconnaissance.md), questions only).
 3. Load only the relevant [attack-surface checklist](references/attack-surfaces.md) sections, then the matching class reference from the table below for sinks, safe patterns, and traps.
 4. Trace candidate paths from entry point to sink; check the strongest controls on each path ([hunting method](references/hunting-and-validation.md)). Validate with the harmless techniques listed there.
-5. Answer with confirmed findings, `needs_validation` items, rejected concerns, and hardening notes, each with file:line evidence and the smallest fix.
+5. Try to refute each candidate: apply the precedents and score it against the reporting threshold.
+6. Answer with confirmed findings, `needs_validation` items, rejected concerns, and hardening notes, each with file:line evidence and the smallest fix. Before sending, re-read each written item against its cited source once more.
 
 ## Full audit procedure
 
 1. **Setup.** Record the target, source ref (commit, dirty state), profile, scope, budget, and an output directory **outside** the target (default `~/axiom-security-audit/<repo>/run-<N>/`). Use a directory inside the target only if the user chooses it and version control ignores it.
 2. **Reconnaissance.** Map the product, principals, controls, entry surfaces, sinks, and local execution limits. Build the **coverage ledger** from stable units (surface × boundary × attack class). Read prior runs' ledgers and findings, and re-validate them against current source. See [reconnaissance](references/reconnaissance.md).
-3. **Hunting waves.** Assign isolated hunters (subagents when available) to ledger units, with the relevant attack-surface sections. Each hunter returns structured candidates, never prose-only. After each wave, run a **coverage critic** that looks for unmapped surfaces and shallow units. See [hunting and validation](references/hunting-and-validation.md).
-4. **Candidate validation.** Consolidate candidates by fingerprint. Give each one to a **fresh verifier** that did not hunt it and whose job is to refute it.
+3. **Hunting waves.** Assign isolated hunters (subagents when available) to ledger units, with the relevant attack-surface sections, plus one obvious-things hunter and one wildcard hunter per wave. Each hunter returns structured candidates, never prose-only. After each wave, run a **coverage critic** that looks for unmapped surfaces and shallow units. See [hunting and validation](references/hunting-and-validation.md).
+4. **Candidate validation.** Consolidate candidates by fingerprint. Give each one to a **fresh verifier** that did not hunt it and whose job is to refute it, including the precedents and the reporting threshold.
 5. **Structured records.** Write the final `confirmed`, `needs_validation`, and `rejected` records in the [record format](references/reporting.md), and update every ledger unit's terminal state.
-6. **Independent record verification.** Have fresh agents re-check the cited source of the final records. Reconcile any corrections.
+6. **Independent record verification.** Step 4 checks candidates; this step checks the final written records. Have fresh agents that did not hunt or verify a record re-check it against the cited source ([final-record verifier brief](references/hunting-and-validation.md)). Reconcile any corrections.
 7. **Report.** Derive the report from the records only. Prose and records must agree. Include no live-probe instructions.
 
 End in exactly one of two terminal states: all report artifacts written and every ledger unit in a terminal state, **or** the run marked `incomplete` with its exact reason, disclosed at the top of the report. Never claim complete coverage from one pass, a `quick` profile, or a scoped run.
@@ -102,6 +115,7 @@ For each confirmed finding, state the invariant the code must enforce and the na
 5. Prose-only hunter output that cannot be deduplicated or verified.
 6. Writing the report before independent verification, or letting prose and records disagree.
 7. Treating a scanner hit as a confirmed vulnerability.
+8. Dropping a below-threshold or precedent-excluded candidate without a `needs_validation` or `rejected` record.
 
 ## References
 
@@ -111,8 +125,9 @@ Open a reference when its trigger applies. Do not load all of them.
 |---|---|
 | [Reconnaissance](references/reconnaissance.md) | Mapping a codebase: stack fingerprint, entry points, trust-boundary questions, ledger, prioritization |
 | [Attack-surface checklists](references/attack-surfaces.md) | Choosing what to hunt; the obvious-exposure sweep; non-web surfaces (cloud, IPC, AI, memory safety) |
-| [Hunting and validation](references/hunting-and-validation.md) | Tracing a candidate, choosing a harmless validation, applying the candidate gate, briefing hunters and verifiers |
-| [Records, ledger, and report](references/reporting.md) | Writing a finding, calibrating severity, shaping a guidance answer or full report |
+| [Precedents](references/precedents.md) | Before reporting any candidate: what is normally not reported, and when it becomes reportable |
+| [Hunting and validation](references/hunting-and-validation.md) | Tracing a candidate, choosing a harmless validation, applying the candidate gate, wave assignments, briefing hunters and verifiers |
+| [Records, ledger, and report](references/reporting.md) | Writing a finding, required fields by verdict, calibrating severity, shaping a guidance answer or full report |
 | [Injection](references/injection.md) | Input reaches SQL, NoSQL, shell, templates, `eval`, LDAP, or headers |
 | [Authentication and sessions](references/authn-and-session.md) | Login, sessions, JWT, OAuth/OIDC, SAML, MFA, password reset, API keys |
 | [Authorization and tenancy](references/authz-and-tenancy.md) | Requests name resource IDs; roles differ; several tenants share storage; writes bind request bodies to models |
@@ -122,5 +137,8 @@ Open a reference when its trigger applies. Do not load all of them.
 | [Secrets and crypto](references/secrets-and-crypto.md) | Credentials in the repo or bundles, token generation, password hashing, encryption, webhook signatures, debug exposure |
 | [Supply chain](references/supply-chain.md) | Dependency advisories, lockfiles, registries, CI workflows, release and update integrity |
 | [Business logic](references/business-logic.md) | Money, credits, quotas, approvals, multi-step flows, check-then-act races, export/import abuse |
+| [Data lifecycle](references/data-lifecycle.md) | Backups, restore and import, deletion, exports and download links, retention |
+| [AI and LLM features](references/ai-llm.md) | The application calls a model and renders its output, passes it to tools, or retrieves data for it |
+| [Agent configuration](references/agent-config.md) | The repository holds agent hooks, MCP server configs, permission allowlists, instruction files, skills or plugins, or CI agents |
 
 Related repository files: security audit workflow (`workflows/security-audit/WORKFLOW.md` in the Axiom repository), security tools integration (`integrations/security-tools/README.md` in the Axiom repository).

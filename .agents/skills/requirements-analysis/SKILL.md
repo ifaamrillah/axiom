@@ -23,10 +23,10 @@ The request, discovery output (if any), existing product behavior, architecture,
 6. **Write acceptance scenarios** as Given/When/Then for each story. Every must-have requirement maps to at least one scenario. Use concrete values, one action per When, and observable Thens. Use an examples table for rules with ranges, and a state-transition table for entities with a status. See [writing acceptance criteria](references/acceptance-criteria.md).
 7. **Phrase NFRs measurably:** metric, target, load, environment, and verification method. Pick categories from the [NFR catalog](references/nfr-catalog.md) based on what the feature touches (money, personal data, public UI, external APIs).
 8. **Test the requirements** with the [requirements-quality checklist](references/requirements-checklist.md). These checks test the writing, not the implementation.
-9. **Cross-check** against the constitution, constraints, existing behavior, and architecture. Surface conflicts. Do not reconcile them silently.
+9. **Cross-check** against the constitution, constraints, existing behavior, architecture, and the project glossary. Surface conflicts. Do not reconcile them silently. Use glossary terms in the spec. When a term is decided, add or correct it in the glossary in the same turn; flag a word that conflicts with an entry. When a concept is rejected and is likely to be proposed again, write a short out-of-scope record, and check those records before proposing a concept. Open [glossary and out-of-scope records](references/glossary-and-out-of-scope.md).
 10. **Set status:** `draft` while markers remain on must-haves, `clarified` when none remain, and `approved` only after the user or owner accepts it.
 
-When a spec already exists and behavior changes, write a change proposal with ADDED, MODIFIED, REMOVED, and RENAMED deltas instead of editing the spec in place. Open [change proposals](references/change-proposals.md).
+When a spec already exists and behavior changes, write a change proposal with ADDED, MODIFIED, REMOVED, and RENAMED deltas instead of editing the spec in place. Every proposal either declares at least one delta or states `Specs: none — <reason>` (for example a refactor or a dependency bump with no behavior change). Never invent a requirement to fill the format. Open [change proposals](references/change-proposals.md).
 
 ## Outputs
 
@@ -48,4 +48,5 @@ When a spec already exists and behavior changes, write a change proposal with AD
 - [NFR catalog](references/nfr-catalog.md): open when writing non-functional requirements.
 - [Ambiguity word list](references/ambiguity-words.md): open when scanning a draft for vague language, including the grep command.
 - [Change proposals](references/change-proposals.md): open when changing behavior that already has a spec.
+- [Glossary and out-of-scope records](references/glossary-and-out-of-scope.md): open when a term is decided, a term conflicts, or a concept is rejected.
 - [Product discovery](../product-discovery/SKILL.md), [spec analysis](../spec-analysis/SKILL.md)

@@ -27,7 +27,8 @@ Before any status claim, or before expressing satisfaction with the result:
 4. **Compare** the output with the claim.
    - If it does not support the claim, state the real status with the evidence.
    - If it does, state the claim together with the evidence.
-5. **Record** command, environment, and result in the workflow state or report when the work is multi-stage.
+5. **Check gate integrity.** A green run proves nothing if the check got easier. List every place the change weakened the bar: assertions loosened or deleted, tests skipped, xfail, or `.only`, timeouts or retries raised, snapshots or golden files regenerated, coverage thresholds or lint rules lowered, suppressions added. Each item is ASK: it needs a stated justification or user approval before the status can be Done. If none are found, state the search done. Procedure and searches: [gate integrity](../code-review/references/gate-integrity.md).
+6. **Record** command, environment, and result in the workflow state or report when the work is multi-stage.
 
 ## What counts as evidence
 
@@ -54,9 +55,11 @@ The table covers the common claims. For commands and traps per area (tests, buil
 - Words like "should", "probably", "seems to", "looks fine" attached to a status.
 - Celebrating ("Done!", "All good") before reading output.
 - About to commit, push, or open a PR with no run since the last edit.
+- Writing a PR description without the Merge danger section and before/after evidence from [finishing a branch](../implementation/references/finishing-a-branch.md).
 - Trusting a subagent's, tool's, or CI summary without reading it.
 - Extrapolating from a partial run ("the module tests pass, so the suite passes").
 - A check failed for an environment reason and you want to call it passed anyway.
+- The run went green right after a test was skipped, a timeout raised, or a snapshot regenerated.
 
 ## Rationalizations and the answer
 
@@ -86,7 +89,14 @@ Before accepting a subagent's, tool's, or teammate's success report: re-read the
 
 ## Output
 
-A short statement per claim: the claim, the command, and the observed result. Checks that were not run, with the reason, are listed separately. Use the status words Done, Done with limits, Blocked, or Not done. Full good-versus-bad report examples: [completion reports](references/completion-reports.md).
+A short statement per claim: the claim, the command, and the observed result. Then the gate integrity list (or "none found" with the search). Use the status words Done, Done with limits, Blocked, or Not done. A PR description also gets the Merge danger section from [finishing a branch](../implementation/references/finishing-a-branch.md): reversibility, a one-word blast radius, and before/after commands with output. Every report ends with this fixed block, even when both lines are empty:
+
+```
+Not checked: <each check not run or not verified, with the reason; or "none">
+Risk: <the main residual risk; or "none known">
+```
+
+Full good-versus-bad report examples: [completion reports](references/completion-reports.md).
 
 ## Examples
 
@@ -94,6 +104,7 @@ A short statement per claim: the claim, the command, and the observed result. Ch
 Good: "Unit tests pass: `npm test -- orders` → 34 passed, 0 failed (run after the last edit)."
 Bad:  "Fixed the bug, tests should pass now."
 Good: "Build not verified: `cargo build` needs network access to fetch crates, which is unavailable here."
+Bad:  "Tests green after raising the timeout to 30s. Done."
 ```
 
 ## References

@@ -60,6 +60,17 @@ Without the plugin, either paste the kernel into `CLAUDE.md` using the [Axiom bl
 
 The hook needs a POSIX `sh` (on Windows, Git Bash). If no shell is available, use the `CLAUDE.md` block.
 
+### Kernel in subagents
+
+SessionStart context stays in the main conversation; subagents do not get it. The plugin adds a second hook for this:
+
+- A `SubagentStart` hook with no matcher, so it runs for every subagent, built-in or custom. [subagent-start.sh](hooks/subagent-start.sh) reads the same kernel file and prints it as JSON: `{"hookSpecificOutput": {"hookEventName": "SubagentStart", "additionalContext": "<kernel>"}}`. The [hooks reference](https://code.claude.com/docs/en/hooks) (checked 2026-11-17) documents `additionalContext` for SubagentStart and does not list it among the events whose plain stdout becomes context. The script is read-only and needs only `sh` and `awk`.
+- Each of the four Axiom subagents also tells itself to read the kernel file if it is not in its context. This covers hosts or versions where the hook does not run.
+
+Cost: about 5 KB of kernel text per subagent launch. To limit it to Axiom's own subagents, add `"matcher": "^axiom:"` to the SubagentStart entry. Plugin subagents report a plugin-scoped type such as `axiom:reviewer`.
+
+**Live-verified once (Claude Code 2.1.326, 2026-11-17).** With the hook, a general-purpose subagent quoted kernel rule 6 without reading files; with the hook removed, it said it did not have the kernel ([record](../../evaluations/results/2026-11-17-2030-claude-code-subagent-kernel.md)). One run per arm. To add it without the plugin, put the same entry under `"SubagentStart"` in `.claude/settings.json`, with the path to `subagent-start.sh`.
+
 ## Slash commands
 
 The manifest's `commands` key adds four user-invoked commands from [commands/](commands/): `/axiom:spec`, `/axiom:plan`, `/axiom:review`, and `/axiom:ship`. Each sets `disable-model-invocation: true`, so the model never loads them on its own. They only name canonical skills and subagents; all procedure lives in the skills. Not yet verified in a live session.
@@ -77,13 +88,27 @@ Portable role metadata in `agents/roles/` maps to Claude Code subagents as follo
 
 Model aliases change over time. Check current names in the Claude Code docs before pinning them.
 
+### Work categories
+
+The orchestrator names four host-neutral work categories. On Claude Code they map to the shipped subagents and their `model:` fields:
+
+| Category | Claude Code choice |
+|---|---|
+| `quick` | `axiom:researcher` (`model: haiku`) for read-only lookups; otherwise inherit the session model |
+| `deep` | `axiom:reviewer` or `axiom:security-reviewer` (`model: opus`) for review and audit |
+| `visual` | inherit the session model; no dedicated subagent |
+| `writing` | inherit the session model (`axiom:implementer` uses `model: inherit`) |
+
+This table is a recommendation, not a rule enforced by the plugin. For Codex and OpenCode, see the work-category note in their INSTALL files; Antigravity has no mapping documented.
+
 The plugin ships four subagents built on this mapping, in [agents/](agents/): `axiom:reviewer` and `axiom:security-reviewer` (deep, read-only), `axiom:researcher` (fast, read-only), and `axiom:implementer` (inherits the session model, writes). The manifest's `agents` key lists only these files, so the role cards in the repository's top-level `agents/` folder are **not** loaded as subagents. A live session listed exactly these four agent types. `claude plugin validate` still prints "No frontmatter" warnings for the role cards. These warnings do not change the loaded agents.
 
 ## Verify
 
 1. Start a session and ask "What skills are available?" `verification-before-completion` and `axiom-orchestrator` should be listed (namespaced as `axiom:` when installed as a plugin).
 2. With the hook enabled, ask "What is rule 6 of the Axiom kernel?" The answer should quote the evidence-before-claims rule without reading files.
-3. Run the trigger evals: `python3 scripts/run_evals.py --host claude-code --kind trigger --skill debugging`.
+3. Subagent kernel (not yet run): ask the main session to spawn a general-purpose subagent that must answer "What is rule 6 of the Axiom kernel?" without reading files. The subagent should quote the evidence-before-claims rule. Check the subagent transcript for a file read; if it read `kernel.md`, the hook did not deliver it.
+4. Run the trigger evals: `python3 scripts/run_evals.py --host claude-code --kind trigger --skill debugging`.
 
 Recorded results live in `evaluations/results/`. See the [compatibility report](../../docs/compatibility/README.md) for what has actually been run.
 

@@ -10,6 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 ERRORS: list[str] = []
+WARNINGS: list[str] = []  # advisory only; never change the exit code
 REQUIRED_SKILLS = {
     "axiom-orchestrator", "architecture-design", "code-review", "codebase-exploration",
     "codebase-onboarding", "debugging", "e2e-testing", "implementation", "product-discovery",
@@ -122,6 +123,30 @@ def check_reference_reachability(skill_path: Path, skill_text: str) -> None:
             fail(f"{ref.relative_to(ROOT).as_posix()}: orphan reference; link it from SKILL.md")
 
 
+# Advisory: a SKILL.md line that opens with a prohibition ("Don't", "Do not", "Never") and,
+# in the same sentence, names a writing style. Prohibitions about how to compose output were
+# reported by obra/superpowers to backfire (not measured by Axiom); a positive recipe is the
+# suggested rewrite. Prohibitions of one concrete act ("Never run git checkout") do not match.
+COMPOSITION_PROHIBITION = re.compile(
+    r"^\s*(?:[-*]\s+|\d+\.\s+)?[*_]*(?:don['\u2019]t|do not|never)\b[^.\n]{0,60}?"
+    r"\b(?:verbose|wordy|long-winded|lengthy|long|over-?explain\w*|explain\w*|overthink\w*|ramble|elaborate)\b",
+    re.IGNORECASE,
+)
+
+
+def phrasing_warnings(text: str) -> list[tuple[int, str]]:
+    """Return (line number, line) for lines that look like composition prohibitions."""
+    return [(number, line.strip()) for number, line in enumerate(text.splitlines(), 1)
+            if COMPOSITION_PROHIBITION.search(line)]
+
+
+def check_phrasing() -> None:
+    for path in sorted(SKILLS_ROOT.glob("*/SKILL.md")):
+        for number, line in phrasing_warnings(path.read_text(encoding="utf-8")):
+            WARNINGS.append(f"{path.relative_to(ROOT).as_posix()}:{number}: composition prohibition; "
+                            f"consider a positive recipe: {line[:100]}")
+
+
 def check_json() -> None:
     for source in ROOT.rglob("*.json"):
         if ".git" in source.parts or "node_modules" in source.parts:
@@ -166,13 +191,21 @@ def check_workflows() -> None:
             fail(f"Missing required lifecycle workflow: {canonical}")
 
 
+FENCE = re.compile(r"(?ms)^[ \t]*(```|~~~).*?^[ \t]*\1[^\n]*$")
+
+
+def strip_fenced_code(text: str) -> str:
+    """Links inside fenced code blocks are not rendered (for example eval transcripts quoting a file)."""
+    return FENCE.sub("", text)
+
+
 def check_local_links() -> None:
     # Inline Markdown links; external URLs and mailto links are not filesystem paths.
     pattern = re.compile(r"(?<!!)\[[^\]]*\]\(([^)]+)\)")
     for source in ROOT.rglob("*.md"):
         if ".git" in source.parts:
             continue
-        text = source.read_text(encoding="utf-8")
+        text = strip_fenced_code(source.read_text(encoding="utf-8"))
         for target in pattern.findall(text):
             target = target.strip().strip("<>")
             if not target or target.startswith(("https://", "http://", "mailto:", "#")):
@@ -253,6 +286,9 @@ def main() -> int:
     check_local_links()
     check_json()
     check_version()
+    check_phrasing()
+    for warning in WARNINGS:
+        print(f"WARNING: {warning}")
     if ERRORS:
         for error in ERRORS:
             print(f"ERROR: {error}")

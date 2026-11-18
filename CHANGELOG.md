@@ -6,9 +6,54 @@ New entries go under **Unreleased**, grouped as Breaking, Added, Changed, Fixed.
 
 ## [Unreleased]
 
+Kernel: changed (two routing rows, rule 6 ends reports with `Not checked:` and `Risk:`, and a new Project customization section). Projects that pasted the Axiom block re-paste it at the next release.
+
+### Added
+
+Improvement pass from a comparison with sixteen skill and harness projects (2026-11-17). Not yet measured with live runs; the new eval cases below are written, not run.
+
+- Claude Code: a `SubagentStart` hook gives every subagent the kernel through `additionalContext`, and the four Axiom subagents read the kernel when it is not in context. One live run per arm on Claude Code 2.1.326: with the hook a subagent quoted rule 6; without it, it had no kernel ([record](evaluations/results/2026-11-17-2030-claude-code-subagent-kernel.md)).
+- Eval runner: `--arm`/`--arms {skill,none,oneliner}` compares a skill with the bare host and a one-line instruction, per case with deltas; UNCOVERED marks cases every arm fails. Incomplete runs and runs with a permission denial are INVALID and excluded from rates; their raw output goes to `evaluations/results/raw/` (`--keep-raw` keeps all). Case metadata `Safety: yes`, `Split: held-out`, and `Seeded: <defect>` (recall and false findings) are validated by `--check`.
+- `skill-evaluator`: session diagnosis from a host transcript, one analyst per dimension, every finding cited; `session-log` fixture.
+- `code-review` and `verification-before-completion`: a mandatory gate-integrity check lists every weakened assertion, skip, raised timeout or retry, regenerated snapshot, lowered threshold, and suppression as ASK.
+- `verification-before-completion` and `implementation` reports end with `Not checked:` and `Risk:`.
+- `release-management`: a `shortcut:` debt ledger (`no-trigger` flagged) and a doc-drift check before GO. PR bodies gain a Merge danger section (one-way or two-way door, blast radius, before/after evidence).
+- `security-audit`: precedents (what is normally not reported and when it becomes reportable), a reporting threshold of 8/10 after a refuting check (below it: `needs_validation`, never dropped), references for agent configuration as attack surface, AI/LLM features, and data lifecycle, obvious-things and wildcard hunters, a final-record verifier, and required fields per verdict. The Claude Code `/axiom:review` security pass and security reviewer apply the same threshold.
+- `product-discovery`: premise challenge, alternatives with S/M/L effort including the smallest option, and a go / needs-clarification / kill verdict. `task-planning` states a scope mode (hold, selective, expand, reduce).
+- Glossary contract and out-of-scope records in discovery and requirements; change proposals declare a delta or `Specs: none — <reason>`, checked by `spec-analysis`.
+- Orchestrator: skill overrides, workflow overlays, and stage hooks (tighten only, unreadable entries reported); task briefs as files dispatched by path; delta-scoped re-review; research in at most 3 rounds; checkpoints, a resume trust order that reports conflicts first, and an append-only decision trail; work categories `quick`, `deep`, `visual`, `writing`; `kernel-examples.md`.
+- `project-documentation`: a learning loop from `.axiom/learnings/` to Pitfalls, with promotion after two sessions or user confirmation and an enforcement level per pitfall.
+- `skill-factory`: phrasing checklist and edit ladder; the validator warns (without failing) on composition prohibitions in `SKILL.md`.
+- `ui-ux-design`: browser-surface Verify items, a cognitive-load checklist, a rendered-review disposition (recapture, rebuild, fix, ship), status and RTL columns on the style table, and a theme-migration mode.
+- Adapters: `adapters/PORTING.md`, an untested GitHub Actions review example, and a Claude Code mapping for work categories.
+
+### Changed
+
+- Kernel routing: chained requests ("onboard, then add X") go to `axiom-orchestrator`.
+- `ci-and-observability` requires a timeout on every CI job; `performance-optimization` lists inputs whose result could differ before keeping a change; `writing-quality` forbids strengthening a claim (adding "all", "only", "every").
+- `run_evals.py` defaults: behavior runs use 25 turns and a $1.50 cap, trigger runs keep 4 turns and $0.50. A behavior run at 4 turns was cut off and read as skill failures.
+
 ### Fixed
 
+- Eval cases: the orchestrator case gains a fixture, because its prompt says "this repo"; the requirements case asks for criteria from stated rules instead of a spec that does not exist.
+- `docs/UPGRADING.md`: `npx skills` installs for Claude Code only land in `.claude/skills/`, and `#ref` takes a branch or tag, not a commit SHA.
+
 - `docs/RELEASES.md`: the publish step now rewrites the notes' relative links to absolute links at the tag. Published as-is, they broke on the GitHub release page (seen on v0.1.0, whose release text was corrected by hand).
+
+### Evidence
+
+- Improvement pass, Claude Code 2.1.326, one run each, separate grader:
+  - Trigger: 149/150 across 27 skills; the miss sent the design-tokens prompt to `axiom-orchestrator` ([record](evaluations/results/2026-11-17-2153-claude-code-trigger.md)).
+  - Skill vs none arm: `verification-before-completion` B2 PASS vs FAIL; `security-audit` B5 (held-out) PASS vs FAIL; `security-audit` B4 PASS vs PASS; `debugging` B2 PASS with seeded recall 1/1 and 0 false findings. Five none-arm runs and both `code-review` B3 runs were INVALID (a compound shell command outside the runner's allowlist was denied) and are excluded ([records](evaluations/results/2026-11-17-2154-claude-code-behavior.md) to [2202](evaluations/results/2026-11-17-2202-claude-code-behavior.md)).
+  - Three skill-arm failures led to the kernel and skill changes above; after them `implementation` B2 and `product-discovery` B2 pass ([2204](evaluations/results/2026-11-17-2204-claude-code-behavior.md), [2205](evaluations/results/2026-11-17-2205-claude-code-behavior-2.md)). `axiom-orchestrator` B5 still fails one expectation: with only `debugging` loaded, the agent applied the overlay entry without reporting that its anchor stage does not exist ([2207](evaluations/results/2026-11-17-2207-claude-code-behavior.md)).
+  - Final check after the follow-up fixes, 3 runs per arm, separate grader with the longer tool trace (records [0011](evaluations/results/2026-11-18-0011-claude-code-trigger.md) to [0031](evaluations/results/2026-11-18-0031-claude-code-behavior.md); intermediate iterations in records 2230 to 2315):
+    - Trigger: 147/150. Misses: three implementation-shaped prompts (structured logging, build the specced coupon function, design tokens) went to `axiom-orchestrator`.
+    - `verification-before-completion` B2: skill 3/3, none 0/1 (2 invalid). `implementation` B2: skill 3/3, none 0/3; the skill passed by reading its files, and the Skill tool was not invoked in any run. `product-discovery` B2: skill 3/3, none 0/3.
+    - `axiom-orchestrator` B5: skill 1/1 valid (2 invalid), none 0 valid (3 invalid). `code-review` B3 (held-out): all 6 runs invalid, so it is still unmeasured.
+    - Every invalid run had one denied command, and in each case it was a shell `for` loop. Claude Code refuses to pre-approve a command whose variable it cannot check, so the runner's allowlist cannot admit it. The runner counts any denial as invalid rather than grading a run that lost a step.
+  - Subagent kernel: with the `SubagentStart` hook a subagent quoted rule 6; without it, it had no kernel ([record](evaluations/results/2026-11-17-2030-claude-code-subagent-kernel.md)).
+- Trigger, Claude Code 2.1.326, one run per prompt: 131/131 across 27 skills ([record](evaluations/results/2026-11-17-1635-claude-code-trigger.md)).
+- Behavior, three new skills, 3 runs each, separate grader, 25 turns: 6/9 before the skill changes above, 7/9 after (`ci-and-observability` 3/3, `performance-optimization` 2/3, `writing-quality` 2/3); every run loaded the skill ([before](evaluations/results/2026-11-17-1647-claude-code-behavior.md), [after](evaluations/results/2026-11-17-1943-claude-code-behavior.md)). A 4-turn run that cut agents off is kept as a record ([record](evaluations/results/2026-11-17-1639-claude-code-behavior.md)).
 
 ## [0.1.0] - 2026-11-17
 

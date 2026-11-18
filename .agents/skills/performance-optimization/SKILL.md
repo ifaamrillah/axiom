@@ -29,7 +29,7 @@ The symptom or target (for example "p95 under 300 ms at 50 rps"), the workload, 
 1. **Define the metric.** Name one user-visible number (latency percentile, throughput, memory peak, bundle size, page LCP) and the workload that produces it.
 2. **Measure a baseline.** Run the workload at least 3 times on the same machine and state the spread. Use the recipes in [profiling](references/profiling.md). Never run load against production without explicit approval.
 3. **Find the bottleneck.** Profile; do not guess from reading code. Rank where time or memory goes. Check the usual causes first: N+1 queries, missing indexes, work inside loops, synchronous I/O on hot paths, unbounded result sets, large payloads, re-renders.
-4. **Change one thing.** The smallest change that targets the top item. Keep behavior identical; tests must pass before and after.
+4. **Change one thing.** The smallest change that targets the top item. Keep behavior identical; tests must pass before and after. Before keeping it, list every input whose result could differ (missing rows, ordering, rounding, time zones, errors); any difference means the change is not done, so fix it or report it as a behavior change.
 5. **Re-measure** with the same workload and environment. Report the before, the after, and the spread. A gain inside the noise is no gain.
 6. **Decide.** Keep the change only if the gain is real and worth its complexity. Revert otherwise and record what was tried.
 7. **Guard it** when the path is critical: a benchmark, a query-count assertion, or a budget check in CI.

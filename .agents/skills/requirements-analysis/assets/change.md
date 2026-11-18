@@ -20,6 +20,8 @@ capabilities: [<capability>]
 
 ## Deltas
 
+Declare at least one delta below, or replace this section's body with one line: `Specs: none — <reason>` (no behavior change). Never invent a requirement to fill the format.
+
 ### Capability: <capability>
 
 #### ADDED

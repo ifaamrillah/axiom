@@ -49,7 +49,8 @@ Rules:
 
 - **MODIFIED copies the whole new requirement and its scenarios**, not only the changed words. A partial block silently drops the rest when it is merged.
 - **REMOVED needs a reason and a migration** (what happens to users and data that relied on it).
-- A delta with no ADDED, MODIFIED, REMOVED, or RENAMED entry is not a behavior change. Say so in the proposal and skip the delta file.
+- **Declare deltas or opt out explicitly.** Every proposal has at least one ADDED, MODIFIED, REMOVED, or RENAMED entry, or the line `Specs: none — <reason>` in place of the Deltas section. Use the opt-out for work with no behavior change (a refactor, a dependency bump, a build fix) and skip the delta file. Never invent a requirement to satisfy the format; an invented delta is worse than an honest opt-out.
+- `Specs: none` is a claim. If "What changes" describes behavior a user or caller can observe, the opt-out is wrong; write the delta.
 - New IDs continue after the highest ID in the living spec.
 
 ## Lifecycle

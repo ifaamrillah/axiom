@@ -43,6 +43,7 @@ Failures that make a plan look done while leaving the executor to guess. Run thi
 | Refactor bundled into a feature task | Review mixes structure and behavior | Separate refactor task with "no behavior change" verification, or a separate plan |
 | Gold-plated abstractions ("make it pluggable for future providers") | Cost now for a need nobody stated | YAGNI; build for the spec |
 | Plan silently changes a spec decision | Spec and code drift | Raise the conflict; change the spec through requirements-analysis |
+| No `Scope mode:` line, or work outside the stated mode | Reviewers cannot tell whether extra or missing work was intended | State hold, selective, expand, or reduce; list expanded or deferred items by name |
 
 ## Process anti-patterns
 

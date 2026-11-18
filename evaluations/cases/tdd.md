@@ -10,11 +10,15 @@ fixture: evaluations/fixtures/discount-bug
 - "Use TDD to add a percent cap to apply_discount"
 - "apply_discount(1000, 10) returns 0. Write a failing test for this bug first, then fix it"
 - "Make apply_discount reject negative totals, test-first please"
+- "Run this through the tdd skill: apply_discount should accept a maximum discount in cents"
+- "Red, green, refactor: add rounding to the nearest cent in apply_discount"
 
 ## Should not trigger
 
 - "Why is the build slow?" → `ci-and-observability`
 - "Review this diff for security issues" → `code-review`
+- "apply_discount returns 0 for a 10% discount, find out why" → `debugging`
+- "Which apply_discount edge cases do our tests miss?" → `testing`
 
 ## Behavior
 

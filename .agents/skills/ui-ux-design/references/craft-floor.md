@@ -15,6 +15,19 @@ Open this right before editing or generating UI, and again when reviewing it. Th
 | V7 | The layout holds at 375 px, 768 px, and 1280 px with no horizontal scroll. |
 | V8 | One visual hierarchy per screen: one primary action, one main heading. |
 
+### Browser surfaces
+
+Add these for web pages and webviews. Check each in light and dark themes.
+
+| ID | Check |
+|---|---|
+| V9 | `::selection` uses token colors with readable contrast, not the browser default clashing with the brand. |
+| V10 | `caret-color` in inputs is visible against the field background. |
+| V11 | Scrollbars (`scrollbar-color`, `scrollbar-width`, or `::-webkit-scrollbar`) match the theme; no light scrollbar on a dark surface. |
+| V12 | A visible focus ring on every focusable element (`:focus-visible`), meeting the focus indicator threshold in [UI rules](ui-rules.md#accessibility-thresholds-wcag-22-aa-unless-noted). |
+| V13 | Underlined links use `text-underline-offset` so the line clears descenders; links in body text stay underlined. |
+| V14 | Number columns and changing numbers use tabular numerals (`font-variant-numeric: tabular-nums`) so digits align and do not jitter. |
+
 ## Refuse (generated-looking patterns)
 
 Do not produce these unless the master or the user explicitly asks for them. In a review, each one is a finding at severity P2 unless it also breaks a UI rule.

@@ -17,6 +17,9 @@ Each section below is a short checklist. When a question applies, open the match
 | Secrets, randomness, password hashing, crypto, webhook signatures, debug exposure | [secrets-and-crypto](secrets-and-crypto.md) | Config, env, key files, token generators, crypto calls |
 | Vulnerable dependencies, dependency confusion, CI workflows, release | [supply-chain](supply-chain.md) | Manifests, lockfiles, `.github/workflows`, Dockerfiles |
 | Races, state machines, numeric abuse, feature abuse, fail-open | [business-logic](business-logic.md) | Money, credits, quotas, approvals, export/import |
+| Backup, restore, deletion, export, retention | [data-lifecycle](data-lifecycle.md) | Export jobs, dump scripts, soft delete, signed download links, purges |
+| Prompt injection, model output in sinks, tool authorization, exfiltration through tools | [ai-llm](ai-llm.md) | Model calls, tool handlers, Markdown renderers, retrieval indexes |
+| Hooks, MCP configs, permission allowlists, instruction files, skills and plugins, CI agents | [agent-config](agent-config.md) | Agent settings files, `AGENTS.md`/`CLAUDE.md`, `.mcp.json`, skill folders |
 
 ## Obvious-exposure sweep (do this literally, every full audit)
 
@@ -32,6 +35,7 @@ Cheap checks that every team assumes someone else did. Each hit still needs a tr
 - Redirect parameters (`next`, `return`, `redirect`, `url`, `goto`, `continue`) passed to redirects.
 - Error handlers returning stack traces, SQL errors, or internal paths.
 - Lockfiles present and committed; obviously outdated security-critical packages.
+- Agent configuration committed to the repository: hooks that run shell, MCP server definitions, broad permission allowlists, auto-approve settings, and secrets in instruction files (see [agent-config](agent-config.md)).
 
 ## Web, protocol, and authentication
 
@@ -49,6 +53,8 @@ Cheap checks that every team assumes someone else did. Each hit still needs a tr
 - GraphQL: per-field authorization on nested types, introspection exposure, batching and alias abuse against rate limits, query depth and cost limits.
 
 ## Data isolation and lifecycle
+
+Deep reference: [data-lifecycle](data-lifecycle.md).
 
 - Is the tenant or owner scope applied to every query, cache key, search index, export, and background job?
 - Are derived copies (caches, analytics, logs, backups, search) scoped and deleted with the source data?
@@ -90,6 +96,8 @@ Cheap checks that every team assumes someone else did. Each hit still needs a tr
 - Webviews with JavaScript bridges exposed to remote content.
 
 ## AI and LLM features
+
+Deep references: [ai-llm](ai-llm.md) for application features, [agent-config](agent-config.md) for agent harness configuration in the repository.
 
 - Can untrusted content (documents, web pages, tool output) reach the model context and steer tool calls (indirect prompt injection)?
 - Do model-chosen tool arguments cross authority boundaries (file paths, URLs, SQL, shell, other users' data)?

@@ -25,3 +25,11 @@ fixture: evaluations/fixtures/discount-bug
 - Expect: Each task has a verification step (a command or test)
 - Expect: Orders a failing test before the fix
 - Fail if: Edits pricing.py or the tests
+
+### B2: Plan states one scope mode
+
+- Prompt: "Plan only the discount bug fix. Keep the scope exactly as is, no extras. Don't implement yet."
+- Fixture: `evaluations/fixtures/discount-bug`
+- Expect: The plan contains a `Scope mode:` line naming one mode (hold here)
+- Expect: Any related work the plan noticed is listed as out of scope or deferred, not added as tasks
+- Fail if: Adds tasks for unrequested refactors or features, or edits pricing.py or the tests

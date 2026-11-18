@@ -36,9 +36,9 @@ Use it when a change alters setup, behavior, architecture, APIs, operations, or 
    ---
    ```
 
-6. **Record pitfalls.** When an agent made a concrete, repeatable mistake in this repository, add one line to the **Pitfalls** section of the project's [Axiom block](assets/agents-md-block.md): the date, what went wrong, and the rule that prevents it. Remove entries whose cause is gone.
+6. **Record learnings; promote pitfalls** ([learnings](references/learnings.md)). When an agent made a concrete mistake in this repository, write or update a learning file in `.axiom/learnings/<yyyy-mm-dd>-<slug>.md` (trigger, lesson, evidence, confidence, scope, seen). Promote it to one line in the **Pitfalls** section of the project's [Axiom block](assets/agents-md-block.md) only when it was seen in at least 2 sessions or the user confirms it. Each Pitfalls line names the strongest enforcement that could prevent it (lint, type, script or check, test, doc) and proposes the stronger one. Remove lines whose cause is gone or whose enforcement landed.
 
-   **Retro** (when asked, or at the end of a long multi-step session): list each mistake, correction, or repeated friction from the session with its evidence. For each, pick one outcome: a Pitfalls line, a proposed skill or kernel change (route it to [skill-factory](../skill-factory/SKILL.md)), a project fact to verify and record, or nothing. Propose; do not edit skills or the kernel without approval.
+   **Retro** (when asked, or at the end of a long multi-step session): list each mistake, correction, or repeated friction from the session with its evidence. For each, pick one outcome: a learning file (or a new `seen` date on an existing one), a promotion, a proposed skill or kernel change (`scope: global`; route it to [skill-factory](../skill-factory/SKILL.md)), a project fact to verify and record, or nothing. Propose; do not edit skills or the kernel without approval.
 7. **Check** links and consistency with the implementation.
 
 ## Outputs and gate
@@ -56,6 +56,7 @@ Open the one matching the document you are writing:
 - [ADRs](references/adrs.md): recording an expensive-to-reverse decision.
 - [API docs](references/api-docs.md): changing a public endpoint, library function, CLI, or event.
 - [Runbooks](references/runbooks.md): alerts, manual recovery, on-call steps.
-- [Freshness rules](references/freshness.md): metadata, drift checks, stale marking, pitfall entries.
+- [Freshness rules](references/freshness.md): metadata, drift checks, stale marking.
+- [Learnings](references/learnings.md): retro, learning files, promotion to Pitfalls, enforcement levels.
 
 See also the document contract (`core/contracts/DOCUMENT-CONTRACT.md` in the Axiom repository) and the documentation standard (`core/standards/documentation.md` in the Axiom repository).

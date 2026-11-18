@@ -5,7 +5,7 @@
 ## Do
 
 1. Update affected docs with `sources:` and `verified_at_commit:` metadata.
-2. Record decisions and ADRs, and add any observed agent pitfall to the project's instructions block.
+2. Record decisions and ADRs. Record each agent mistake observed during the run as a learning, and promote repeated or user-confirmed ones to a pitfall (the mistake and the rule that prevents it) in the project instructions block, following the [learnings loop](../../../.agents/skills/project-documentation/references/learnings.md) in `project-documentation`.
 3. Bring the workflow state up to date.
 
 ## Exit

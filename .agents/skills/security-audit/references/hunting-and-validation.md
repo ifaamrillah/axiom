@@ -101,6 +101,18 @@ For each candidate, return a structured record (no prose-only results):
 For units with no candidate, return what you checked, so the unit can be marked covered.
 ```
 
+## Wave assignments
+
+Each hunting wave has three kinds of hunter. Reserve budget for all three before assigning unit hunters.
+
+| Hunter | Assignment | Returns |
+|---|---|---|
+| **Unit hunters** | One ledger unit or a small group, with the brief above | Candidates per unit, or what was checked |
+| **Obvious-things hunter** (one per wave) | Run the obvious-exposure sweep from the [attack-surface checklists](attack-surfaces.md) literally over the whole scope: committed secrets, debug modes, operational routes, seed accounts, dynamic execution, CORS and cookies, redirects, error leaks, agent configuration. In later waves, only on surfaces added since the last sweep | One line per sweep item with its result, and candidates for traced hits |
+| **Wildcard hunter** (one per wave) | No assigned unit. Look for what the ledger shape misses: chains that span units, the oddest or newest code, sibling paths that no unit names, and assumptions shared by every unit. Exclude fingerprints already found | Candidates, plus proposed new ledger units for the critic |
+
+The `quick` profile runs one obvious-things hunter and may skip the wildcard. The wildcard hunter's units still pass through the critic and the verifiers like any other.
+
 ## Coverage critic (after each wave)
 
 A fresh agent reviews the ledger and hunter returns:
@@ -126,11 +138,33 @@ and record the missing capability as a needs_validation blocker.
 4. Check that likelihood, impact, and the fix match only what the evidence shows.
 5. For needs_validation: is the blocker genuinely outside source? Name the exact
    missing fact and a safe owner-run check. If source settles it, decide it.
-Return: verdict (confirmed | needs_validation | rejected), corrected record fields,
-and the refuting control (file:line) for a rejection.
+6. Check the precedents (references/precedents.md). If one applies, check its
+   "becomes reportable when" condition in source before rejecting.
+7. Score exploitability 0-10 (reachability 0-3, trace 0-4, impact 0-3; see SKILL.md).
+   Below 8, the verdict cannot be confirmed: settle it from source, or return
+   needs_validation with the exact unresolved fact.
+Return: verdict (confirmed | needs_validation | rejected), the score with one line per
+part, corrected record fields, and the refuting control or precedent (file:line) for
+a rejection.
 ```
 
 The verifier receives only the candidate, its unit, the architecture facts it needs, the relevant checklist sections, and prior records with the same fingerprint. It never receives another verifier's conclusion.
+
+## Final-record verifier brief
+
+Candidate verification checks hunter output. This pass checks what will be published: the records as written in `findings.md`, after consolidation and editing. Use a fresh agent (or, without subagents, a fresh pass started from the record file alone) that did not hunt or verify the record.
+
+```text
+You are checking final written records, not candidates. For each record:
+1. Open every cited file:line at <source ref>. Does it exist and say what the record claims?
+2. Do the title, severity, and result claim only what the evidence shows?
+3. Are the verdict's required fields present (see the required fields by verdict in
+   references/reporting.md)? No severity on needs_validation or rejected.
+4. Does the fix enforce the stated invariant at the cited decision point?
+Return per record: ok, or the field to correct and the evidence for the correction.
+```
+
+The coordinator reconciles corrections before the report is written.
 
 ## Consolidation
 

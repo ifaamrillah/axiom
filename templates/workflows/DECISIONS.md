@@ -2,6 +2,8 @@
 
 Record decisions that materially affect scope, behavior, architecture, implementation, or risk. Link durable architectural decisions to individual ADR documents.
 
+This file is append-only. Add each entry when the decision is made, not at recap time. To change a decision, add a new entry whose status reads `Supersedes <old ID>`; leave the old entry as it was.
+
 | ID | Date | Decision | Rationale | Consequences | Status |
 |---|---|---|---|---|---|
 | | | | | | |

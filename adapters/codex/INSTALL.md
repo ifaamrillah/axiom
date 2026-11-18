@@ -12,6 +12,8 @@ Codex documentation lists `~/.agents/skills/` for user-wide skills. Copy selecte
 
 Paste the [Axiom block](../../templates/project/agents-md-block.md) into the project's `AGENTS.md` so that the kernel and skill routing are always loaded. Map role metadata from `agents/roles/` to the host's agent or model settings where it supports them: `capability` (deep, standard, fast) selects the model tier, and `writes: false` means a read-only agent. Where the host has no such controls, follow the role cards as instructions.
 
+Work categories in the orchestrator (`quick`, `deep`, `visual`, `writing`) suggest one of these capability tiers. Codex documents a `model` key and `model_reasoning_effort` in its config, profiles selected with `--profile`, and `agents.default_subagent_model` for spawned agents (config reference checked 2026-11-17). Whether a custom role under `agents.<name>` can set its own model is not documented there; test before relying on it.
+
 Optional installer: `npx skills add ifaamrillah/axiom -a codex` (see the [adapter overview](../README.md)).
 
 ## Verify

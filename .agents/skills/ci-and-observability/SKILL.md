@@ -22,7 +22,7 @@ Use it to create or change pipelines and instrumentation. A test that fails in C
 
 1. **Read what exists.** List pipeline files (`.github/workflows/`, `.gitlab-ci.yml`, `Jenkinsfile`, `azure-pipelines.yml`) and the project's real commands from manifests. Reuse the repository's commands; do not invent new ones.
 2. **Order checks cheapest first:** format and lint, type check, unit tests, build, then integration and end-to-end. Fail fast.
-3. **Make it reproducible:** pin tool and action versions, use the lockfile install (`npm ci`, `pip install -r` with hashes, `go mod download`), and cache dependencies by lockfile hash.
+3. **Make it reproducible and bounded:** set a timeout on every job (`timeout-minutes` in GitHub Actions), pin tool and action versions, use the lockfile install (`npm ci`, `pip install -r` with hashes, `go mod download`), and cache dependencies by lockfile hash.
 4. **Keep secrets out:** use the platform's secret store, give jobs the least permissions (`permissions:` in GitHub Actions), and never echo secrets. Workflows triggered by forks get no secrets.
 5. **Never lower the bar to go green:** no `continue-on-error` on required checks, no skipped tests, no `|| true`. See [quality-constraints](../quality-constraints/SKILL.md).
 6. **Validate the file** before claiming it works: the platform's linter if installed (`actionlint`), a local runner if available, or a real run on a branch. Report which one ran.

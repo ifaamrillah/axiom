@@ -12,6 +12,7 @@ Usage:
   python3 scripts/run_evals.py --routing     # offline TF-IDF routing report; no host, no quota
   python3 scripts/run_evals.py --host claude-code --kind trigger [--skill NAME] [--model M] [--dry-run]
   python3 scripts/run_evals.py --host claude-code --kind behavior --skill NAME [--dry-run]
+  python3 scripts/run_evals.py --host claude-code --kind behavior --skill NAME --arms skill,none --repeat 3 --grade
 
 Running cases invokes the host and spends the maintainer's model quota. Use
 --dry-run to print the commands without running them.
@@ -49,6 +50,13 @@ class Behavior:
     fixture: str = ""
     expect: list[str] = field(default_factory=list)
     fail_if: list[str] = field(default_factory=list)
+    safety: bool = False  # any failing run fails the case
+    split: str = "tune"  # "held-out": confirmation only; never tune skills against it
+    seeded: list[str] = field(default_factory=list)  # planted defects the grader checks one by one
+    errors: list[str] = field(default_factory=list)  # malformed metadata, reported by check()
+
+
+SPLITS = ("tune", "held-out")
 
 
 @dataclass
@@ -103,6 +111,19 @@ def parse_case(path: Path) -> CaseFile:
                 behavior.expect.append(value)
             elif key == "fail if":
                 behavior.fail_if.append(value)
+            elif key == "safety":
+                if value.lower() not in ("yes", "no"):
+                    behavior.errors.append(f"Safety must be 'yes' or 'no', not '{value}'")
+                behavior.safety = value.lower() == "yes"
+            elif key == "split":
+                if value.lower() not in SPLITS:
+                    behavior.errors.append(f"Split must be one of {', '.join(SPLITS)}, not '{value}'")
+                behavior.split = value.lower()
+            elif key == "seeded":
+                if not value:
+                    behavior.errors.append("Seeded needs a defect description")
+                else:
+                    behavior.seeded.append(value)
         case.behaviors.append(behavior)
     return case
 
@@ -151,6 +172,10 @@ def check(cases: list[CaseFile]) -> list[str]:
                 errors.append(f"{rel}: behavior {behavior.case_id} needs Prompt and Expect")
             if behavior.fixture and not (ROOT / behavior.fixture).exists():
                 errors.append(f"{rel}: behavior {behavior.case_id} fixture missing: {behavior.fixture}")
+            for problem in behavior.errors:
+                errors.append(f"{rel}: behavior {behavior.case_id}: {problem}")
+            if behavior.seeded and not behavior.fixture:
+                errors.append(f"{rel}: behavior {behavior.case_id} has Seeded defects but no Fixture")
     return errors
 
 
@@ -273,18 +298,30 @@ def routing_report(cases: list[CaseFile], docs: dict[str, str] | None = None) ->
     return errors, misses, stats
 
 
-def prepare_workspace(fixture: str, kernel: bool = True) -> Path:
-    """Create an isolated project: optional fixture copy, skills in the host path, and,
-    by default, the kernel in the project instructions files as a documented install does."""
+# Comparison arms for behavior runs. "skill" is a documented install; "none" is the bare host;
+# "oneliner" is the bare host plus one generic instruction, so a skill must beat cheap advice.
+ARMS = ("skill", "none", "oneliner")
+ONELINER = "Reproduce before fixing; cite the command output that proves each claim; keep changes minimal."
+
+
+def prepare_workspace(fixture: str, kernel: bool = True, arm: str = "skill") -> Path:
+    """Create an isolated project with an optional fixture copy. Arm "skill" adds the skills in
+    the host paths and, by default, the kernel in the project instructions files as a documented
+    install does. Arm "none" adds neither. Arm "oneliner" adds no skills and writes ONELINER as
+    the only project instruction."""
+    if arm not in ARMS:
+        raise ValueError(f"unknown arm '{arm}'; expected one of {', '.join(ARMS)}")
     workdir = Path(tempfile.mkdtemp(prefix="axiom-eval-"))
     if fixture:
         shutil.copytree(ROOT / fixture, workdir, dirs_exist_ok=True)
-    shutil.copytree(SKILLS_DIR, workdir / ".claude" / "skills")
-    shutil.copytree(SKILLS_DIR, workdir / ".agents" / "skills")
-    if kernel:
-        block = kernel_block()
+    if arm == "skill":
+        shutil.copytree(SKILLS_DIR, workdir / ".claude" / "skills")
+        shutil.copytree(SKILLS_DIR, workdir / ".agents" / "skills")
+    instructions = (kernel_block() if kernel else None) if arm == "skill" else (
+        ONELINER + "\n" if arm == "oneliner" else None)
+    if instructions:
         for name in ("CLAUDE.md", "AGENTS.md"):
-            (workdir / name).write_text(block, encoding="utf-8")
+            (workdir / name).write_text(instructions, encoding="utf-8")
     subprocess.run(["git", "init", "-q"], cwd=workdir, check=False)
     return workdir
 
@@ -296,7 +333,14 @@ BEHAVIOR_ALLOWED = ["Skill", "Read", "Glob", "Grep", "Edit", "Write",
                     "Bash(python3 -m unittest:*)", "Bash(python3 -c:*)", "Bash(git status:*)",
                     "Bash(git diff:*)", "Bash(git log:*)", "Bash(ls:*)", "Bash(cat:*)", "Bash(head:*)",
                     "Bash(tail:*)", "Bash(grep:*)", "Bash(wc:*)", "Bash(python3 -m pytest:*)",
-                    "Bash(python -m pytest:*)", "Bash(python3 -m unittest)"]
+                    "Bash(python -m pytest:*)", "Bash(python3 -m unittest)",
+                    # Read-only or workspace-local helpers agents chain with the commands above.
+                    "Bash(find:*)", "Bash(sed:*)", "Bash(echo:*)", "Bash(printf:*)", "Bash(diff:*)",
+                    "Bash(sort:*)", "Bash(python3 -I -c:*)", "Bash(python3 -I -m unittest:*)",
+                    "Bash(python3 -:*)", "Bash(git stash:*)"]
+# Shell loops that expand a variable (for f in ...; do cat "$f"; done) cannot be allowlisted:
+# the host refuses them because the variable cannot be checked before it runs. Runs that hit
+# that refusal are INVALID; this affects the none arm more, since agents chain shell more there.
 
 
 def host_command(host: str, prompt: str, model: str | None, max_turns: int,
@@ -349,6 +393,53 @@ def run_completed(stream: str) -> bool:
                 return False
             return event.get("subtype", "success") in COMPLETED_SUBTYPES
     return False
+
+
+# Denial text the host writes into a tool result when a call is outside the allowed tools.
+DENIAL_TEXT = re.compile(r"requested permissions? to use|haven't granted it|permission (?:was |has been )?denied",
+                         re.IGNORECASE)
+
+
+def permission_denials(stream: str) -> list[str]:
+    """Tools the host refused during the run: Claude Code lists them on the final `result`
+    event (`permission_denials`) and writes denial text into the tool result."""
+    found: list[str] = []
+    for line in stream.splitlines():
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(event, dict):
+            continue
+        if event.get("type") == "result":
+            for denial in event.get("permission_denials") or []:
+                name = denial.get("tool_name", "tool") if isinstance(denial, dict) else str(denial)
+                found.append(str(name))
+            continue
+        message = event.get("message")
+        content = message.get("content") if isinstance(message, dict) else None
+        if event.get("type") != "user" or not isinstance(content, list):
+            continue
+        for block in content:
+            if not (isinstance(block, dict) and block.get("type") == "tool_result" and block.get("is_error")):
+                continue
+            body = block.get("content")
+            if isinstance(body, list):
+                body = " ".join(str(b.get("text", "")) for b in body if isinstance(b, dict))
+            if DENIAL_TEXT.search(str(body or "")):
+                found.append(" ".join(str(body).split())[:120])
+    return found
+
+
+def invalid_reason(stream: str) -> str:
+    """Why a run does not count, or "" when it is valid. An invalid run is neither a pass nor a
+    fail: the harness, not the agent, decided its outcome."""
+    if not run_completed(stream):
+        return "run did not complete (usage limit, budget cap, timeout, or crash)"
+    denials = permission_denials(stream)
+    if denials:
+        return f"permission denied ({len(denials)}): " + "; ".join(dict.fromkeys(denials))[:200]
+    return ""
 
 
 def run_usage(stream: str) -> tuple[int, int] | None:
@@ -461,17 +552,32 @@ Expectations (each must be true to pass):
 
 Failure signals (each must be false to pass):
 {fail_if}
-
+{seeded}
 Reply with JSON only, no prose and no code fence:
-{{"expect": [true|false, ...], "fail_if": [true|false, ...], "reason": "<one sentence>"}}
-The arrays must have exactly {n_expect} and {n_fail} entries, in order."""
+{{"expect": [true|false, ...], "fail_if": [true|false, ...],{seeded_shape} "reason": "<one sentence>"}}
+The arrays must have exactly {n_expect} and {n_fail}{n_seeded} entries, in order."""
+
+SEEDED_BLOCK = """
+Seeded defects (planted in the project on purpose). For each, judge whether the agent's answer
+identifies it (true) or not (false):
+{items}
+
+False findings: count the defects the agent reported that are not one of the seeded defects and
+that the evidence shows are not real problems. Do not count a seeded defect restated twice.
+"""
 
 
-def valid_verdict(data: object, n_expect: int, n_fail: int) -> bool:
-    """A verdict counts only if both fields are lists of real booleans of the expected length."""
+def valid_verdict(data: object, n_expect: int, n_fail: int, n_seeded: int = 0) -> bool:
+    """A verdict counts only if its fields are lists of real booleans of the expected length and,
+    for seeded cases, false_findings is a non-negative integer."""
     if not isinstance(data, dict):
         return False
-    for key, size in (("expect", n_expect), ("fail_if", n_fail)):
+    if n_seeded:
+        count = data.get("false_findings")
+        if not isinstance(count, int) or isinstance(count, bool) or count < 0:
+            return False
+    checks = (("expect", n_expect), ("fail_if", n_fail)) + ((("seeded", n_seeded),) if n_seeded else ())
+    for key, size in checks:
         values = data.get(key)
         if not isinstance(values, list) or len(values) != size:
             return False
@@ -483,8 +589,13 @@ def valid_verdict(data: object, n_expect: int, n_fail: int) -> bool:
 def grade(behavior: Behavior, trace: str, final: str, args: argparse.Namespace) -> dict | None:
     """Ask a separate headless session, with no tools and no repository context, to grade one run."""
     numbered = lambda items: "\n".join(f"{i}. {x}" for i, x in enumerate(items, 1)) or "(none)"
+    seeded = behavior.seeded
     prompt = GRADER_PROMPT.format(prompt=behavior.prompt, trace=trace, final=final[:6000],
                                   expect=numbered(behavior.expect), fail_if=numbered(behavior.fail_if),
+                                  seeded=SEEDED_BLOCK.format(items=numbered(seeded)) if seeded else "",
+                                  seeded_shape=' "seeded": [true|false, ...], "false_findings": <integer>,'
+                                  if seeded else "",
+                                  n_seeded=f" and {len(seeded)}" if seeded else "",
                                   n_expect=len(behavior.expect), n_fail=len(behavior.fail_if))
     if getattr(args, "grader_host", "claude-code") == "codex":
         cmd = [CODEX_BIN, "exec", "--json", "--skip-git-repo-check", "--sandbox", "read-only"]
@@ -505,15 +616,139 @@ def grade(behavior: Behavior, trace: str, final: str, args: argparse.Namespace) 
         data = json.loads(match.group(0)) if match else None
     except json.JSONDecodeError:
         data = None
-    if not valid_verdict(data, len(behavior.expect), len(behavior.fail_if)):
+    if not valid_verdict(data, len(behavior.expect), len(behavior.fail_if), len(behavior.seeded)):
         return None
     data["pass"] = all(data["expect"]) and not any(data["fail_if"])
     return data
 
 
-def run_behaviors(cases: list[CaseFile], args: argparse.Namespace) -> tuple[list[str], list[str]]:
+@dataclass
+class ArmOutcome:
+    """Valid-run tallies for one behavior case in one arm. Invalid runs are kept apart."""
+    case: str
+    arm: str
+    safety: bool = False
+    split: str = "tune"
+    runs: int = 0
+    invoked: int = 0
+    graded: int = 0
+    passes: int = 0
+    invalid: list[str] = field(default_factory=list)
+    usages: list[tuple[int, int]] = field(default_factory=list)
+    seeded_found: int = 0
+    seeded_total: int = 0
+    false_findings: int = 0
+
+    def verdict(self) -> str:
+        """PASS or FAIL for this arm, or "ungraded". Safety cases fail on any failing run;
+        other cases pass when more than half of the graded runs pass."""
+        if not self.graded:
+            return "ungraded"
+        if self.safety:
+            return "PASS" if self.passes == self.graded else "FAIL"
+        return "PASS" if self.passes * 2 > self.graded else "FAIL"
+
+
+def _rate(passes: int, graded: int) -> str:
+    return f"{passes}/{graded}" if graded else "ungraded"
+
+
+def _median(values: list[int]) -> int:
+    return sorted(values)[len(values) // 2]
+
+
+def compare_report(outcomes: list[ArmOutcome], arms: list[str]) -> str:
+    """Per-case table with one pass-rate column per arm, the delta against the first arm, and
+    UNCOVERED when every arm fails; then held-out vs tuning rates and the invalid runs."""
+    by_case: dict[str, dict[str, ArmOutcome]] = {}
+    for outcome in outcomes:
+        by_case.setdefault(outcome.case, {})[outcome.arm] = outcome
+    head = ["Case", "Tags"] + [f"{arm} pass" for arm in arms]
+    if len(arms) > 1:
+        head += [f"Δ {arm} vs {arms[0]}" for arm in arms[1:]]
+    head += ["Skill invoked", "Median tokens (in/out)", "Seeded recall / false", "Verdict"]
+    lines = ["| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
+    for case, cells in by_case.items():
+        first = next(iter(cells.values()))
+        tags = ", ".join(t for t in ("safety" if first.safety else "",
+                                     "held-out" if first.split == "held-out" else "") if t) or "—"
+        row = [case, tags] + [_rate(cells[a].passes, cells[a].graded) + (
+            f" ({len(cells[a].invalid)} invalid)" if cells[a].invalid else "") if a in cells else "—"
+            for a in arms]
+        base = cells.get(arms[0])
+        for arm in arms[1:]:
+            other = cells.get(arm)
+            if base and other and base.graded and other.graded:
+                delta = round(100 * other.passes / other.graded - 100 * base.passes / base.graded)
+                row.append(f"{delta:+d} pp")
+            else:
+                row.append("—")
+        row.append(", ".join(f"{a} {cells[a].invoked}/{cells[a].runs}" for a in arms if a in cells))
+        row.append(", ".join(f"{a} {_median([u[0] for u in cells[a].usages])}/"
+                             f"{_median([u[1] for u in cells[a].usages])}"
+                             for a in arms if a in cells and cells[a].usages) or "not reported")
+        row.append(", ".join(f"{a} {cells[a].seeded_found}/{cells[a].seeded_total} / {cells[a].false_findings}"
+                             for a in arms if a in cells and cells[a].seeded_total) or "—")
+        verdicts = {a: cells[a].verdict() for a in arms if a in cells}
+        graded = [v for v in verdicts.values() if v != "ungraded"]
+        note = ", ".join(f"{a} {v}" for a, v in verdicts.items())
+        if graded and len(graded) == len(verdicts) and all(v == "FAIL" for v in graded):
+            note = "UNCOVERED (" + note + ")"
+        row.append(note)
+        lines.append("| " + " | ".join(row) + " |")
+    lines.append("")
+    for split in ("tune", "held-out"):
+        rows = [o for o in outcomes if o.split == split]
+        if rows:
+            rates = ", ".join(f"{a} {_rate(sum(o.passes for o in rows if o.arm == a), sum(o.graded for o in rows if o.arm == a))}"
+                              for a in arms)
+            lines.append(f"- {'Held-out (confirmation only)' if split == 'held-out' else 'Tuning'} cases, "
+                         f"graded runs passing: {rates}")
+    invalid = [f"- {o.case} [{o.arm}] {reason}" for o in outcomes for reason in o.invalid]
+    lines += ["", "Invalid runs (excluded from every rate above):", ""] + (invalid or ["- none"])
+    return "\n".join(lines) + "\n"
+
+
+def selected_arms(args: argparse.Namespace) -> list[str]:
+    raw = getattr(args, "arms", None) or getattr(args, "arm", None) or "skill"
+    arms = [a.strip() for a in raw.split(",") if a.strip()]
+    unknown = [a for a in arms if a not in ARMS]
+    if unknown or not arms or len(set(arms)) != len(arms):
+        raise SystemExit(f"--arms takes distinct values from {', '.join(ARMS)}; got '{raw}'")
+    return arms
+
+
+def save_raw(args: argparse.Namespace, name: str, text: str) -> Path:
+    """Write a run's raw host output under results/raw/<run>/; never overwrite a file."""
+    folder = getattr(args, "raw_dir", None)
+    if folder is None:
+        stamp = dt.datetime.now().strftime("%Y-%m-%d-%H%M")
+        base = RESULTS_DIR / "raw" / f"{stamp}-{args.host}-{args.kind}"
+        folder, n = base, 2
+        while True:
+            try:
+                folder.mkdir(parents=True)
+                break
+            except FileExistsError:
+                folder = base.with_name(f"{base.name}-{n}")
+                n += 1
+        args.raw_dir = folder
+    path, n = folder / f"{name}.jsonl", 2
+    while True:
+        try:
+            with path.open("x", encoding="utf-8") as handle:
+                handle.write(text)
+            return path
+        except FileExistsError:
+            path = folder / f"{name}-{n}.jsonl"
+            n += 1
+
+
+def run_behaviors(cases: list[CaseFile], args: argparse.Namespace) -> tuple[list[str], list[ArmOutcome]]:
     sections: list[str] = []
-    summary: list[str] = []
+    outcomes: list[ArmOutcome] = []
+    arms = selected_arms(args)
+    mark = lambda ok: "x" if ok else " "
     for case in cases:
         for behavior in case.behaviors:
             if getattr(args, "case", None) and behavior.case_id not in args.case.split(","):
@@ -521,58 +756,80 @@ def run_behaviors(cases: list[CaseFile], args: argparse.Namespace) -> tuple[list
             cmd = host_command(args.host, behavior.prompt, args.model, args.max_turns, "behavior",
                                args.budget, not args.no_isolate)
             if args.dry_run:
-                print(f"[{case.skill}/{behavior.case_id}] fixture={behavior.fixture or 'none'} x{args.repeat} "
-                      f"claude -p {json.dumps(behavior.prompt)[:80]}…")
+                print(f"[{case.skill}/{behavior.case_id}] fixture={behavior.fixture or 'none'} "
+                      f"arms={','.join(arms)} x{args.repeat} claude -p {json.dumps(behavior.prompt)[:80]}…")
                 continue
-            passes, graded, invoked = 0, 0, 0
-            usages: list[tuple[int, int]] = []
-            for run in range(1, args.repeat + 1):
-                workdir = prepare_workspace(behavior.fixture, not args.no_kernel)
-                code, out = run_host(cmd, workdir, args.timeout)
-                shutil.rmtree(workdir, ignore_errors=True)
-                final = _final_text(out)
-                skills = invoked_skills(out)
-                invoked += bool({case.skill, *case.accept} & set(skills))
-                trace = "\n".join(f"{i}. {c}" for i, c in enumerate(tool_trace(out), 1)) or "(no tool calls)"
-                completed = run_completed(out)
-                usage = run_usage(out)
-                if usage:
-                    usages.append(usage)
-                result = grade(behavior, trace, final, args) if args.grade and completed else None
-                if result is not None:
-                    graded += 1
-                    passes += result["pass"]
-                mark = lambda ok: "x" if ok else " "
-                if result is not None:
-                    checks = "\n".join(f"- [{mark(ok)}] {e}" for e, ok in zip(behavior.expect, result["expect"]))
-                    fails = "\n".join(f"- [{mark(not hit)}] (must be false) {f}{' — OCCURRED' if hit else ''}"
-                                      for f, hit in zip(behavior.fail_if, result["fail_if"])) or "- none listed"
-                    verdict = f"**{'PASS' if result['pass'] else 'FAIL'}** (independent grader: {result.get('reason', '')})"
-                else:
-                    checks = "\n".join(f"- [ ] {e}" for e in behavior.expect)
-                    fails = "\n".join(f"- [ ] (must be false) {f}" for f in behavior.fail_if) or "- none listed"
-                    verdict = ("host error: run did not complete (usage limit, budget cap, or crash)"
-                               if not completed else
-                               "ungraded" if not args.grade else "grader returned no valid verdict")
-                run_label = f" (run {run}/{args.repeat})" if args.repeat > 1 else ""
-                sections.append(
-                    f"### {case.skill}/{behavior.case_id}{run_label}: {behavior.title}\n\n"
-                    f"- Exit code: {code}\n- Skills invoked: {', '.join(skills) or 'none'}\n"
-                    f"- Tokens (in/out): {f'{usage[0]}/{usage[1]}' if usage else 'not reported'}\n- Verdict: {verdict}\n\n"
-                    f"Tool calls in order:\n\n```text\n{trace}\n```\n\n"
-                    f"Expectations:\n\n{checks}\n\nFailure signals:\n\n{fails}\n\n"
-                    f"Final answer:\n\n```text\n{final[:4000]}\n```\n")
-                print(f"ran {case.skill}/{behavior.case_id}{run_label}: exit {code}, {verdict[:60]}")
-            median = (lambda xs: sorted(xs)[len(xs) // 2])
-            tokens = (f"{median([u[0] for u in usages])}/{median([u[1] for u in usages])}"
-                      if usages else "not reported")
-            summary.append(f"| {case.skill}/{behavior.case_id} | {args.repeat} | {invoked}/{args.repeat} | "
-                           f"{f'{passes}/{graded}' if graded else 'ungraded'} | {tokens} |")
-    return sections, summary
+            for arm in arms:
+                outcome = ArmOutcome(case=f"{case.skill}/{behavior.case_id}", arm=arm,
+                                     safety=behavior.safety, split=behavior.split)
+                for run in range(1, args.repeat + 1):
+                    workdir = prepare_workspace(behavior.fixture, not args.no_kernel, arm)
+                    code, out = run_host(cmd, workdir, args.timeout)
+                    shutil.rmtree(workdir, ignore_errors=True)
+                    run_label = f" (run {run}/{args.repeat})" if args.repeat > 1 else ""
+                    raw_name = f"{case.skill}-{behavior.case_id}-{arm}-run{run}"
+                    raw = save_raw(args, raw_name, out) if getattr(args, "keep_raw", False) else None
+                    reason = invalid_reason(out)
+                    skills = invoked_skills(out)
+                    trace = "\n".join(f"{i}. {c}" for i, c in enumerate(tool_trace(out), 1)) or "(no tool calls)"
+                    final = _final_text(out)
+                    if reason:
+                        raw = raw or save_raw(args, raw_name, out)
+                        outcome.invalid.append(f"run {run}: exit {code}; {reason}; raw: "
+                                               f"{raw.relative_to(ROOT).as_posix()}")
+                        verdict, result = f"INVALID (excluded from rates): {reason}", None
+                    else:
+                        outcome.runs += 1
+                        outcome.invoked += bool({case.skill, *case.accept} & set(skills))
+                        usage = run_usage(out)
+                        if usage:
+                            outcome.usages.append(usage)
+                        result = grade(behavior, trace, final, args) if args.grade else None
+                        if result is not None:
+                            outcome.graded += 1
+                            outcome.passes += result["pass"]
+                            if behavior.seeded:
+                                outcome.seeded_found += sum(result["seeded"])
+                                outcome.seeded_total += len(behavior.seeded)
+                                outcome.false_findings += result["false_findings"]
+                            verdict = (f"**{'PASS' if result['pass'] else 'FAIL'}** "
+                                       f"(independent grader: {result.get('reason', '')})")
+                        else:
+                            verdict = "ungraded" if not args.grade else "grader returned no valid verdict"
+                    if result is not None:
+                        checks = "\n".join(f"- [{mark(ok)}] {e}" for e, ok in zip(behavior.expect, result["expect"]))
+                        fails = "\n".join(f"- [{mark(not hit)}] (must be false) {f}{' — OCCURRED' if hit else ''}"
+                                          for f, hit in zip(behavior.fail_if, result["fail_if"])) or "- none listed"
+                        seeded = "".join(f"- [{mark(ok)}] (seeded) {d}\n" for d, ok in zip(behavior.seeded, result.get("seeded", [])))
+                        if behavior.seeded:
+                            seeded += f"- False findings: {result['false_findings']}\n"
+                    else:
+                        checks = "\n".join(f"- [ ] {e}" for e in behavior.expect)
+                        fails = "\n".join(f"- [ ] (must be false) {f}" for f in behavior.fail_if) or "- none listed"
+                        seeded = "".join(f"- [ ] (seeded) {d}\n" for d in behavior.seeded)
+                    usage = run_usage(out)
+                    sections.append(
+                        f"### {case.skill}/{behavior.case_id} [{arm}]{run_label}: {behavior.title}\n\n"
+                        f"- Arm: {arm}\n- Exit code: {code}\n- Skills invoked: {', '.join(skills) or 'none'}\n"
+                        f"- Tokens (in/out): {f'{usage[0]}/{usage[1]}' if usage else 'not reported'}\n"
+                        + (f"- Raw stream: {raw.relative_to(ROOT).as_posix()}\n" if raw else "")
+                        + f"- Verdict: {verdict}\n\n"
+                        f"Tool calls in order:\n\n```text\n{trace}\n```\n\n"
+                        f"Expectations:\n\n{checks}\n\nFailure signals:\n\n{fails}\n\n"
+                        + (f"Seeded defects:\n\n{seeded}\n" if behavior.seeded else "")
+                        + f"Final answer:\n\n```text\n{final[:4000]}\n```\n")
+                    print(f"ran {case.skill}/{behavior.case_id} [{arm}]{run_label}: exit {code}, {verdict[:60]}")
+                outcomes.append(outcome)
+    return sections, outcomes
 
 
-def tool_trace(stream: str, limit: int = 60, result_chars: int = 240) -> list[str]:
-    """Ordered tool calls (name + short input + start of result) so graders can check sequencing."""
+TRACE_INPUT_CHARS = 400  # chained shell commands must stay visible to the grader
+
+
+def tool_trace(stream: str, limit: int = 60, result_chars: int = 700) -> list[str]:
+    """Ordered tool calls (name + input + start of result) so graders can check sequencing.
+    Inputs and results are long enough that a chained command and the output it quotes are
+    both visible; shorter limits made graders call quoted output unsupported."""
     calls: list[str] = []
     index: dict[str, int] = {}
     for line in stream.splitlines():
@@ -584,7 +841,7 @@ def tool_trace(stream: str, limit: int = 60, result_chars: int = 240) -> list[st
         if isinstance(item, dict) and event.get("type") == "item.completed":
             if item.get("type") == "command_execution":
                 out = " ".join(str(item.get("aggregated_output", "")).split())[:result_chars]
-                calls.append(f"Shell: {str(item.get('command', ''))[:160]}" + (f"\n   → {out}" if out else ""))
+                calls.append(f"Shell: {str(item.get('command', ''))[:TRACE_INPUT_CHARS]}" + (f"\n   → {out}" if out else ""))
             elif item.get("type") == "file_change":
                 paths = ", ".join(str(c.get("path", "")) for c in item.get("changes", []) if isinstance(c, dict))
                 calls.append(f"FileChange: {paths[:160]}")
@@ -600,10 +857,10 @@ def tool_trace(stream: str, limit: int = 60, result_chars: int = 240) -> list[st
                 data = block.get("input") or {}
                 detail = data.get("command") or data.get("file_path") or data.get("skill") or data.get("pattern") or ""
                 index[str(block.get("id"))] = len(calls)
-                calls.append(f"{block.get('name')}: {str(detail)[:120]}")
+                calls.append(f"{block.get('name')}: {str(detail)[:TRACE_INPUT_CHARS]}")
                 written = data.get("content") or data.get("new_string")
                 if written and result_chars:  # graders need to see what was written, not only where
-                    calls[-1] += "\n   + " + " ".join(str(written).split())[:result_chars * 3]
+                    calls[-1] += "\n   + " + " ".join(str(written).split())[:result_chars * 2]
             elif event.get("type") == "user" and block.get("type") == "tool_result" and result_chars:
                 pos = index.get(str(block.get("tool_use_id")))
                 body = block.get("content")
@@ -647,9 +904,14 @@ def write_results(kind: str, args: argparse.Namespace, body: str) -> Path:
               f"- Repeats per behavior case: {getattr(args, 'repeat', 1)}; grader: "
               f"{('separate ' + getattr(args, 'grader_host', 'claude-code') + ' session, model ' + (args.grader_model or 'host default')) if getattr(args, 'grade', False) else 'none'}\n"
               f"- Isolation: {'user-level config loaded (Codex has no isolation flag); sandbox bounds the run' if args.host == 'codex' else ('user settings excluded' if not args.no_isolate else 'user settings loaded')}\n"
-              f"- Kernel in project instructions: {'no' if args.no_kernel else 'yes'}\n"
+              f"- Arms: {getattr(args, 'arms', None) or getattr(args, 'arm', None) or 'skill'} "
+              f"(skill: Axiom skills installed; none: no skills, no kernel; oneliner: no skills, one generic line)\n"
+              f"- Kernel in project instructions (skill arm): {'no' if args.no_kernel else 'yes'}\n"
               f"- Per-run budget cap (USD): {args.budget or 'none'}\n"
               f"- Runner: scripts/run_evals.py\n\n")
+    raw_dir = getattr(args, "raw_dir", None)
+    if raw_dir:
+        header += f"- Raw host output: {raw_dir.relative_to(ROOT).as_posix()}/\n\n"
     while True:  # several runs can finish within one minute; never overwrite a record
         try:
             with path.open("x", encoding="utf-8") as handle:
@@ -658,6 +920,17 @@ def write_results(kind: str, args: argparse.Namespace, body: str) -> Path:
         except FileExistsError:
             path = RESULTS_DIR / f"{stamp}-{args.host}-{kind}-{n}.md"
             n += 1
+
+
+KIND_DEFAULTS = {"trigger": {"max_turns": 4, "budget": 0.5},
+                 "behavior": {"max_turns": 25, "budget": 1.5}}
+
+
+def apply_kind_defaults(args: argparse.Namespace) -> None:
+    """Behavior runs need room to act; 4 turns cut them off and read as skill failures."""
+    for key, value in KIND_DEFAULTS[args.kind].items():
+        if getattr(args, key) is None:
+            setattr(args, key, value)
 
 
 def main() -> int:
@@ -670,10 +943,12 @@ def main() -> int:
     parser.add_argument("--kind", choices=("trigger", "behavior"), default="trigger")
     parser.add_argument("--skill", help="skill name, or several separated by commas")
     parser.add_argument("--model")
-    parser.add_argument("--max-turns", type=int, default=4)
+    parser.add_argument("--max-turns", type=int, default=None,
+                        help="default: 4 for trigger runs, 25 for behavior runs")
     parser.add_argument("--timeout", type=int, default=300)
-    parser.add_argument("--budget", type=float, default=0.5,
-                        help="per-run spend cap in USD passed to the host (0 disables)")
+    parser.add_argument("--budget", type=float, default=None,
+                        help="per-run spend cap in USD passed to the host (0 disables); "
+                             "default: 0.5 for trigger runs, 1.5 for behavior runs")
     parser.add_argument("--no-isolate", action="store_true",
                         help="also load the maintainer's user-level host settings")
     parser.add_argument("--no-kernel", action="store_true",
@@ -685,10 +960,21 @@ def main() -> int:
     parser.add_argument("--grader-model", help="model for the grader session (default: host default)")
     parser.add_argument("--grader-host", choices=SUPPORTED_HOSTS, default="claude-code",
                         help="host that runs the grader (codex gives a non-Claude grader)")
+    parser.add_argument("--arm", choices=ARMS, default="skill",
+                        help="behavior workspace: skill (installed), none (no skills, no kernel), "
+                             "oneliner (no skills, one generic instruction line)")
+    parser.add_argument("--arms", help="run each behavior case once per arm, comma-separated "
+                                       "(for example skill,none); the report compares them per case")
+    parser.add_argument("--keep-raw", action="store_true",
+                        help="save every run's raw host output under evaluations/results/raw/ "
+                             "(invalid runs are always saved)")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
+    apply_kind_defaults(args)
     if args.repeat < 1:
         parser.error("--repeat must be at least 1")
+    if args.kind == "trigger" and selected_arms(args) != ["skill"]:
+        parser.error("--arm/--arms apply to behavior runs; trigger runs need the skills installed")
 
     cases = load_cases()
     errors = check(cases)
@@ -737,13 +1023,12 @@ def main() -> int:
         body = ("| Skill | Expect | Prompt | Owner | Invoked | Verdict |\n|---|---|---|---|---|---|\n"
                 + "\n".join(rows) + f"\n\nSummary: {passed}/{len(rows)} pass.\n")
     else:
-        sections, summary = run_behaviors(cases, args)
+        sections, outcomes = run_behaviors(cases, args)
         if args.dry_run:
             return 0
         note = ("Graded by a separate headless session with no tools and no repository context.\n\n"
                 if args.grade else "Ungraded: unchecked boxes are not passes.\n\n")
-        body = (note + "| Case | Runs | Skill invoked | Graded pass | Median tokens (in/out) |\n|---|---|---|---|---|\n" + "\n".join(summary)
-                + "\n\n" + "\n".join(sections))
+        body = note + compare_report(outcomes, selected_arms(args)) + "\n" + "\n".join(sections)
     print(f"Results written to {write_results(args.kind, args, body).relative_to(ROOT)}")
     return 0
 

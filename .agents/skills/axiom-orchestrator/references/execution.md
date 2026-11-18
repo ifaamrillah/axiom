@@ -20,9 +20,9 @@ For an approved plan (see [task-planning](../../task-planning/SKILL.md)):
 1. Check that the plan meets the Ready for Development standard. If it does not, return to planning.
 2. For each task in dependency order:
    - **Inline mode:** implement the task yourself with the [implementation](../../implementation/SKILL.md) skill.
-   - **Delegated mode:** when the host supports subagents and tasks are independent, dispatch a fresh implementer with a constructed brief ([implementer prompt](../assets/prompts/implementer.md)). Subagents receive only what the task needs, not the session history.
+   - **Delegated mode:** when the host supports subagents and tasks are independent, dispatch a fresh implementer with a constructed brief ([implementer prompt](../assets/prompts/implementer.md)) written to `tasks/<n>-brief.md` and passed by path ([brief files](delegation.md#brief-files)). Subagents receive only what the task needs, not the session history.
    - Review the task in two stages: **spec compliance**, then **code quality** ([task reviewer prompt](../assets/prompts/task-reviewer.md)).
-   - If the review fails, run the [fix loop](../assets/prompts/fix-loop.md). If it passes, verify the evidence yourself, then update the task status and the ledger in the workflow state.
+   - If the review fails, run the [fix loop](../assets/prompts/fix-loop.md). If it passes, verify the evidence yourself, then update the task status and the ledger in the workflow state. This is a [checkpoint](context-budget.md#checkpoints).
 3. After the last task, run a whole-change review and the full gate checks against the baseline.
 
 Continue between tasks without asking "should I continue?" unless a stop condition applies.
@@ -34,6 +34,8 @@ When a running plan meets a minor conflict, ambiguity, or plan defect, decide it
 ```
 Ruling: <what was decided> — <why> — <cost if wrong>
 ```
+
+Append the ruling when you make it, before continuing; do not batch rulings into a recap. Never rewrite an earlier entry: supersede it with a new one that names the old ID.
 
 The specification is binding. The plan is its argument. Judgment settles what neither answers.
 

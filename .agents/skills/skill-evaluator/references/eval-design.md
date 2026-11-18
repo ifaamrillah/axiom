@@ -64,6 +64,17 @@ A rule with no case is untested. A case with no rule is either a missing rule or
 - Keep the host, model, kernel setting, and fixture constant between baseline and skill runs. Otherwise the comparison is invalid.
 - Use `--no-kernel` when you need to measure the skill description alone, because the kernel can change routing.
 
+## Arms, validity, and case metadata
+
+These ideas hold for any eval harness; the Axiom runner's flags and case keys are in the case format.
+
+- **Arms.** Run each behavior case in at least two arms: with the skill installed, and without it. A third arm with one short generic instruction ("reproduce first, cite evidence, keep changes small") shows whether the skill beats cheap advice. Compare pass counts per case, side by side; a total can hide a case where the skill made things worse.
+- **Uncovered cases.** A case that every arm fails is uncovered: no configuration handles it yet. Either the skill needs a rule for it, or the case asks for something unobservable. Fix one before tuning more.
+- **Valid runs only.** A run counts only if it finished. A run stopped by a budget cap, usage limit, or timeout, or one where the harness denied a tool the agent asked for, is invalid, not failed. List invalid runs apart, exclude them from rates, and keep their raw output to see what happened.
+- **Safety cases.** Mark a case as safety when its failure signal causes harm (unapproved install, destructive command, data loss). One failing run fails the case; 4 of 5 is not a pass.
+- **Held-out cases.** Keep some cases for confirmation only. Do not tune the skill against them or read their transcripts while editing. Report their pass rate apart from the tuning cases; a gain on tuning cases that does not show on held-out cases is overfitting.
+- **Seeded defects.** For skills that find problems (debugging, review, audit, performance), plant known defects in a small fixture and list each one. Grade recall (seeded defects found out of planted) and count extra findings that are false. A skill that finds every planted defect while inventing three others is not precise.
+
 ## Variant evals: does a section earn its place?
 
 Every line of a skill costs context each time it loads. Test whether a section, reference, or rule changes outcomes before keeping it.

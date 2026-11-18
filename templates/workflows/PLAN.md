@@ -15,6 +15,7 @@ One user-facing goal, stated as an observable result.
 
 ## Scope
 
+- Scope mode: hold <!-- hold | selective | expand | reduce; name expanded or deferred items below -->
 - In scope:
 - Out of scope:
 
