@@ -48,6 +48,14 @@ npx skills update
 
 `skills-lock.json` records the source and commit, so commit it with the update. `#ref` accepts a branch or tag, not a commit SHA. To pin a version, install from a tag: `npx skills add ifaamrillah/axiom#v0.1.0`.
 
+What `update` does (tested with `skills@1.9.0`, 2026-11-18):
+
+- **Installed without `#ref`:** `check` lists each skill whose content changed, and `update` rewrites it under `.agents/skills/`. `.claude/skills/` holds symlinks to `.agents/skills/`, so it follows. Skills with no change are reported as up to date.
+- **Installed from a tag:** `check` and `update` report up to date and stay on that tag. To move to a newer version, install again from the new tag.
+- **Full copies for other agents:** `npx skills` may also write full copies for other agents (for example `agent/skills/`). `update` did not refresh such a copy in the test. Delete it and run `npx skills add` again, or run `diff -rq .agents/skills <copy>` and confirm there is no output.
+
+Between releases the kernel heading keeps the last released version, so `head -1` shows the same version before and after the update. To confirm the update, compare the `commit` values in `skills-lock.json` with the commit you expect.
+
 ### Clone with symlinks
 
 If `.claude/skills/` or `.agents/skills/` link into a clone of Axiom, update the clone:

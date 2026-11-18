@@ -42,6 +42,8 @@ Improvement pass from a comparison with sixteen skill and harness projects (2026
 
 ### Evidence
 
+- `npx skills@1.9.0 update`, 2026-11-18: an unpinned install moved to `main` at 6e5c6fc. `.agents/skills/` and `.claude/skills/` then matched `main` (`diff -rq`). A tag install stayed on its tag. The full copy in `agent/skills/` was not refreshed. The old state was simulated by restoring v0.1.0 files and lock entries. Documented in [Upgrading](docs/UPGRADING.md).
+
 - Improvement pass, Claude Code 2.1.326, one run each, separate grader:
   - Trigger: 149/150 across 27 skills; the miss sent the design-tokens prompt to `axiom-orchestrator` ([record](evaluations/results/2026-11-17-2153-claude-code-trigger.md)).
   - Skill vs none arm: `verification-before-completion` B2 PASS vs FAIL; `security-audit` B5 (held-out) PASS vs FAIL; `security-audit` B4 PASS vs PASS; `debugging` B2 PASS with seeded recall 1/1 and 0 false findings. Five none-arm runs and both `code-review` B3 runs were INVALID (a compound shell command outside the runner's allowlist was denied) and are excluded ([records](evaluations/results/2026-11-17-2154-claude-code-behavior.md) to [2202](evaluations/results/2026-11-17-2202-claude-code-behavior.md)).
